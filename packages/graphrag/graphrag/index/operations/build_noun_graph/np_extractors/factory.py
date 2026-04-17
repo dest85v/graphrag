@@ -69,6 +69,7 @@ class NounPhraseExtractorFactory:
                 )
             case NounPhraseExtractorType.RegexEnglish:
                 return RegexENNounPhraseExtractor(
+                    model_name=config.model_name,
                     exclude_nouns=exclude_nouns,
                     max_word_length=config.max_word_length,
                     word_delimiter=config.word_delimiter,

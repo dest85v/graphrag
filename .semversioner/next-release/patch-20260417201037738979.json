@@ -1,0 +1,4 @@
+{
+  "type": "patch",
+  "description": "Replace textblob with spaCy in RegexENNounPhraseExtractor."
+}

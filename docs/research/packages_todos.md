@@ -1,6 +1,8 @@
 # Packages — TODOs
 
-## P0 — Переход RegexENNounPhraseExtractor с textblob на spaCy
+## P0 — Переход RegexENNounPhraseExtractor с textblob на spaCy ✅ **ВЫПОЛНЕНО**
+
+> Реализовано в фиче `004-textblob-to-spacy`. `textblob` удалён, экстрактор переписан на spaCy с `doc.noun_chunks`, определители (DET) отфильтрованы, Jaccard similarity с CFG-экстрактором = 66.67%.
 
 **Файл:** `packages/graphrag/graphrag/index/operations/build_noun_graph/np_extractors/regex_extractor.py`
 

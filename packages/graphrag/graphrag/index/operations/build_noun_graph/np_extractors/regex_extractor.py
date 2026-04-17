@@ -3,77 +3,86 @@
 
 """Functions to analyze text data using SpaCy."""
 
-import re
 from typing import Any
-
-import nltk
-from textblob import TextBlob
 
 from graphrag.index.operations.build_noun_graph.np_extractors.base import (
     BaseNounPhraseExtractor,
 )
-from graphrag.index.operations.build_noun_graph.np_extractors.resource_loader import (
-    download_if_not_exists,
+from graphrag.index.operations.build_noun_graph.np_extractors.np_validator import (
+    has_valid_token_length,
+    is_compound,
 )
 
 
 class RegexENNounPhraseExtractor(BaseNounPhraseExtractor):
-    """Regular expression-based noun phrase extractor for English."""
+    """spaCy-based noun phrase extractor for English.
+
+    Uses spaCy's noun_chunks and POS tagging to detect noun phrases.
+    Much faster than the syntactic parser-based extractor with no external
+    corpora dependencies.
+    """
 
     def __init__(
         self,
-        exclude_nouns: list[str],
+        model_name: str,
         max_word_length: int,
+        exclude_nouns: list[str],
         word_delimiter: str,
     ):
         """
-        Noun phrase extractor for English based on TextBlob's fast NP extractor, which uses a regex POS tagger and context-free grammars to detect noun phrases.
+        Noun phrase extractor for English based on spaCy's noun_chunks and POS tagging.
 
-        NOTE: This is the extractor used in the first bencharmking of LazyGraphRAG but it only works for English.
-        It is much faster but likely less accurate than the syntactic parser-based extractor.
-        TODO: Reimplement this using SpaCy to remove TextBlob dependency.
+        Uses spaCy's built-in pipeline to detect noun phrases and proper nouns,
+        then applies filtering heuristics to select valid noun phrase entities.
 
         Args:
+            model_name: SpaCy model name (e.g., "en_core_web_sm").
             max_word_length: Maximum length (in character) of each extracted word.
+            exclude_nouns: List of stop words to exclude from noun phrases.
             word_delimiter: Delimiter for joining words.
         """
         super().__init__(
-            model_name=None,
+            model_name=model_name,
             max_word_length=max_word_length,
             exclude_nouns=exclude_nouns,
             word_delimiter=word_delimiter,
         )
-        # download corpora
-        download_if_not_exists("brown")
-        download_if_not_exists("treebank")
-        download_if_not_exists("averaged_perceptron_tagger_eng")
-
-        # download tokenizers
-        download_if_not_exists("punkt")
-        download_if_not_exists("punkt_tab")
-
-        # Preload the corpora to avoid lazy loading issues due to
-        # race conditions when running multi-threaded jobs.
-        nltk.corpus.brown.ensure_loaded()
-        nltk.corpus.treebank.ensure_loaded()
+        # Load spaCy model with tagger and parser (needed for noun_chunks)
+        # Exclude lemmatizer and NER to reduce overhead (not needed for this extractor)
+        self.nlp = self.load_spacy_model(model_name, exclude=["lemmatizer", "ner"])
 
     def extract(
         self,
         text: str,
     ) -> list[str]:
         """
-        Extract noun phrases from text using regex patterns.
+        Extract noun phrases from text using spaCy noun_chunks and POS tags.
 
         Args:
             text: Text.
 
         Returns: List of noun phrases.
         """
-        blob = TextBlob(text)
-        proper_nouns = [token[0].upper() for token in blob.tags if token[1] == "NNP"]  # type: ignore
+        doc = self.nlp(text)
+
+        # Identify proper nouns via POS tag
+        proper_nouns = {token.text.upper() for token in doc if token.pos_ == "PROPN"}
+
+        # Extract noun chunks, filtering out leading determiners for parity with textblob
+        noun_phrase_texts = []
+        for chunk in doc.noun_chunks:
+            tokens = list(chunk)
+            # Strip leading determiners (DET) to match textblob behavior
+            start = 0
+            while start < len(tokens) and tokens[start].pos_ == "DET":
+                start += 1
+            if start < len(tokens):
+                noun_phrase_texts.append(
+                    self.word_delimiter.join(t.text for t in tokens[start:])
+                )
+
         tagged_noun_phrases = [
-            self._tag_noun_phrases(chunk, proper_nouns)
-            for chunk in blob.noun_phrases  # type: ignore
+            self._tag_noun_phrases(chunk, proper_nouns) for chunk in noun_phrase_texts
         ]
 
         filtered_noun_phrases = set()
@@ -87,27 +96,24 @@ class RegexENNounPhraseExtractor(BaseNounPhraseExtractor):
         return list(filtered_noun_phrases)
 
     def _tag_noun_phrases(
-        self, noun_phrase: str, all_proper_nouns: list[str] | None = None
+        self, noun_phrase: str, all_proper_nouns: set[str] | None = None
     ) -> dict[str, Any]:
         """Extract attributes of a noun chunk, to be used for filtering."""
         if all_proper_nouns is None:
-            all_proper_nouns = []
-        tokens = [token for token in re.split(r"[\s]+", noun_phrase) if len(token) > 0]
+            all_proper_nouns = set()
+        tokens = [
+            token for token in noun_phrase.split(self.word_delimiter) if len(token) > 0
+        ]
         cleaned_tokens = [
             token for token in tokens if token.upper() not in self.exclude_nouns
         ]
         has_proper_nouns = any(
             token.upper() in all_proper_nouns for token in cleaned_tokens
         )
-        has_compound_words = any(
-            "-" in token
-            and len(token.strip()) > 1
-            and len(token.strip().split("-")) > 1
-            for token in cleaned_tokens
-        )
-        has_valid_tokens = all(
-            re.match(r"^[a-zA-Z0-9\-]+\n?$", token) for token in cleaned_tokens
-        ) and all(len(token) <= self.max_word_length for token in cleaned_tokens)
+        has_compound_words = is_compound(cleaned_tokens)
+        has_valid_tokens = has_valid_token_length(
+            cleaned_tokens, self.max_word_length
+        ) and all(self._is_valid_token(token) for token in cleaned_tokens)
         return {
             "cleaned_tokens": cleaned_tokens,
             "cleaned_text": self.word_delimiter
@@ -119,6 +125,12 @@ class RegexENNounPhraseExtractor(BaseNounPhraseExtractor):
             "has_valid_tokens": has_valid_tokens,
         }
 
+    def _is_valid_token(self, token: str) -> bool:
+        """Check if a token contains only valid characters (alphanumeric, hyphens)."""
+        import re
+
+        return bool(re.match(r"^[a-zA-Z0-9\-]+\n?$", token))
+
     def __str__(self) -> str:
         """Return string representation of the extractor, used for cache key generation."""
-        return f"regex_en_{self.exclude_nouns}_{self.max_word_length}_{self.word_delimiter}"
+        return f"regex_en_{self.model_name}_{self.exclude_nouns}_{self.max_word_length}_{self.word_delimiter}"
