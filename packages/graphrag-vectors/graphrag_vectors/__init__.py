@@ -38,6 +38,7 @@ __all__ = [
     "NotExpr",
     "Operator",
     "OrExpr",
+    "QdrantVectorStore",
     "TextEmbedder",
     "VectorStore",
     "VectorStoreConfig",
@@ -50,3 +51,14 @@ __all__ = [
     "register_vector_store",
     "vector_store_factory",
 ]
+
+# QdrantVectorStore import — fail gracefully if qdrant-client not installed
+try:
+    from graphrag_vectors.qdrant import QdrantVectorStore
+except ImportError:
+    from types import ModuleType
+
+    QdrantVectorStore: type[ModuleType] = ModuleType(  # type: ignore[assignment]
+        "QdrantVectorStore",
+        "Qdrant client not installed. Install with: pip install graphrag-vectors[qdrant]",
+    )

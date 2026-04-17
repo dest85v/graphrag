@@ -52,6 +52,8 @@
 ## Active Technologies
 - Python 3.11–3.13 (per project `requires-python = ">=3.11,<3.14"`) + `openai~=1.60` (replaces `litellm==1.82.6`), `tiktoken~=0.8` (already transitive, make direct), `azure-identity~=1.25` (unchanged) (001-litellm-to-openai)
 - N/A — pure library package (001-litellm-to-openai)
+- Python 3.11–3.13 (per project `requires-python = ">=3.11,<3.14"`) + `qdrant-client>=1.7.0,<1.18.0` (optional `qdrant` extra in `graphrag-vectors`) (003-003-qdrant-vector)
+- Qdrant (external, remote or local via Docker) (003-003-qdrant-vector)
 
 ## Recent Changes
 - 001-litellm-to-openai: Added Python 3.11–3.13 (per project `requires-python = ">=3.11,<3.14"`) + `openai~=1.60` (replaces `litellm==1.82.6`), `tiktoken~=0.8` (already transitive, make direct), `azure-identity~=1.25` (unchanged)

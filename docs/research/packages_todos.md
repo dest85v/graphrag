@@ -24,7 +24,9 @@
 
 ---
 
-## P1 — Добавить поддержку Qdrant как 4-й векторной БД
+## P1 — Добавить поддержку Qdrant как 4-й векторной БД ✅ **ВЫПОЛНЕНО**
+
+> Реализовано в рамках `specs/003-qdrant-vector-db/`: `QdrantVectorStore` в `qdrant.py`, enum `Qdrant` в `vector_store_type.py`, lazy-load в `vector_store_factory.py`, config-поля в `vector_store_config.py`, optional extra в `pyproject.toml`, 42 unit tests pass, 0 regressions in existing tests.
 
 **Пакет:** `graphrag-vectors`
 

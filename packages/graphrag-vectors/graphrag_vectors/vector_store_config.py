@@ -50,6 +50,27 @@ class VectorStoreConfig(BaseModel):
         default=None,
     )
 
+    # Qdrant-specific configuration fields
+    distance: str | None = Field(
+        description="Distance metric for Qdrant (cosine, dot, euclidean, manhattan).",
+        default=None,
+    )
+
+    hnsw_m: int | None = Field(
+        description="HNSW m parameter for Qdrant (edges per node).",
+        default=None,
+    )
+
+    hnsw_ef_construct: int | None = Field(
+        description="HNSW ef_construct parameter for Qdrant (construction-time ef).",
+        default=None,
+    )
+
+    hnsw_ef: int | None = Field(
+        description="HNSW ef parameter for Qdrant (search-time ef).",
+        default=None,
+    )
+
     vector_size: int = Field(
         description="Default vector size for all index schemas. Individual index schemas can override this value.",
         default=DEFAULT_VECTOR_SIZE,
