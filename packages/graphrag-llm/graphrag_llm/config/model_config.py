@@ -23,8 +23,8 @@ class ModelConfig(BaseModel):
     """Allow extra fields to support custom LLM provider implementations."""
 
     type: str = Field(
-        default=LLMProviderType.LiteLLM,
-        description="The type of LLM provider to use. (default: litellm)",
+        default=LLMProviderType.OpenAI,
+        description="The type of LLM provider to use. (default: openai).",
     )
 
     model_provider: str = Field(
@@ -57,7 +57,7 @@ class ModelConfig(BaseModel):
 
     auth_method: AuthMethod = Field(
         default=AuthMethod.ApiKey,
-        description="The authentication method to use. (default: api_key)",
+        description="The authentication method to use. (default: api_key).",
     )
 
     azure_deployment_name: str | None = Field(
@@ -85,8 +85,8 @@ class ModelConfig(BaseModel):
         description="List of mock responses for testing.",
     )
 
-    def _validate_lite_llm_config(self) -> None:
-        """Validate LiteLLM specific configuration."""
+    def _validate_openai_config(self) -> None:
+        """Validate OpenAI/Azure OpenAI specific configuration."""
         if self.model_provider == "azure" and not self.api_base:
             msg = "api_base must be specified with the 'azure' model provider."
             raise ValueError(msg)
@@ -106,6 +106,6 @@ class ModelConfig(BaseModel):
     @model_validator(mode="after")
     def _validate_model(self):
         """Validate model configuration after initialization."""
-        if self.type == LLMProviderType.LiteLLM:
-            self._validate_lite_llm_config()
+        if self.type in (LLMProviderType.OpenAI, LLMProviderType.LiteLLM):
+            self._validate_openai_config()
         return self

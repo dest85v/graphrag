@@ -59,24 +59,14 @@ def create_tokenizer(tokenizer_config: "TokenizerConfig") -> Tokenizer:
 
     if strategy not in tokenizer_factory:
         match strategy:
-            case TokenizerType.LiteLLM:
-                from graphrag_llm.tokenizer.lite_llm_tokenizer import (
-                    LiteLLMTokenizer,
-                )
-
-                register_tokenizer(
-                    TokenizerType.LiteLLM,
-                    LiteLLMTokenizer,
-                    scope="singleton",
-                )
             case TokenizerType.Tiktoken:
-                from graphrag_llm.tokenizer.tiktoken_tokenizer import (
-                    TiktokenTokenizer,
+                from graphrag_llm.tokenizer.openai_tokenizer import (
+                    OpenAITokenizer,
                 )
 
                 register_tokenizer(
                     TokenizerType.Tiktoken,
-                    TiktokenTokenizer,
+                    OpenAITokenizer,
                     scope="singleton",
                 )
             case _:

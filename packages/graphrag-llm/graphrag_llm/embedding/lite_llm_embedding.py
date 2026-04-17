@@ -1,11 +1,15 @@
 # Copyright (c) 2024 Microsoft Corporation.
 # Licensed under the MIT License
 
-"""LLMEmbedding based on litellm."""
+"""LLMEmbedding based on the OpenAI SDK.
+
+This module is retained as a compatibility layer. It wraps the OpenAI SDK
+and provides the same interface as the original LiteLLM implementation.
+"""
 
 from typing import TYPE_CHECKING, Any, Unpack
 
-import litellm
+import openai
 from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 
 from graphrag_llm.config.types import AuthMethod
@@ -28,11 +32,9 @@ if TYPE_CHECKING:
         Metrics,
     )
 
-litellm.suppress_debug_info = True
-
 
 class LiteLLMEmbedding(LLMEmbedding):
-    """LLMEmbedding based on litellm."""
+    """LLMEmbedding based on the OpenAI SDK (backward-compatible name)."""
 
     _model_config: "ModelConfig"
     _model_id: str
@@ -61,30 +63,30 @@ class LiteLLMEmbedding(LLMEmbedding):
         drop_unsupported_params: bool = True,
         **kwargs: Any,
     ):
-        """Initialize LiteLLMEmbedding.
+        """Initialize LiteLLMEmbedding (OpenAI SDK backend).
 
         Args
         ----
             model_id: str
-                The LiteLLM model ID, e.g., "openai/gpt-4o"
+                The model ID, e.g., "text-embedding-ada-002".
             model_config: ModelConfig
                 The configuration for the model.
             tokenizer: Tokenizer
                 The tokenizer to use.
-            metrics_store: MetricsStore | None (default: None)
+            metrics_store: MetricsStore
                 The metrics store to use.
             metrics_processor: MetricsProcessor | None (default: None)
                 The metrics processor to use.
             cache: Cache | None (default: None)
                 An optional cache instance.
-            cache_key_prefix: str | None (default: "chat")
-                The cache key prefix. Required if cache is provided.
+            cache_key_creator: CacheKeyCreator
+                The cache key creator.
             rate_limiter: RateLimiter | None (default: None)
                 The rate limiter to use.
             retrier: Retry | None (default: None)
                 The retry strategy to use.
-            azure_cognitive_services_audience: str (default: "https://cognitiveservices.azure.com/.default")
-                The audience for Azure Cognitive Services when using Managed Identity.
+            azure_cognitive_services_audience: str
+                The audience for Azure Cognitive Services.
             drop_unsupported_params: bool (default: True)
                 Whether to drop unsupported parameters for the model provider.
         """
@@ -163,36 +165,96 @@ def _create_base_embeddings(
     drop_unsupported_params: bool,
     azure_cognitive_services_audience: str,
 ) -> tuple["LLMEmbeddingFunction", "AsyncLLMEmbeddingFunction"]:
-    """Create base embedding functions."""
+    """Create base embedding functions using OpenAI SDK."""
     model_provider = model_config.model_provider
     model = model_config.azure_deployment_name or model_config.model
 
-    base_args: dict[str, Any] = {
-        "drop_params": drop_unsupported_params,
-        "model": f"{model_provider}/{model}",
-        "api_key": model_config.api_key,
-        "api_base": model_config.api_base,
-        "api_version": model_config.api_version,
-        **model_config.call_args,
-    }
+    def _get_sync_client() -> openai.OpenAI | openai.AzureOpenAI:
+        """Get sync OpenAI client."""
+        if model_provider == "azure":
+            kwargs: dict[str, Any] = {
+                "azure_endpoint": model_config.api_base,
+                "api_version": model_config.api_version,
+            }
+            if model_config.auth_method == AuthMethod.AzureManagedIdentity:
+                kwargs["azure_ad_token_provider"] = get_bearer_token_provider(
+                    DefaultAzureCredential(), azure_cognitive_services_audience
+                )
+            else:
+                kwargs["api_key"] = model_config.api_key
+            kwargs.update(model_config.call_args)
+            return openai.AzureOpenAI(**kwargs)
+        kwargs = {"api_key": model_config.api_key}
+        if model_config.api_base:
+            kwargs["base_url"] = model_config.api_base
+        kwargs.update(model_config.call_args)
+        return openai.OpenAI(**kwargs)
 
-    if model_config.auth_method == AuthMethod.AzureManagedIdentity:
-        base_args["azure_ad_token_provider"] = get_bearer_token_provider(
-            DefaultAzureCredential(), azure_cognitive_services_audience
-        )
+    def _get_async_client() -> openai.AsyncOpenAI | openai.AsyncAzureOpenAI:
+        """Get async OpenAI client."""
+        if model_provider == "azure":
+            kwargs: dict[str, Any] = {
+                "azure_endpoint": model_config.api_base,
+                "api_version": model_config.api_version,
+            }
+            if model_config.auth_method == AuthMethod.AzureManagedIdentity:
+                kwargs["azure_ad_token_provider"] = get_bearer_token_provider(
+                    DefaultAzureCredential(), azure_cognitive_services_audience
+                )
+            else:
+                kwargs["api_key"] = model_config.api_key
+            kwargs.update(model_config.call_args)
+            return openai.AsyncAzureOpenAI(**kwargs)
+        kwargs = {"api_key": model_config.api_key}
+        if model_config.api_base:
+            kwargs["base_url"] = model_config.api_base
+        kwargs.update(model_config.call_args)
+        return openai.AsyncOpenAI(**kwargs)
 
     def _base_embedding(**kwargs: Any) -> LLMEmbeddingResponse:
-        kwargs.pop("metrics", None)  # Remove metrics if present
-        new_args: dict[str, Any] = {**base_args, **kwargs}
+        kwargs.pop("metrics", None)
+        merged = {"model": model, **model_config.call_args, **kwargs}
 
-        response = litellm.embedding(**new_args)
-        return LLMEmbeddingResponse(**response.model_dump())
+        if drop_unsupported_params:
+            merged = {
+                k: v
+                for k, v in merged.items()
+                if k
+                in {
+                    "model",
+                    "input",
+                    "encoding_format",
+                    "dimensions",
+                    "user",
+                }
+            }
+
+        sync_client = _get_sync_client()
+        response = sync_client.embeddings.create(**merged)
+
+        return LLMEmbeddingResponse.model_validate(response.model_dump())
 
     async def _base_embedding_async(**kwargs: Any) -> LLMEmbeddingResponse:
-        kwargs.pop("metrics", None)  # Remove metrics if present
-        new_args: dict[str, Any] = {**base_args, **kwargs}
+        kwargs.pop("metrics", None)
+        merged = {"model": model, **model_config.call_args, **kwargs}
 
-        response = await litellm.aembedding(**new_args)
-        return LLMEmbeddingResponse(**response.model_dump())
+        if drop_unsupported_params:
+            merged = {
+                k: v
+                for k, v in merged.items()
+                if k
+                in {
+                    "model",
+                    "input",
+                    "encoding_format",
+                    "dimensions",
+                    "user",
+                }
+            }
+
+        async_client = _get_async_client()
+        response = await async_client.embeddings.create(**merged)
+
+        return LLMEmbeddingResponse.model_validate(response.model_dump())
 
     return _base_embedding, _base_embedding_async

@@ -8,9 +8,11 @@ from graphrag_llm.completion.completion_factory import (
     create_completion,
     register_completion,
 )
+from graphrag_llm.completion.openai_completion import OpenAICompletion
 
 __all__ = [
     "LLMCompletion",
+    "OpenAICompletion",
     "create_completion",
     "register_completion",
 ]

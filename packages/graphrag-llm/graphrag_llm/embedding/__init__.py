@@ -8,9 +8,11 @@ from graphrag_llm.embedding.embedding_factory import (
     create_embedding,
     register_embedding,
 )
+from graphrag_llm.embedding.openai_embedding import OpenAIEmbedding
 
 __all__ = [
     "LLMEmbedding",
+    "OpenAIEmbedding",
     "create_embedding",
     "register_embedding",
 ]

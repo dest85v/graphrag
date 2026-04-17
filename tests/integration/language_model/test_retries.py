@@ -1,13 +1,14 @@
 # Copyright (c) 2024 Microsoft Corporation.
 # Licensed under the MIT License
 
-"""Test LiteLLM Retries."""
+"""Test OpenAI SDK Retries."""
 
 import time
+from collections.abc import Callable
 from typing import Any
 
 import httpx
-import litellm.exceptions as exceptions
+import openai
 import pytest
 from graphrag_llm.config import RetryConfig, RetryType
 from graphrag_llm.retry import create_retry
@@ -113,6 +114,65 @@ async def test_retries_async(
     )
 
 
+# OpenAI SDK exceptions that should not trigger retries
+_OPENAI_RETRY_SKIP_EXCEPTIONS: list[tuple[str, Callable[..., Any]]] = [
+    (
+        "BadRequestError",
+        lambda: openai.BadRequestError(
+            "Oh no!", response=_make_response(400), body=None
+        ),
+    ),
+    (
+        "AuthenticationError",
+        lambda: openai.AuthenticationError(
+            "Oh no!", response=_make_response(401), body=None
+        ),
+    ),
+    (
+        "PermissionDeniedError",
+        lambda: openai.PermissionDeniedError(
+            "Oh no!", response=_make_response(403), body=None
+        ),
+    ),
+    (
+        "NotFoundError",
+        lambda: openai.NotFoundError("Oh no!", response=_make_response(404), body=None),
+    ),
+    (
+        "UnprocessableEntityError",
+        lambda: openai.UnprocessableEntityError(
+            "Oh no!", response=_make_response(422), body=None
+        ),
+    ),
+    (
+        "APIConnectionError",
+        lambda: openai.APIConnectionError(
+            message="Oh no!", request=httpx.Request("GET", "https://api.openai.com")
+        ),
+    ),
+    (
+        "APIError",
+        lambda: openai.APIError(
+            "Oh no!", request=httpx.Request("GET", "https://api.openai.com"), body=None
+        ),
+    ),
+    (
+        "APIResponseValidationError",
+        lambda: openai.APIResponseValidationError(
+            response=_make_response(500), body=None, message="Oh no!"
+        ),
+    ),
+]
+
+
+def _make_response(status_code: int) -> httpx.Response:
+    """Create a mock httpx.Response for exception construction."""
+    return httpx.Response(
+        status_code=status_code,
+        request=httpx.Request(method="GET", url="https://openai.com"),
+    )
+
+
 @pytest.mark.parametrize(
     "config",
     [
@@ -133,92 +193,11 @@ async def test_retries_async(
     ],
 )
 @pytest.mark.parametrize(
-    ("exception", "exception_args"),
-    [
-        (
-            "BadRequestError",
-            ["Oh no!", "", ""],
-        ),
-        (
-            "UnsupportedParamsError",
-            ["Oh no!", "", ""],
-        ),
-        (
-            "ContextWindowExceededError",
-            ["Oh no!", "", ""],
-        ),
-        (
-            "ContentPolicyViolationError",
-            ["Oh no!", "", ""],
-        ),
-        (
-            "ImageFetchError",
-            ["Oh no!", "", ""],
-        ),
-        (
-            "InvalidRequestError",
-            ["Oh no!", "", ""],
-        ),
-        (
-            "AuthenticationError",
-            ["Oh no!", "", ""],
-        ),
-        (
-            "PermissionDeniedError",
-            [
-                "Oh no!",
-                "",
-                "",
-                httpx.Response(
-                    status_code=403,
-                    request=httpx.Request(
-                        method="GET", url="https://litellm.ai"
-                    ),  # mock request object
-                ),
-            ],
-        ),
-        (
-            "NotFoundError",
-            ["Oh no!", "", ""],
-        ),
-        (
-            "UnprocessableEntityError",
-            [
-                "Oh no!",
-                "",
-                "",
-                httpx.Response(
-                    status_code=403,
-                    request=httpx.Request(
-                        method="GET", url="https://litellm.ai"
-                    ),  # mock request object
-                ),
-            ],
-        ),
-        (
-            "APIConnectionError",
-            ["Oh no!", "", ""],
-        ),
-        (
-            "APIError",
-            [500, "Oh no!", "", ""],
-        ),
-        (
-            "ServiceUnavailableError",
-            ["Oh no!", "", ""],
-        ),
-        (
-            "APIResponseValidationError",
-            ["Oh no!", "", ""],
-        ),
-        (
-            "BudgetExceededError",
-            ["Oh no!", "", ""],
-        ),
-    ],
+    ("exception", "exception_factory"),
+    _OPENAI_RETRY_SKIP_EXCEPTIONS,
 )
 def test_exponential_backoff_skipping_exceptions(
-    config: RetryConfig, exception: str, exception_args: list[Any]
+    config: RetryConfig, exception: str, exception_factory: Callable[..., Any]
 ) -> None:
     """
     Test skipping retries for exceptions that should not cause a retry.
@@ -227,12 +206,12 @@ def test_exponential_backoff_skipping_exceptions(
 
     # start at -1 because the first call is not a retry
     retries = -1
-    exception_cls = exceptions.__dict__[exception]
+    exception_cls = getattr(openai, exception)
 
     def mock_func():
         nonlocal retries
         retries += 1
-        raise exception_cls(*exception_args)
+        raise exception_factory()
 
     with pytest.raises(exception_cls, match="Oh no!"):
         retry_service.retry(func=mock_func, input_args={})

@@ -242,7 +242,9 @@ class MCPConfig(BaseModel):
 
 ---
 
-## P2 — Заменить LiteLLM на OpenAI SDK
+## P2 — Заменить LiteLLM на OpenAI SDK ✅ ВЫПОЛНЕНО
+
+**Статус:** Завершена. Все 41 задача из `specs/001-litellm-to-openai/tasks.md` выполнены. `poe check` проходит, 303 unit + все integration тесты проходят.
 
 **Пакет:** `graphrag-llm`
 

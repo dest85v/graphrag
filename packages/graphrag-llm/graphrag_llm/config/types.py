@@ -10,7 +10,8 @@ from enum import StrEnum
 class LLMProviderType(StrEnum):
     """Enum for LLM provider types."""
 
-    LiteLLM = "litellm"
+    OpenAI = "openai"
+    LiteLLM = "litellm"  # Deprecated: routes to OpenAI
     MockLLM = "mock"
 
 
@@ -68,5 +69,4 @@ class TemplateManagerType(StrEnum):
 class TokenizerType(StrEnum):
     """Enum for tokenizer types."""
 
-    LiteLLM = "litellm"
     Tiktoken = "tiktoken"

@@ -7,33 +7,54 @@ import pytest
 from graphrag_llm.config import TokenizerConfig, TokenizerType
 
 
-def test_litellm_tokenizer_validation() -> None:
+def test_tiktoken_tokenizer_validation() -> None:
     """Test that missing required parameters raise validation errors."""
 
+    # Empty strings should raise
     with pytest.raises(
         ValueError,
-        match="model_id must be specified for LiteLLM tokenizer\\.",
+        match="Either model_id or encoding_name must be specified for TikToken tokenizer\\.",
     ):
         _ = TokenizerConfig(
-            type=TokenizerType.LiteLLM,
+            type=TokenizerType.Tiktoken,
+            model_id="",
+            encoding_name="",
+        )
+
+    # Empty model_id alone should raise
+    with pytest.raises(
+        ValueError,
+        match="Either model_id or encoding_name must be specified for TikToken tokenizer\\.",
+    ):
+        _ = TokenizerConfig(
+            type=TokenizerType.Tiktoken,
             model_id="",
         )
 
+    # Empty encoding_name alone should raise
     with pytest.raises(
         ValueError,
-        match="encoding_name must be specified for TikToken tokenizer\\.",
+        match="Either model_id or encoding_name must be specified for TikToken tokenizer\\.",
     ):
         _ = TokenizerConfig(
             type=TokenizerType.Tiktoken,
             encoding_name="",
         )
 
-    # passes validation
+    # passes validation - model_id provided
     _ = TokenizerConfig(
-        type=TokenizerType.LiteLLM,
+        type=TokenizerType.Tiktoken,
         model_id="openai/gpt-4o",
     )
+
+    # passes validation - encoding_name provided
     _ = TokenizerConfig(
         type=TokenizerType.Tiktoken,
         encoding_name="o200k-base",
     )
+
+
+def test_default_tokenizer_type() -> None:
+    """Test that the default tokenizer type is Tiktoken."""
+    config = TokenizerConfig()
+    assert config.type == TokenizerType.Tiktoken

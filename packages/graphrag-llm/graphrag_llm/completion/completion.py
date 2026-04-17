@@ -107,7 +107,7 @@ class LLMCompletion(ABC):
                 The number of completions to generate for each prompt.
             tools: list[Tool] | None (default=None)
                 Optional tools to use during completion.
-                https://docs.litellm.ai/docs/completion/function_call
+                https://platform.openai.com/docs/api-reference/chat/create
             **kwargs: Any
                 Additional keyword arguments.
 
@@ -149,7 +149,7 @@ class LLMCompletion(ABC):
                 The number of completions to generate for each prompt.
             tools: list[Tool] | None (default=None)
                 Optional tools to use during completion.
-                https://docs.litellm.ai/docs/completion/function_call
+                https://platform.openai.com/docs/api-reference/chat/create
             **kwargs: Any
                 Additional keyword arguments.
 

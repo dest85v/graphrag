@@ -19,9 +19,8 @@ def get_tokenizer(
     Args
     ----
         model_config: LanguageModelConfig, optional
-            The model configuration. If not provided or model_config.encoding_model is manually set,
-            use a tiktoken based tokenizer. Otherwise, use a LitellmTokenizer based on the model name.
-            LiteLLM supports token encoding/decoding for the range of models it supports.
+            The model configuration. If provided, use an OpenAI tokenizer based on the model name.
+            Otherwise, use a tiktoken tokenizer with the specified encoding model.
         encoding_model: str, optional
             A tiktoken encoding model to use if no model configuration is provided. Only used if a
             model configuration is not provided.
@@ -33,7 +32,7 @@ def get_tokenizer(
     if model_config is not None:
         return create_tokenizer(
             TokenizerConfig(
-                type=TokenizerType.LiteLLM,
+                type=TokenizerType.Tiktoken,
                 model_id=f"{model_config.model_provider}/{model_config.model}",
             )
         )

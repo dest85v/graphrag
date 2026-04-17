@@ -3,6 +3,7 @@
 
 """Completion factory."""
 
+import warnings
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any
 
@@ -70,7 +71,7 @@ def create_completion(
         cache_key_creator: CacheKeyCreator | None (default: create_cache_key)
             An optional cache key creator function.
             (dict[str, Any]) -> str
-        tokenizer: Tokenizer | None (default: litellm)
+        tokenizer: Tokenizer | None (default: None)
             An optional tokenizer instance.
 
     Returns
@@ -83,16 +84,26 @@ def create_completion(
     strategy = model_config.type
     extra: dict[str, Any] = model_config.model_extra or {}
 
+    # Emit deprecation warning for legacy "litellm" type
+    if strategy == LLMProviderType.LiteLLM:
+        warnings.warn(
+            "LLMProviderType.LiteLLM is deprecated and will be removed in a future version. "
+            "Use LLMProviderType.OpenAI instead.",
+            DeprecationWarning,
+            stacklevel=3,
+        )
+        strategy = LLMProviderType.OpenAI
+
     if strategy not in completion_factory:
         match strategy:
-            case LLMProviderType.LiteLLM:
-                from graphrag_llm.completion.lite_llm_completion import (
-                    LiteLLMCompletion,
+            case LLMProviderType.OpenAI | LLMProviderType.LiteLLM:
+                from graphrag_llm.completion.openai_completion import (
+                    OpenAICompletion,
                 )
 
                 register_completion(
-                    completion_type=LLMProviderType.LiteLLM,
-                    completion_initializer=LiteLLMCompletion,
+                    completion_type=LLMProviderType.OpenAI,
+                    completion_initializer=OpenAICompletion,
                     scope="singleton",
                 )
             case LLMProviderType.MockLLM:

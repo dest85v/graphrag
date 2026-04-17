@@ -8,7 +8,7 @@ import random
 import time
 from typing import TYPE_CHECKING, Any
 
-import litellm.exceptions as exceptions
+import openai
 
 if TYPE_CHECKING:
     from graphrag_llm.types import (
@@ -42,7 +42,7 @@ def with_errors_for_testing(
             The failure rate for testing, between 0.0 and 1.0.
             Defaults to 0.0 (no failures).
         exception_type: str
-            The name of the exceptions class from litellm.exceptions to raise.
+            The name of the exception class from openai to raise.
             Defaults to "ValueError".
         exception_args: list[Any] | None
             The arguments to pass to the exception when raising it. Defaults to None,
@@ -60,7 +60,7 @@ def with_errors_for_testing(
         if failure_rate > 0.0 and random.random() <= failure_rate:  # noqa: S311
             time.sleep(0.5)
 
-            exception_cls = exceptions.__dict__.get(exception_type, ValueError)
+            exception_cls = getattr(openai, exception_type, ValueError)
             raise exception_cls(
                 *(exception_args or ["Simulated failure for debugging purposes."])
             )
@@ -73,7 +73,7 @@ def with_errors_for_testing(
         if failure_rate > 0.0 and random.random() <= failure_rate:  # noqa: S311
             await asyncio.sleep(0.5)
 
-            exception_cls = exceptions.__dict__.get(exception_type, ValueError)
+            exception_cls = getattr(openai, exception_type, ValueError)
             raise exception_cls(
                 *(exception_args or ["Simulated failure for debugging purposes."])
             )

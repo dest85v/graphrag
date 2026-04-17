@@ -3,6 +3,7 @@
 
 """Embedding factory."""
 
+import warnings
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any
 
@@ -69,7 +70,7 @@ def create_embedding(
             An optional cache instance.
         cache_key_creator: CacheKeyCreator | None (default: create_cache_key)
             An optional cache key creator function.
-        tokenizer: Tokenizer | None (default: litellm)
+        tokenizer: Tokenizer | None (default: None)
             An optional tokenizer instance.
 
     Returns
@@ -82,16 +83,26 @@ def create_embedding(
     strategy = model_config.type
     extra: dict[str, Any] = model_config.model_extra or {}
 
+    # Emit deprecation warning for legacy "litellm" type
+    if strategy == LLMProviderType.LiteLLM:
+        warnings.warn(
+            "LLMProviderType.LiteLLM is deprecated and will be removed in a future version. "
+            "Use LLMProviderType.OpenAI instead.",
+            DeprecationWarning,
+            stacklevel=3,
+        )
+        strategy = LLMProviderType.OpenAI
+
     if strategy not in embedding_factory:
         match strategy:
-            case LLMProviderType.LiteLLM:
-                from graphrag_llm.embedding.lite_llm_embedding import (
-                    LiteLLMEmbedding,
+            case LLMProviderType.OpenAI | LLMProviderType.LiteLLM:
+                from graphrag_llm.embedding.openai_embedding import (
+                    OpenAIEmbedding,
                 )
 
                 register_embedding(
-                    embedding_type=LLMProviderType.LiteLLM,
-                    embedding_initializer=LiteLLMEmbedding,
+                    embedding_type=LLMProviderType.OpenAI,
+                    embedding_initializer=OpenAIEmbedding,
                     scope="singleton",
                 )
             case LLMProviderType.MockLLM:

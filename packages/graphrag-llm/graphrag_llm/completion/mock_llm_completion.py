@@ -5,8 +5,6 @@
 
 from typing import TYPE_CHECKING, Any, Unpack
 
-import litellm
-
 from graphrag_llm.completion.completion import LLMCompletion
 from graphrag_llm.utils import (
     create_completion_response,
@@ -25,9 +23,6 @@ if TYPE_CHECKING:
         LLMCompletionResponse,
         ResponseFormat,
     )
-
-
-litellm.suppress_debug_info = True
 
 
 class MockLLMCompletion(LLMCompletion):

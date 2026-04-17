@@ -5,8 +5,6 @@
 
 from typing import TYPE_CHECKING, Any, Unpack
 
-import litellm
-
 from graphrag_llm.embedding.embedding import LLMEmbedding
 from graphrag_llm.utils import create_embedding_response
 
@@ -18,8 +16,6 @@ if TYPE_CHECKING:
         LLMEmbeddingArgs,
         LLMEmbeddingResponse,
     )
-
-litellm.suppress_debug_info = True
 
 
 class MockLLMEmbedding(LLMEmbedding):

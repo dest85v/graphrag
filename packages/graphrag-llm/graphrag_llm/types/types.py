@@ -15,12 +15,10 @@ from typing import (
     runtime_checkable,
 )
 
-from litellm import (
-    AnthropicThinkingParam,
+from openai.types.chat import (
     ChatCompletionAudioParam,
     ChatCompletionModality,
     ChatCompletionPredictionContentParam,
-    OpenAIWebSearchOptions,
 )
 from openai.types.chat.chat_completion import (
     ChatCompletion,
@@ -42,6 +40,20 @@ from openai.types.create_embedding_response import CreateEmbeddingResponse, Usag
 from openai.types.embedding import Embedding
 from pydantic import BaseModel, computed_field
 from typing_extensions import TypedDict
+
+
+class OpenAIWebSearchOptions(TypedDict, total=False):
+    """Web search options for OpenAI chat completions."""
+
+    type: str
+
+
+class AnthropicThinkingParam(TypedDict, total=False):
+    """Thinking configuration for Anthropic-style models via OpenAI-compatible APIs."""
+
+    type: str
+    budget_tokens: int | None
+
 
 LLMCompletionMessagesParam = str | Sequence[ChatCompletionMessageParam | dict[str, Any]]
 
@@ -106,7 +118,7 @@ class LLMCompletionArgs(
 ):
     """Arguments for LLMCompletionFunction.
 
-    Same signature as litellm.completion but without the `model` parameter
+    Same signature as OpenAI chat.completions.create() but without the `model` parameter
     as this is already set in the model configuration.
     """
 
@@ -150,7 +162,7 @@ class LLMCompletionArgs(
 class LLMCompletionFunction(Protocol):
     """Synchronous completion function.
 
-    Same signature as litellm.completion but without the `model` parameter
+    Same signature as OpenAI chat.completions.create() but without the `model` parameter
     as this is already set in the model configuration.
     """
 
@@ -165,7 +177,7 @@ class LLMCompletionFunction(Protocol):
 class AsyncLLMCompletionFunction(Protocol):
     """Asynchronous completion function.
 
-    Same signature as litellm.completion but without the `model` parameter
+    Same signature as OpenAI chat.completions.create() but without the `model` parameter
     as this is already set in the model configuration.
     """
 
@@ -201,7 +213,7 @@ class LLMEmbeddingResponse(CreateEmbeddingResponse):
 class LLMEmbeddingArgs(TypedDict, total=False, extra_items=Any):
     """Arguments for embedding functions.
 
-    Same signature as litellm.embedding but without the `model` parameter
+    Same signature as OpenAI embeddings.create() but without the `model` parameter
     as this is already set in the model configuration.
     """
 
@@ -216,7 +228,7 @@ class LLMEmbeddingArgs(TypedDict, total=False, extra_items=Any):
 class LLMEmbeddingFunction(Protocol):
     """Synchronous embedding function.
 
-    Same signature as litellm.embedding but without the `model` parameter
+    Same signature as OpenAI embeddings.create() but without the `model` parameter
     as this is already set in the model configuration.
     """
 
@@ -233,7 +245,7 @@ class LLMEmbeddingFunction(Protocol):
 class AsyncLLMEmbeddingFunction(Protocol):
     """Asynchronous embedding function.
 
-    Same signature as litellm.aembedding but without the `model` parameter
+    Same signature as OpenAI embeddings.create() but without the `model` parameter
     as this is already set in the model configuration.
     """
 
