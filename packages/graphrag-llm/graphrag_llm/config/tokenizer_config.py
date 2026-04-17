@@ -21,13 +21,19 @@ class TokenizerConfig(BaseModel):
 
     model_id: str | None = Field(
         default=None,
-        description="The identifier for the tokenizer model. Example: gpt-4o. Used to resolve the correct tiktoken encoding.",
+        description="The identifier for the tokenizer model. For Tiktoken: example gpt-4o used to resolve the correct encoding. For HuggingFace: a HuggingFace model repository path (e.g. 'meta-llama/Llama-3.1-8B-Instruct') or a local tokenizer.json file path.",
     )
 
     encoding_name: str | None = Field(
         default=None,
         description="The encoding name for the tokenizer. Example: cl100k_base.",
     )
+
+    def _validate_huggingface_config(self) -> None:
+        """Validate HuggingFace tokenizer configuration."""
+        if self.model_id is None or self.model_id.strip() == "":
+            msg = "model_id must be specified for HuggingFace tokenizer."
+            raise ValueError(msg)
 
     @model_validator(mode="after")
     def _validate_model(self):
@@ -50,4 +56,6 @@ class TokenizerConfig(BaseModel):
             ):
                 msg = "Either model_id or encoding_name must be specified for TikToken tokenizer."
                 raise ValueError(msg)
+        elif self.type == TokenizerType.HuggingFace:
+            self._validate_huggingface_config()
         return self

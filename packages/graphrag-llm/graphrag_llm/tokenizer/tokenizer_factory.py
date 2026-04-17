@@ -69,6 +69,16 @@ def create_tokenizer(tokenizer_config: "TokenizerConfig") -> Tokenizer:
                     OpenAITokenizer,
                     scope="singleton",
                 )
+            case TokenizerType.HuggingFace:
+                from graphrag_llm.tokenizer.huggingface_tokenizer import (
+                    HuggingFaceTokenizer,
+                )
+
+                register_tokenizer(
+                    TokenizerType.HuggingFace,
+                    HuggingFaceTokenizer,
+                    scope="singleton",
+                )
             case _:
                 msg = f"TokenizerConfig.type '{strategy}' is not registered in the TokenizerFactory. Registered strategies: {', '.join(tokenizer_factory.keys())}"
                 raise ValueError(msg)

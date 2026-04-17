@@ -3,6 +3,7 @@
 
 """Tokenizer module."""
 
+from graphrag_llm.tokenizer.huggingface_tokenizer import HuggingFaceTokenizer
 from graphrag_llm.tokenizer.tokenizer import Tokenizer
 from graphrag_llm.tokenizer.tokenizer_factory import (
     create_tokenizer,
@@ -10,6 +11,7 @@ from graphrag_llm.tokenizer.tokenizer_factory import (
 )
 
 __all__ = [
+    "HuggingFaceTokenizer",
     "Tokenizer",
     "create_tokenizer",
     "register_tokenizer",

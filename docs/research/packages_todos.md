@@ -479,6 +479,7 @@ from openai import (
 
 ## P3 — Добавить HuggingFace `tokenizers` для не-OpenAI моделей
 
+**Статус:** ✅ Выполнено (2026-04-17)  
 **Зависит от:** P2 (замена LiteLLM на OpenAI SDK) — завершить полностью перед началом.
 
 **Пакет:** `graphrag-llm`
@@ -656,3 +657,15 @@ def get_tokenizer(model_config=None, encoding_model=None) -> Tokenizer:
 - `tokenizers` может требовать `sentencepiece`/`spm` для моделей типа T5
 - HuggingFace Hub download требует интернет при первом запуске (кешируется в `~/.cache/huggingface/`)
 - `add_special_tokens=False` — важно для consistency с tiktoken (tiktoken не добавляет BOS/EOS)
+
+**Статус:** ✅ ЗАВЕРШЕНО (2026-04-17). Реализовано:
+1. `HuggingFaceTokenizer` в `packages/graphrag-llm/graphrag_llm/tokenizer/huggingface_tokenizer.py`
+2. `TokenizerType.HuggingFace` в enum
+3. Валидация `TokenizerConfig` для huggingface type
+4. Регистрация в `TokenizerFactory`
+5. Экспорт в `__init__.py`
+6. Auto-routing в `get_tokenizer()` — OpenAI → tiktoken, остальное → HuggingFace
+7. Зависимости: `tokenizers>=0.21,<0.23`, `sentencepiece>=0.2,<0.3`, `protobuf>=5.0,<6.0` (опционально)
+8. 36 тестов: unit + integration, все проходят
+9. `poe check` проходит: 0 lint errors, 0 type errors
+10. Semversioner minor change entry добавлен

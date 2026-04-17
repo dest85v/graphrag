@@ -70,3 +70,4 @@ class TokenizerType(StrEnum):
     """Enum for tokenizer types."""
 
     Tiktoken = "tiktoken"
+    HuggingFace = "huggingface"
