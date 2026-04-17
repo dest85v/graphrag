@@ -673,3 +673,146 @@ def get_tokenizer(model_config=None, encoding_model=None) -> Tokenizer:
 8. 36 тестов: unit + integration, все проходят
 9. `poe check` проходит: 0 lint errors, 0 type errors
 10. Semversioner minor change entry добавлен
+
+---
+
+## P1 — Добавить поддержку русского языка с вкраплениями англоязычных терминов
+
+**Приоритет:** P1 — блокирует полноценную работу с русскоязычными документами
+
+**Пакеты:** `graphrag`, `graphrag-chunking`
+
+**Текущее состояние:** Проект настроен на английский текст по умолчанию. Есть два критических барьера для русского языка:
+
+### Проблема 1: regex_extractor отбрасывает кириллицу
+
+`packages/graphrag/graphrag/index/operations/build_noun_graph/np_extractors/regex_extractor.py:128`:
+```python
+def _is_valid_token(self, token: str) -> bool:
+    return bool(re.match(r"^[a-zA-Z0-9\-]+\n?$", token))
+```
+
+Regex `^[a-zA-Z0-9\-]+$` блокирует все символы, кроме ASCII латиницы. Все русские слова (и вообще любые не-ASCII) считаются невалидными токенами и отбрасываются. Даже если подставить русскую spaCy-модель — RegexExtractor извлечёт **пустой список** из кириллического текста.
+
+При этом англоязычные термины в кириллическом тексте (типа "API", "endpoint", "deployment pipeline") тоже отсекутся, если будут записаны слитно с кириллическими символами или содержать специфические символы.
+
+### Проблема 2: spaCy модель по умолчанию — английская
+
+`packages/graphrag/graphrag/config/defaults.py:162`:
+```python
+model_name: str = "en_core_web_md"
+```
+
+`en_core_web_md` плохо работает с кириллическим текстом: spaCy не корректно определяет POS-теги, noun_chunks для русского текста будут неполными или некорректными.
+
+### Проблема 3: cfg_extractor — grammar hard-coded для английского
+
+`packages/graphrag/graphrag/index/operations/build_noun_graph/np_extractors/cfg_extractor.py` содержит grammar rules, написанные для английского языка. Для русского нужны другие правила синтаксического разбора.
+
+### Что работает из коробки
+
+| Компонент | Статус для русского |
+|---|---|
+| Токенизатор `o200k_base` (default) | ✅ Работает — multilingual (tiktoken) |
+| Token-based chunking | ✅ Не зависит от языка |
+| LLM prompts (`{language}` placeholder) | ✅ prompt_tune детектирует язык, подсказки генерируются |
+| Entity summarization (перевод) | ✅ Переводит описания на указанный язык |
+| SyntacticParsingExtractor + `ru_core_news_md` | ✅ Работает при подстановке модели |
+| CFGExtractor + `ru_core_news_md` | ⚠️ Работает частично — grammar rules английские |
+
+### Что нужно реализовать
+
+#### 1. Поддержка Unicode в RegexExtractor
+
+**Файл:** `packages/graphrag/graphrag/index/operations/build_noun_graph/np_extractors/regex_extractor.py`
+
+Заменить `_is_valid_token`:
+```python
+def _is_valid_token(self, token: str) -> bool:
+    return bool(re.match(r"^\w+[\-]?\w*$", token, re.UNICODE))
+```
+
+или явно:
+```python
+def _is_valid_token(self, token: str) -> bool:
+    return bool(re.match(r"^[\p{L}\p{N}\-]+$", token))  # Unicode letters + digits
+```
+
+Альтернатива — добавить параметр `supported_scripts` (list of Unicode ranges) и валидировать токены через него.
+
+#### 2. Поддержка мультиязычных spaCy моделей
+
+**Файл:** `packages/graphrag/graphrag/config/defaults.py`
+
+Заменить default:
+```python
+model_name: str = "en_core_web_md"  # →
+model_name: str = "en_core_web_md"  # оставить как default для backward compat
+```
+
+Добавить новый default или опцию:
+```python
+model_name: str = "xx_ent_wiki_sm"  # Universal NER — мультиязычная
+```
+
+`xx_ent_wiki_sm` — это мультиязычная spaCy модель, обученная на вики-текстах на многих языках, включая русский и английский. Она лучше распознаёт именованные сущности в смешанном тексте.
+
+ИЛИ использовать конфигурацию с параметром `nlp_model`:
+```python
+# graphrag config.yaml
+extract_graph_nlp:
+  strategy:
+    type: graphrag_nlp
+    config:
+      nlp_model: "ru_core_news_md"  # или "xx_ent_wiki_sm"
+```
+
+#### 3. Добавить русскоязычную spaCy модель как опциональную зависимость
+
+**Файл:** `packages/graphrag/pyproject.toml`
+
+Добавить optional extra:
+```toml
+[project.optional-dependencies]
+nlp-ru = ["spacy-ru-core-news-md~=3.8"]
+nlp-xx = ["spacy-xx-ent-wiki-sm~=3.8"]
+```
+
+#### 4. (Опционально) Мультиязычные grammar rules для CFGExtractor
+
+**Файл:** `packages/graphrag/graphrag/index/operations/build_noun_graph/np_extractors/cfg_extractor.py`
+
+Добавить набор grammar rules для русского языка. Это можно сделать через config:
+```python
+RU_NOUN_PHRASE_GRAMMARS = [
+    "<ADJ><NOUN>",           # "красная машина"
+    "<NOUN><ADP><NOUN>",     # "дом друга"
+    "<ADV><ADJ><NOUN>",      # "очень важная информация"
+]
+```
+
+#### 5. Тесты
+
+- Юнит-тест: RegexExtractor на тексте `["Русский текст с английскими терминами API и endpoint"]` — должен извлечь и русские, и английские именные фразы
+- Интеграционный тест: полный NLP pipeline с `ru_core_news_md` на русском тексте
+- Интеграционный тест: `xx_ent_wiki_sm` на смешанном RU+EN тексте — coverage сущностей
+- Сравнение: `en_core_web_md` vs `ru_core_news_md` vs `xx_ent_wiki_sm` на смешанном тексте
+
+### Зависимости от других задач
+
+- Нет прямых зависимостей
+- Можно делать параллельно с любыми другими задачами
+- Рекомендуется после P2 (litellm→openai) и P3 (HuggingFace tokenizer), т.к. токенизация должна быть стабильной
+
+### Риск
+
+**Средний:**
+1. `re.UNICODE` / `\w` — может включить нежелательные символы (диакритика, арабская вязь и т.д.)
+2. `xx_ent_wiki_sm` — мультиязычная модель менее точна, чем моноязычная для конкретного языка
+3. CFG grammar rules для русского — нужен лингвистический анализ
+4. Regression risk — если тесты написаны только на английском тексте
+
+**Mitigation:**
+- Сохранить `en_core_web_md` как default (backward compat)
+- Добавить конфиг-опцию `nlp_model` для выбора модели
+- RegexExtractor тесты на трёх сценариях: EN-only, RU-only, RU+EN mixed
