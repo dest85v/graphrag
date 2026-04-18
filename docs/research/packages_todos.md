@@ -676,7 +676,7 @@ def get_tokenizer(model_config=None, encoding_model=None) -> Tokenizer:
 
 ---
 
-## P1 — Добавить поддержку русского языка с вкраплениями англоязычных терминов
+## P1 — Добавить поддержку русского языка с вкраплениями англоязычных терминов ✅ ВЫПОЛНЕНО
 
 **Приоритет:** P1 — блокирует полноценную работу с русскоязычными документами
 
@@ -816,3 +816,266 @@ RU_NOUN_PHRASE_GRAMMARS = [
 - Сохранить `en_core_web_md` как default (backward compat)
 - Добавить конфиг-опцию `nlp_model` для выбора модели
 - RegexExtractor тесты на трёх сценариях: EN-only, RU-only, RU+EN mixed
+
+---
+
+## P1 — Language-aware NLP Factory: auto-select stop words и CFG grammars по языку
+
+**Приоритет:** P1 — следует за P1 (русский язык, строка 679)
+
+**Пакеты:** `graphrag`
+
+**Текущее состояние:** В репозитории определены русскоязычные ресурсы, но они не используются:
+
+| Ресурс | Файл | Статус |
+|---|---|---|
+| `RU_STOP_WORDS` | `np_extractors/stop_words.py:23-34` | Определён, но **нигде не импортируется**. Фабрика всегда берёт `EN_STOP_WORDS` (`factory.py:43`) |
+| `RU_NOUN_PHRASE_GRAMMARS` | `np_extractors/cfg_extractor.py:19-31` | Определён, но **нигде не импортируется**. CFG-экстрактор использует грамматики из конфига/дефолтов (английские) |
+
+### Что не работает
+
+```python
+# factory.py:41-43 — всегда EN_STOP_WORDS, language не учитывается
+if exclude_nouns is None:
+    exclude_nouns = EN_STOP_WORDS
+```
+
+Пользователь может указать `nlp_model: ru_core_news_md` (что уже поддерживается, `extract_graph_nlp_config.py:23-25`), но стоп-слова останутся английскими (`"stuff"`, `"thing"`, `"bunch"`) — бессмыслица для русского текста.
+
+### Что нужно реализовать
+
+#### 1. Добавить `language` в `TextAnalyzerConfig`
+
+**Файл:** `packages/graphrag/graphrag/config/models/extract_graph_nlp_config.py`
+
+Добавить поле:
+```python
+language: str | None = Field(
+    default=None,
+    description="Document language for selecting appropriate stop words and CFG grammars (e.g., 'en', 'ru', 'de'). Falls back to English defaults if not set.",
+)
+```
+
+#### 2. Интегрировать RU_STOP_WORDS в factory
+
+**Файл:** `packages/graphrag/graphrag/index/operations/build_noun_graph/np_extractors/factory.py`
+
+```python
+from graphrag.index.operations.build_noun_graph.np_extractors.stop_words import (
+    EN_STOP_WORDS,
+    RU_STOP_WORDS,
+)
+
+# В get_np_extractor (строка 40-43) заменить:
+#   if exclude_nouns is None:
+#       exclude_nouns = EN_STOP_WORDS
+# на:
+if exclude_nouns is None:
+    lang = (config.language or "en").lower()
+    if lang == "ru":
+        exclude_nouns = list(RU_STOP_WORDS)  # factory expects list[str]
+    else:
+        exclude_nouns = EN_STOP_WORDS
+```
+
+#### 3. Вынести EN-грамматики из `defaults.py` в `cfg_extractor.py`
+
+**Файл:** `packages/graphrag/graphrag/config/defaults.py:172-180`
+
+Перенести грамматики из `TextAnalyzerDefaults.noun_phrase_grammars` в `cfg_extractor.py`:
+
+```python
+# cfg_extractor.py
+EN_NOUN_PHRASE_GRAMMARS: dict[str, str] = {
+    "PROPN,PROPN": "PROPN",
+    "NOUN,NOUN": "NOUNS",
+    "NOUNS,NOUN": "NOUNS",
+    "ADJ,ADJ": "ADJ",
+    "ADJ,NOUN": "NOUNS",
+}
+
+# RU_NOUN_PHRASE_GRAMMARS уже есть, переименовать в CFG_NOUN_PHRASE_GRAMMARS
+```
+
+**Файл:** `packages/graphrag/graphrag/config/defaults.py` — обновить import:
+```python
+from graphrag.index.operations.build_noun_graph.np_extractors.cfg_extractor import (
+    EN_NOUN_PHRASE_GRAMMARS,
+)
+```
+
+#### 4. Автовыбор CFG-грамматик по языку в factory
+
+**Файл:** `packages/graphrag/graphrag/index/operations/build_noun_graph/np_extractors/factory.py`, case CFG (строка 56-70):
+
+```python
+case NounPhraseExtractorType.CFG:
+    grammars = {}
+    for key, value in config.noun_phrase_grammars.items():
+        grammars[tuple(key.split(","))] = value
+    
+    # Auto-select base grammars if none provided
+    if not config.noun_phrase_grammars:
+        lang = (config.language or "en").lower()
+        base_grammars = CFG_NOUN_PHRASE_GRAMMARS if lang == "ru" else EN_NOUN_PHRASE_GRAMMARS
+        for k, v in base_grammars.items():
+            grammars[k] = v
+    
+    return CFGNounPhraseExtractor(...)
+```
+
+#### 5. Автовыбор spaCy-модели по языку (опционально)
+
+**Файл:** `packages/graphrag/graphrag/index/operations/build_noun_graph/np_extractors/factory.py:44`
+
+```python
+LANGUAGE_MODEL_MAP = {
+    "en": "en_core_web_md",
+    "ru": "ru_core_news_md",
+    "de": "de_core_news_md",
+    "fr": "fr_core_news_md",
+}
+
+effective_model_name = config.nlp_model or config.model_name
+if not config.nlp_model and not config.model_name:
+    lang = (config.language or "en").lower()
+    effective_model_name = LANGUAGE_MODEL_MAP.get(lang, "en_core_web_md")
+```
+
+#### 6. Переименовать `RU_NOUN_PHRASE_GRAMMARS` → `CFG_NOUN_PHRASE_GRAMMARS`
+
+**Файл:** `packages/graphrag/graphrag/index/operations/build_noun_graph/np_extractors/cfg_extractor.py:19`
+
+#### 7. Обновить `init_content.py`
+
+**Файл:** `packages/graphrag/graphrag/config/init_content.py:90-93`
+
+```yaml
+extract_graph_nlp:
+  text_analyzer:
+    extractor_type: {type} # [regex_english, syntactic_parser, cfg]
+    language: en # [en, ru, de, fr, xx] — selects stop words & CFG grammars; falls back to 'en'
+```
+
+#### 8. Обновить `enums.py`
+
+**Файл:** `packages/graphrag/graphrag/config/enums.py:60-61`
+
+Документация `RegexEnglish = "regex_english"` — актуализировать: *"Standard extractor using regex. Fastest, but limited to English (use syntactic_parser for multilingual)."*
+
+### Зависимости
+
+- Нет прямых зависимостей, но требует наличия `ru_core_news_md` (уже описано в P1 строка 679)
+
+### Тесты
+
+- `tests/unit/test_noun_phrase_factory.py` — `get_np_extractor(language="ru")` → `RU_STOP_WORDS`; `language="en"` → `EN_STOP_WORDS`; `language=None` → `EN_STOP_WORDS` (backward compat)
+- `tests/unit/test_cfg_extractor_language.py` — CFG-экстрактор с `language=ru` использует `CFG_NOUN_PHRASE_GRAMMARS`
+- Integration-тест: полный NLP pipeline с `language: ru` — стоп-слова `"И"`, `"ИЛИ"`, `"ЧТО"` фильтруются
+
+### Риск
+
+**Низкий:**
+- Изменяется только дефолтное поведение factory — явные конфиги (`exclude_nouns: [...]`) не затронуты
+- `language=None` → `EN_STOP_WORDS` (backward compat)
+
+---
+
+## P2 — NLTK Multilingual Sentence Tokenizer для chunking
+
+**Приоритет:** P2 — non-blocking, `chunking.type: tokens` обходит проблему
+
+**Пакеты:** `graphrag-chunking`
+
+**Текущее состояние:** `SentenceChunker` использует `nltk.sent_tokenize(text)` без указания языка. NLTK `punkt` по умолчанию — English-only.
+
+**Файл:** `packages/graphrag-chunking/graphrag_chunking/sentence_chunker.py:31`:
+```python
+sentences = nltk.sent_tokenize(text.strip())  # Always English
+```
+
+**Файл:** `packages/graphrag-chunking/graphrag_chunking/bootstrap_nltk.py:22-23`:
+```python
+nltk.download("punkt")
+nltk.download("punkt_tab")
+```
+
+`punkt_tab` в NLTK 3.9+ включает мультиязычные модели (russian, french, german, spanish...), но `sent_tokenize` по умолчанию всегда использует `english`.
+
+### Что нужно реализовать
+
+#### 1. Добавить `nltk_language` параметр в `SentenceChunker`
+
+**Файл:** `packages/graphrag-chunking/graphrag_chunking/sentence_chunker.py`
+
+```python
+class SentenceChunker(Chunker):
+    def __init__(
+        self,
+        encode: Callable[[str], list[int]] | None = None,
+        nltk_language: str = "english",
+        **kwargs: Any,
+    ) -> None:
+        self._encode = encode
+        self._nltk_language = nltk_language
+        bootstrap()
+
+    def chunk(self, text: str, ...) -> list[TextChunk]:
+        sentences = nltk.sent_tokenize(
+            text.strip(),
+            language=self._nltk_language  # <-- ключевое изменение
+        )
+```
+
+#### 2. Добавить `nltk_language` в конфиг чанкинга
+
+**Файл:** `packages/graphrag/graphrag/config/defaults.py` — в `ChunkingDefaults`:
+
+```python
+nltk_language: str = "english"
+```
+
+Или в отдельном `ChunkingConfig` (если есть):
+```python
+nltk_language: str = Field(
+    default="english",
+    description="NLTK punkt language model. Supported: english, russian, german, french, spanish, ...",
+)
+```
+
+#### 3. Передать язык из конфига в SentenceChunker
+
+Найти место создания чанкера (вероятно, в `packages/graphrag/graphrag/index/workflows/` или `packages/graphrag/graphrag/index/factories/`), передать `nltk_language`.
+
+#### 4. Обновить `init_content.py`
+
+**Файл:** `packages/graphrag/graphrag/config/init_content.py:42-46`
+
+```yaml
+chunking:
+  type: tokens
+  nltk_language: english # [english, russian, french, german, spanish] — used when type=sentence
+```
+
+#### 5. Обновить bootstrap — убедиться, что punkt_tab скачивается
+
+**Файл:** `packages/graphrag-chunking/graphrag_chunking/bootstrap_nltk.py`
+
+Проверить что `punkt_tab` скачивается (уже есть, строка 23). В NLTK 3.9+ `punkt_tab` содержит модели для 10+ языков, включая `russian`.
+
+### Зависимости
+
+- Нет прямых зависимостей
+
+### Тесты
+
+- Юнит-тест: `SentenceChunker(nltk_language="russian")` на русском тексте — корректная разбивка на предложения (сравнить с английским)
+- Тест: `nltk_language="english"` на русском — fallback degradation (показать что работает но хуже)
+- Integration-тест: полный pipeline с `chunking.type: sentence` + `nltk_language: russian`
+
+### Риск
+
+**Низкий:**
+- `nltk.sent_tokenize(language=...)` — стабильный API, поддерживается с nltk 3.8.2+
+- `punkt_tab` в NLTK 3.9+ уже включает мультиязычные модели
+- По умолчанию `english` — backward compat
