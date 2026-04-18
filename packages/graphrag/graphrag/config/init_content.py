@@ -40,10 +40,11 @@ input:
   type: {graphrag_config_defaults.input.type.value} # [csv, text, json, jsonl]
 
 chunking:
-  type: {graphrag_config_defaults.chunking.type}
-  size: {graphrag_config_defaults.chunking.size}
-  overlap: {graphrag_config_defaults.chunking.overlap}
-  encoding_model: {graphrag_config_defaults.chunking.encoding_model}
+   type: {graphrag_config_defaults.chunking.type}
+   size: {graphrag_config_defaults.chunking.size}
+   overlap: {graphrag_config_defaults.chunking.overlap}
+   encoding_model: {graphrag_config_defaults.chunking.encoding_model}
+   nltk_language: english # [english, russian, german, french, spanish] — used when type=sentence
 
 ### Storage settings ###
 ## If blob storage is specified in the following four sections,

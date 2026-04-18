@@ -34,3 +34,7 @@ class ChunkingConfig(BaseModel):
         description="Metadata fields from the source document to prepend on each chunk.",
         default=None,
     )
+    nltk_language: str = Field(
+        description="NLTK punkt language model. Supported: english, russian, german, french, spanish, ...",
+        default="english",
+    )

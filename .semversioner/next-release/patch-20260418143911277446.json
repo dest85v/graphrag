@@ -1,0 +1,4 @@
+{
+  "type": "patch",
+  "description": "Add nltk_language config field to chunking for multilingual sentence tokenization."
+}

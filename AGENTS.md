@@ -57,6 +57,8 @@
 - Python 3.11–3.13 (per `requires-python = ">=3.11,<3.14"`) + `spacy~=3.8` (already in `packages/graphrag/pyproject.toml:54`), `nltk~=3.9` (already in pyproject.toml, will be reduced) (004-textblob-to-spacy)
 - Python 3.11–3.13 (per project `requires-python = ">=3.11,<3.14"`) + `spacy~=3.8` (NLP-модели), `pydantic` (config validation) (006-language-aware-nlp-factory)
 - N/A — чистая бизнес-логика (006-language-aware-nlp-factory)
+- Python 3.11–3.13 (per workspace `requires-python`) + `nltk~=3.9` (already in `packages/graphrag/pyproject.toml:49`), `pydantic~=2.10` (in `graphrag-chunking`) (007-multilingual-sentence-tokenizer)
+- N/A (no data layer changes) (007-multilingual-sentence-tokenizer)
 
 ## Recent Changes
 - 001-litellm-to-openai: Added Python 3.11–3.13 (per project `requires-python = ">=3.11,<3.14"`) + `openai~=1.60` (replaces `litellm==1.82.6`), `tiktoken~=0.8` (already transitive, make direct), `azure-identity~=1.25` (unchanged)

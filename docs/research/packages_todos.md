@@ -999,13 +999,31 @@ extract_graph_nlp:
 
 ---
 
-## P2 — NLTK Multilingual Sentence Tokenizer для chunking
+## P2 — NLTK Multilingual Sentence Tokenizer для chunking ✅ **ВЫПОЛНЕНО**
 
-**Приоритет:** P2 — non-blocking, `chunking.type: tokens` обходит проблему
+> Реализовано в фиче `007-multilingual-sentence-tokenizer`: `nltk_language` поле в `ChunkingConfig` и `SentenceChunker`, конфиг дефолты, init template, 8 unit тестов, 0 регрессий.
 
-**Пакеты:** `graphrag-chunking`
+**Пакеты:** `graphrag-chunking`, `graphrag`
 
-**Текущее состояние:** `SentenceChunker` использует `nltk.sent_tokenize(text)` без указания языка. NLTK `punkt` по умолчанию — English-only.
+**Файлы изменены:**
+- `packages/graphrag-chunking/graphrag_chunking/chunking_config.py` — добавлено поле `nltk_language: str = "english"`
+- `packages/graphrag-chunking/graphrag_chunking/sentence_chunker.py` — `__init__` принимает `nltk_language`, `chunk()` передаёт `language=` в `nltk.sent_tokenize()`
+- `packages/graphrag/graphrag/config/defaults.py` — `ChunkingDefaults.nltk_language = "english"`
+- `packages/graphrag/graphrag/config/models/graph_rag_config.py` — `ChunkingConfig(...)` включает `nltk_language`
+- `packages/graphrag/graphrag/config/init_content.py` — `chunking.nltk_language` в шаблоне конфига
+- `packages/graphrag-chunking/README.md` — документация `nltk_language`
+- `tests/unit/chunking/test_sentence_chunker_nltk_language.py` — 8 тестов
+
+**Что реализовано:**
+1. `ChunkingConfig` имеет поле `nltk_language: str = "english"`
+2. `SentenceChunker` принимает `nltk_language` и передаёт в `nltk.sent_tokenize(language=...)`
+3. `ChunkingDefaults` имеет `nltk_language = "english"` (backward compat)
+4. `GraphRagConfig.chunking` передаёт `nltk_language` через `ChunkingConfig`
+5. `init_content.py` включает `nltk_language` в шаблон конфига с документацией
+6. 8 unit-тестов: EN default, EN explicit, RU mock/actual, DE, FR, invalid → LookupError, default check
+7. Все 19 тестов chunking проходят (0 регрессий)
+8. `poe check` на модифицированных файлах — 0 ошибок
+9. Semversioner PATCH entry добавлен
 
 **Файл:** `packages/graphrag-chunking/graphrag_chunking/sentence_chunker.py:31`:
 ```python

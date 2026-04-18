@@ -8,6 +8,17 @@ This package contains a collection of text chunkers, a core config model, and a 
 
 The SentenceChunker class splits text into individual sentences by identifying sentence boundaries. It takes input text and returns a list where each element is a separate sentence, making it easy to process text at the sentence level.
 
+By default, it uses the English PUNKT model. To use a different language, pass `nltk_language` to the constructor or set `nltk_language` in `ChunkingConfig`:
+
+```python
+chunker = SentenceChunker(nltk_language="russian")
+# or via config
+config = ChunkingConfig(type=ChunkerType.Sentence, nltk_language="russian")
+chunker = create_chunker(config)
+```
+
+Supported languages: `english`, `russian`, `german`, `french`, `spanish`, `portuguese`, `italian`, `dutch`, and more (via NLTK `punkt_tab`).
+
 [Open the notebook to explore the basic sentence example code](example_notebooks/basic_sentence_example.ipynb)
 
 ### Token chunking

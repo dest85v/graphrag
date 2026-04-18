@@ -65,6 +65,7 @@ class ChunkingDefaults:
     overlap: int = 100
     encoding_model: str = ENCODING_MODEL
     prepend_metadata: None = None
+    nltk_language: str = "english"
 
 
 @dataclass

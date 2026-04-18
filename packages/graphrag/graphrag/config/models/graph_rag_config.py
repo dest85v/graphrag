@@ -99,6 +99,7 @@ class GraphRagConfig(BaseModel):
             overlap=graphrag_config_defaults.chunking.overlap,
             encoding_model=graphrag_config_defaults.chunking.encoding_model,
             prepend_metadata=graphrag_config_defaults.chunking.prepend_metadata,
+            nltk_language=graphrag_config_defaults.chunking.nltk_language,
         ),
     )
     """The chunking configuration to use."""

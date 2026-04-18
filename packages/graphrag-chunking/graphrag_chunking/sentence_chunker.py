@@ -18,17 +18,21 @@ class SentenceChunker(Chunker):
     """A chunker that splits text into sentence-based chunks."""
 
     def __init__(
-        self, encode: Callable[[str], list[int]] | None = None, **kwargs: Any
+        self,
+        encode: Callable[[str], list[int]] | None = None,
+        nltk_language: str = "english",
+        **kwargs: Any,
     ) -> None:
         """Create a sentence chunker instance."""
         self._encode = encode
+        self._nltk_language = nltk_language
         bootstrap()
 
     def chunk(
         self, text: str, transform: Callable[[str], str] | None = None
     ) -> list[TextChunk]:
         """Chunk the text into sentence-based chunks."""
-        sentences = nltk.sent_tokenize(text.strip())
+        sentences = nltk.sent_tokenize(text.strip(), language=self._nltk_language)
         results = create_chunk_results(
             sentences, transform=transform, encode=self._encode
         )
