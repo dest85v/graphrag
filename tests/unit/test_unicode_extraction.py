@@ -34,7 +34,9 @@ class TestUnicodeTokenValidation:
 
         cyrillic_words = ["внутренний", "АУДИТ", "отчёт", "документация", "система"]
         for word in cyrillic_words:
-            assert re.match(pattern, word), f"Cyrillic word '{word}' should pass validation"
+            assert re.match(pattern, word), (
+                f"Cyrillic word '{word}' should pass validation"
+            )
 
     def test_english_tokens_still_pass(self):
         """English words still pass after Unicode change."""
@@ -42,7 +44,9 @@ class TestUnicodeTokenValidation:
 
         english_words = ["API", "endpoint", "deployment", "system", "test"]
         for word in english_words:
-            assert re.match(pattern, word), f"English word '{word}' should pass validation"
+            assert re.match(pattern, word), (
+                f"English word '{word}' should pass validation"
+            )
 
     def test_hyphenated_compound_words_pass(self):
         """Hyphenated compound words pass validation."""
@@ -50,13 +54,17 @@ class TestUnicodeTokenValidation:
 
         compound_words = ["deployment-pipeline", "well-designed", "machine-learning"]
         for word in compound_words:
-            assert re.match(pattern, word), f"Compound word '{word}' should pass validation"
+            assert re.match(pattern, word), (
+                f"Compound word '{word}' should pass validation"
+            )
 
     def test_standalone_hyphen_passes(self):
         """Standalone hyphen token (from spaCy tokenization) passes validation."""
         pattern = r"^[\w\-]+$"
 
-        assert re.match(pattern, "-"), "Standalone hyphen should pass (needed for spaCy tokenization)"
+        assert re.match(pattern, "-"), (
+            "Standalone hyphen should pass (needed for spaCy tokenization)"
+        )
 
     def test_special_chars_still_fail(self):
         """Tokens with special characters still fail validation."""
@@ -72,7 +80,9 @@ class TestUnicodeTokenValidation:
 
         number_tokens = ["2026", "v2", "API3", "123"]
         for token in number_tokens:
-            assert re.match(pattern, token), f"Number token '{token}' should pass validation"
+            assert re.match(pattern, token), (
+                f"Number token '{token}' should pass validation"
+            )
 
     def test_jaccard_similarity_on_english_text(self):
         """Jaccard similarity between ASCII-only and new Unicode RegexExtractor on English text >= 95%."""

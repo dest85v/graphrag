@@ -58,7 +58,7 @@ class NounPhraseExtractorType(str, Enum):
     """Enum for the noun phrase extractor options."""
 
     RegexEnglish = "regex_english"
-    """Standard extractor using regex. Fastest, but limited to English."""
+    """Standard extractor using regex. Fastest, but limited to English (use syntactic_parser for multilingual)."""
     Syntactic = "syntactic_parser"
     """Noun phrase extractor based on dependency parsing and NER using SpaCy."""
     CFG = "cfg"

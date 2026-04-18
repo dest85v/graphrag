@@ -20,6 +20,9 @@ from graphrag.config.enums import (
     NounPhraseExtractorType,
     ReportingType,
 )
+from graphrag.index.operations.build_noun_graph.np_extractors.cfg_extractor import (
+    EN_NOUN_PHRASE_GRAMMARS,
+)
 from graphrag.index.operations.build_noun_graph.np_extractors.stop_words import (
     EN_STOP_WORDS,
 )
@@ -170,13 +173,7 @@ class TextAnalyzerDefaults:
     )
     noun_phrase_tags: list[str] = field(default_factory=lambda: ["PROPN", "NOUNS"])
     noun_phrase_grammars: dict[str, str] = field(
-        default_factory=lambda: {
-            "PROPN,PROPN": "PROPN",
-            "NOUN,NOUN": "NOUNS",
-            "NOUNS,NOUN": "NOUNS",
-            "ADJ,ADJ": "ADJ",
-            "ADJ,NOUN": "NOUNS",
-        }
+        default_factory=lambda: EN_NOUN_PHRASE_GRAMMARS
     )
 
 

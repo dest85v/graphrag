@@ -16,7 +16,15 @@ from graphrag.index.operations.build_noun_graph.np_extractors.np_validator impor
     is_valid_entity,
 )
 
-RU_NOUN_PHRASE_GRAMMARS: dict[tuple[str, ...], str] = {
+EN_NOUN_PHRASE_GRAMMARS: dict[str, str] = {
+    "PROPN,PROPN": "PROPN",
+    "NOUN,NOUN": "NOUNS",
+    "NOUNS,NOUN": "NOUNS",
+    "ADJ,ADJ": "ADJ",
+    "ADJ,NOUN": "NOUNS",
+}
+
+CFG_NOUN_PHRASE_GRAMMARS: dict[tuple[str, ...], str] = {
     ("ADJ", "NOUN"): "ADJ_NOUN",
     ("ADJ", "PROPN"): "ADJ_PROPN",
     ("ADV", "ADJ"): "ADV_ADJ",

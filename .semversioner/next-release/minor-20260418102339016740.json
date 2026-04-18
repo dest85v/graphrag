@@ -1,0 +1,4 @@
+{
+  "type": "minor",
+  "description": "Add language-aware NLP factory with auto stop words and CFG grammars selection."
+}

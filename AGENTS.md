@@ -55,6 +55,8 @@
 - Python 3.11–3.13 (per project `requires-python = ">=3.11,<3.14"`) + `qdrant-client>=1.7.0,<1.18.0` (optional `qdrant` extra in `graphrag-vectors`) (003-003-qdrant-vector)
 - Qdrant (external, remote or local via Docker) (003-003-qdrant-vector)
 - Python 3.11–3.13 (per `requires-python = ">=3.11,<3.14"`) + `spacy~=3.8` (already in `packages/graphrag/pyproject.toml:54`), `nltk~=3.9` (already in pyproject.toml, will be reduced) (004-textblob-to-spacy)
+- Python 3.11–3.13 (per project `requires-python = ">=3.11,<3.14"`) + `spacy~=3.8` (NLP-модели), `pydantic` (config validation) (006-language-aware-nlp-factory)
+- N/A — чистая бизнес-логика (006-language-aware-nlp-factory)
 
 ## Recent Changes
 - 001-litellm-to-openai: Added Python 3.11–3.13 (per project `requires-python = ">=3.11,<3.14"`) + `openai~=1.60` (replaces `litellm==1.82.6`), `tiktoken~=0.8` (already transitive, make direct), `azure-identity~=1.25` (unchanged)

@@ -20,6 +20,10 @@ class TextAnalyzerConfig(BaseModel):
         description="The SpaCy model name.",
         default=graphrag_config_defaults.extract_graph_nlp.text_analyzer.model_name,
     )
+    language: str | None = Field(
+        default=None,
+        description="Document language for selecting appropriate stop words and CFG grammars (e.g., 'en', 'ru'). Falls back to English defaults if not set.",
+    )
     nlp_model: str | None = Field(
         default=None,
         description="Override the default NLP model name. If None, uses the default (en_core_web_md). Supports any spaCy model name (e.g., 'ru_core_news_md', 'xx_ent_wiki_sm').",
@@ -37,8 +41,8 @@ class TextAnalyzerConfig(BaseModel):
         default=graphrag_config_defaults.extract_graph_nlp.text_analyzer.include_named_entities,
     )
     exclude_nouns: list[str] | None = Field(
-        description="The list of excluded nouns (i.e., stopwords). If None, will use a default stopword list",
-        default=graphrag_config_defaults.extract_graph_nlp.text_analyzer.exclude_nouns,
+        description="The list of excluded nouns (i.e., stopwords). If None, will be selected based on the 'language' field.",
+        default=None,
     )
     exclude_entity_tags: list[str] = Field(
         description="The list of named entity tags to exclude in noun phrases.",

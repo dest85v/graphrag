@@ -64,6 +64,30 @@ chunking:
 
 ### 3. Настройка NLP-экстрактора сущностей
 
+#### Поле `language` — автоподбор ресурсов
+
+GraphRAG автоматически выбирает стоп-слова и CFG-грамматики на основе поля `language`:
+
+```yaml
+extract_graph_nlp:
+  text_analyzer:
+    language: ru  # ← автоматически выбирает RU_STOP_WORDS и CFG_NOUN_PHRASE_GRAMMARS
+```
+
+| `language` | Стоп-слова | CFG-грамматики |
+|---|---|---|
+| `ru` | Русские (`И`, `ИЛИ`, `ЧТО`, ...) | `CFG_NOUN_PHRASE_GRAMMARS` |
+| `en` / `null` / не указано | Английские (`stuff`, `thing`, ...) | `EN_NOUN_PHRASE_GRAMMARS` |
+
+Явно указанный `exclude_nouns` переопределяет автоподбор:
+
+```yaml
+extract_graph_nlp:
+  text_analyzer:
+    language: ru
+    exclude_nouns: ["И", "ЧТО", "МОЙ_СЛОВ"]  # ← свои слова, language игнорируется
+```
+
 #### Вариант A: Syntactic Parser (рекомендуется для русского)
 
 Использует dependency parsing + NER от spaCy. Корректно работает с любым языком при подстановке соответствующей модели.
@@ -72,9 +96,21 @@ chunking:
 extract_graph_nlp:
   text_analyzer:
     extractor_type: syntactic_parser
-    model_name: ru_core_news_md  # русская модель spaCy
+    language: ru  # ← автовыбор модели ru_core_news_md
+    model_name: ru_core_news_md  # можно опустить при language: ru
     include_named_entities: true
     max_word_length: 15
+```
+
+**Автовыбор spaCy-модели** (опционально):
+
+Если не указан ни `nlp_model`, ни `model_name`, GraphRAG выберет модель автоматически по языку:
+
+```yaml
+extract_graph_nlp:
+  text_analyzer:
+    extractor_type: syntactic_parser
+    language: ru  # ← автоматически выберет ru_core_news_md
 ```
 
 #### Вариант B: CFG Extractor
@@ -85,9 +121,9 @@ extract_graph_nlp:
 extract_graph_nlp:
   text_analyzer:
     extractor_type: cfg
+    language: ru  # ← автоматически выберет CFG_NOUN_PHRASE_GRAMMARS
     model_name: ru_core_news_md
     include_named_entities: true
-    # Grammars задаются через конфигурацию (см. ниже)
 ```
 
 #### Вариант C: Regex Extractor (по умолчанию, только английский)
@@ -208,7 +244,22 @@ graphrag query --root ./my-project --method local --query "Что такое м�
 graphrag query --root ./my-project --method global --query "Какие технологии описаны в документах?"
 ```
 
-## Выбор spaCy-модели
+## Автовыбор spaCy-модели
+
+При указании `language` без `model_name` GraphRAG автоматически выберет модель:
+
+| `language` | Автоматически выбранная модель |
+|---|---|
+| `ru` | `ru_core_news_md` |
+| `de` | `de_core_news_md` |
+| `fr` | `fr_core_news_md` |
+| `es` | `es_core_news_md` |
+| `xx` | `xx_ent_wiki_sm` |
+| `null` / `en` / любое другое | `en_core_web_md` (fallback) |
+
+Явный `model_name` или `nlp_model` всегда переопределяет автовыбор.
+
+## Ручной выбор spaCy-модели
 
 | Модель | Язык | Размер | Когда использовать |
 |---|---|---|---|

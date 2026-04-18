@@ -979,6 +979,24 @@ extract_graph_nlp:
 - Изменяется только дефолтное поведение factory — явные конфиги (`exclude_nouns: [...]`) не затронуты
 - `language=None` → `EN_STOP_WORDS` (backward compat)
 
+**Статус:** ✅ ЗАВЕРШЕНО (2026-04-18). Реализовано:
+1. Поле `language: str | None` добавлено в `TextAnalyzerConfig` (`extract_graph_nlp_config.py`)
+2. `RU_NOUN_PHRASE_GRAMMARS` переименован в `CFG_NOUN_PHRASE_GRAMMARS` (`cfg_extractor.py`)
+3. `EN_NOUN_PHRASE_GRAMMARS` вынесены из `defaults.py` в `cfg_extractor.py`
+4. `defaults.py` импортирует `EN_NOUN_PHRASE_GRAMMARS` из `cfg_extractor.py`
+5. `NounPhraseExtractorFactory` — автоподбор `RU_STOP_WORDS` / `EN_STOP_WORDS` по `language`
+6. `NounPhraseExtractorFactory` — автоподбор CFG-грамматик по `language` (RU → `CFG_NOUN_PHRASE_GRAMMARS`, EN → `EN_NOUN_PHRASE_GRAMMARS`)
+7. `NounPhraseExtractorFactory` — автовыбор spaCy-модели через `LANGUAGE_MODEL_MAP`
+8. Обновлён `init_content.py` — добавлено поле `language` в шаблон конфига
+9. Обновлён `enums.py` — docstring RegexEnglish указывает ограничение по языку
+10. `TextAnalyzerConfig.exclude_nouns` default изменён на `None` (ранее `EN_STOP_WORDS`) — автоподбор через factory
+11. 29 unit-тестов: `test_noun_phrase_factory.py` — coverage всех сценариев
+12. Все 53 теста в `tests/unit/indexing/operations/` проходят
+13. `poe format` — 0 изменений, код отформатирован
+14. `poe check` — рутинг чистый (остались только pre-existing ошибки P3 HuggingFace tokenizer)
+15. Semversioner minor change entry добавлен
+16. `README_RU.md` обновлён: секция автоподбора ресурсов, автовыбор spaCy-модели
+
 ---
 
 ## P2 — NLTK Multilingual Sentence Tokenizer для chunking

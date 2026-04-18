@@ -90,6 +90,7 @@ summarize_descriptions:
 extract_graph_nlp:
   text_analyzer:
     extractor_type: {graphrag_config_defaults.extract_graph_nlp.text_analyzer.extractor_type.value} # [regex_english, syntactic_parser, cfg]
+    language: en # [en, ru, de, fr, es, xx] — selects stop words & CFG grammars; falls back to 'en'
 
 cluster_graph:
   max_cluster_size: {graphrag_config_defaults.cluster_graph.max_cluster_size}
