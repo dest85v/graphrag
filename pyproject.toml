@@ -229,6 +229,7 @@ ignore = [
 "packages/*/graphrag_*/__init__.py" = ["RUF067", "TCH003"]
 "graphrag/index/config/*" = ["TCH"]
 "*.ipynb" = ["T201", "S101", "PT015", "B011", "CPY001", "SLF001", "DTZ005"]
+"packages/graphrag/graphrag/index/operations/build_noun_graph/np_extractors/stop_words.py" = ["RUF001"]
 
 [tool.ruff.lint.flake8-builtins]
 builtins-ignorelist = ["input", "id", "bytes"]

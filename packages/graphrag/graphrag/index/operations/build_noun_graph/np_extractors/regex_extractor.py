@@ -126,10 +126,10 @@ class RegexENNounPhraseExtractor(BaseNounPhraseExtractor):
         }
 
     def _is_valid_token(self, token: str) -> bool:
-        """Check if a token contains only valid characters (alphanumeric, hyphens)."""
+        """Check if a token contains only valid characters (alphanumeric, hyphens, Unicode letters)."""
         import re
 
-        return bool(re.match(r"^[a-zA-Z0-9\-]+\n?$", token))
+        return bool(re.match(r"^[\w\-]+$", token))
 
     def __str__(self) -> str:
         """Return string representation of the extractor, used for cache key generation."""

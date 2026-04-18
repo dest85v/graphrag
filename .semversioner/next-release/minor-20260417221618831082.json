@@ -1,0 +1,4 @@
+{
+  "type": "minor",
+  "description": "Add Russian language support with Unicode-aware token validation, configurable NLP model, and Russian stop words/grammar rules."
+}

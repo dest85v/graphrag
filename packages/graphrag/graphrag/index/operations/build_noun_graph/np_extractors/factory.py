@@ -41,10 +41,11 @@ class NounPhraseExtractorFactory:
         exclude_nouns = config.exclude_nouns
         if exclude_nouns is None:
             exclude_nouns = EN_STOP_WORDS
+        effective_model_name = config.nlp_model or config.model_name
         match np_extractor_type:
             case NounPhraseExtractorType.Syntactic:
                 return SyntacticNounPhraseExtractor(
-                    model_name=config.model_name,
+                    model_name=effective_model_name,
                     max_word_length=config.max_word_length,
                     include_named_entities=config.include_named_entities,
                     exclude_entity_tags=config.exclude_entity_tags,
@@ -57,7 +58,7 @@ class NounPhraseExtractorFactory:
                 for key, value in config.noun_phrase_grammars.items():
                     grammars[tuple(key.split(","))] = value
                 return CFGNounPhraseExtractor(
-                    model_name=config.model_name,
+                    model_name=effective_model_name,
                     max_word_length=config.max_word_length,
                     include_named_entities=config.include_named_entities,
                     exclude_entity_tags=config.exclude_entity_tags,
@@ -69,7 +70,7 @@ class NounPhraseExtractorFactory:
                 )
             case NounPhraseExtractorType.RegexEnglish:
                 return RegexENNounPhraseExtractor(
-                    model_name=config.model_name,
+                    model_name=effective_model_name,
                     exclude_nouns=exclude_nouns,
                     max_word_length=config.max_word_length,
                     word_delimiter=config.word_delimiter,

@@ -20,6 +20,10 @@ class TextAnalyzerConfig(BaseModel):
         description="The SpaCy model name.",
         default=graphrag_config_defaults.extract_graph_nlp.text_analyzer.model_name,
     )
+    nlp_model: str | None = Field(
+        default=None,
+        description="Override the default NLP model name. If None, uses the default (en_core_web_md). Supports any spaCy model name (e.g., 'ru_core_news_md', 'xx_ent_wiki_sm').",
+    )
     max_word_length: int = Field(
         description="The max word length for NLP parsing.",
         default=graphrag_config_defaults.extract_graph_nlp.text_analyzer.max_word_length,

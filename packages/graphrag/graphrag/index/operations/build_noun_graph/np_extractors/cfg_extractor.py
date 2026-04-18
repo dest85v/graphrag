@@ -16,6 +16,20 @@ from graphrag.index.operations.build_noun_graph.np_extractors.np_validator impor
     is_valid_entity,
 )
 
+RU_NOUN_PHRASE_GRAMMARS: dict[tuple[str, ...], str] = {
+    ("ADJ", "NOUN"): "ADJ_NOUN",
+    ("ADJ", "PROPN"): "ADJ_PROPN",
+    ("ADV", "ADJ"): "ADV_ADJ",
+    ("ADV", "ADJ", "NOUN"): "ADV_ADJ_NOUN",
+    ("NOUN", "PREP"): "NOUN_PREP",
+    ("NOUN", "PREP", "NOUN"): "NOUN_PREP_NOUN",
+    ("PROPN", "NOUN"): "PROPN_NOUN",
+    ("NUM", "NOUN"): "NUM_NOUN",
+    ("NOUN", "ADJ"): "NOUN_ADJ",
+    ("DET", "NOUN"): "DET_NOUN",
+    ("DET", "ADJ", "NOUN"): "DET_ADJ_NOUN",
+}
+
 
 class CFGNounPhraseExtractor(BaseNounPhraseExtractor):
     """CFG-based noun phrase extractor."""
