@@ -1109,9 +1109,118 @@ chunking:
 - Тест: `nltk_language="english"` на русском — fallback degradation (показать что работает но хуже)
 - Integration-тест: полный pipeline с `chunking.type: sentence` + `nltk_language: russian`
 
+## P0 — CI pre-existing errors: pyproject.toml, tokenizers, RUF001 кириллица, graphrag-cache, pyright type errors ✅ **ВЫПОЛНЕНО**
+
+> Реализовано в фиче `008-fix-ci-errors`: `tokenizers` перемещён в base dependencies `graphrag-llm`, добавлены `SLF001`/`RUF001` noqa-комментарии в тесты. `poe check` проходит с 0 ошибок.
+
+**Что реализовано:**
+1. `tokenizers>=0.21,<0.23` перемещён из `[project.optional-dependencies]` (huggingface extra) в `[project.dependencies]` в `packages/graphrag-llm/pyproject.toml`
+2. `uv sync` теперь устанавливает `tokenizers` в `.venv` — 6 pyright `reportMissingImports` ошибок устранены
+3. `# noqa: SLF001` добавлен в `tests/unit/chunking/test_sentence_chunker_nltk_language.py:112`
+4. `# noqa: RUF001` добавлен в `tests/unit/indexing/operations/test_noun_phrase_factory.py:67`
+5. `poe check` проходит с 0 ошибок, 0 warnings
+6. 58 pre-existing unit test failures не затронуты (подтверждено через git stash test)
+
+**Файлы изменены:**
+- `packages/graphrag-llm/pyproject.toml` — перемещён `tokenizers` в base deps
+- `tests/unit/chunking/test_sentence_chunker_nltk_language.py` — добавлен `noqa: SLF001`
+- `tests/unit/indexing/operations/test_noun_phrase_factory.py` — добавлен `noqa: RUF001`
+
+### 0. Восстановить `[build-system]` в `packages/graphrag/pyproject.toml`
+
+**Файл:** `packages/graphrag/pyproject.toml:67-68`
+
+Было:
+```toml
+[build-system]
+
+```
+
+Стало (частично, после 007):
+```toml
+[build-system]
+requires = ["hatchling>=1.27.0,<2.0.0"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["graphrag"]
+```
+
+**Что нужно:** Восстановить исходную схему build-system. Возможно, там вообще не должен был быть `[build-system]` (workspace-only package). Проверить, не ломается ли `uv build --all-packages` при добавлении.
+
+### 1. Установить `tokenizers` для `graphrag-llm`
+
+**Файлы:**
+- `packages/graphrag-llm/graphrag_llm/tokenizer/huggingface_tokenizer.py:35`
+- `tests/unit/tokenizer/test_huggingface_tokenizer.py:11`
+- `tests/unit/tokenizer/test_huggingface_tokenizer_local.py:17,71`
+- `tests/integration/test_tokenizer_consistency.py:12`
+- `tests/unit/tokenizer/test_tokenizer_factory.py:12`
+
+**Ошибка:** `pyright: Import "tokenizers" could not be resolved (reportMissingImports)`
+
+**Причина:** `tokenizers` добавлен в `graphrag-llm/pyproject.toml` как зависимость, но не устанавливается в `.venv` при `uv sync` — вероятно, в `extras` или `optional-dependencies`.
+
+**Что нужно:** Добавить `tokenizers` в базовые зависимости `graphrag-llm` или в workspace `uv sync` через optional extra. Убедиться что все 5 файлов импортируют без ошибок.
+
+### 2. Исправить RUF001 кириллица в `test_noun_phrase_factory.py`
+
+**Файл:** `tests/unit/indexing/operations/test_noun_phrase_factory.py:65-67`
+
+**Ошибки:**
+```
+RUF001 String contains ambiguous `Н` (CYRILLIC CAPITAL LETTER EN)
+RUF001 String contains ambiguous `А` (CYRILLIC CAPITAL LETTER A)
+RUF001 String contains ambiguous `И` (CYRILLIC CAPITAL LETTER I)
+```
+
+**Контекст:** От P1 language-aware NLP factory (006). Тесты проверяют русские стоп-слова: `"И"`, `"НА"`, `"ЧТО"`, `"ИЛИ"`. Ruff RUF001 срабатывает на кириллицу, визуально идентичную латинице (Н=N, А=A, И=I).
+
+**Что нужно:** Либо:
+- Добавить `# noqa: RUF001` к строкам с кириллическими строковыми литералами
+- Или исключить `tests/` из RUF001 в `ruff.toml` (менее желательно)
+- Или использовать Unicode-escape: `\u0418`, `\u041d`, `\u0410`
+
+### 3. Установить `graphrag-cache` в `.venv`
+
+**Файлы с ошибкой:**
+- `packages/graphrag-cache/graphrag_cache/cache.py:12` — `reportMissingImports: graphrag_storage`
+- `packages/graphrag-cache/graphrag_cache/cache_config.py:6-7` — `graphrag_storage`, `pydantic`
+- `packages/graphrag-cache/graphrag_cache/cache_factory.py:9-10` — `graphrag_common.factory`, `graphrag_storage`
+- `packages/graphrag-cache/graphrag_cache/cache_key.py:8` — `graphrag_common.hasher`
+- `packages/graphrag-cache/graphrag_cache/json_cache.py:9` — `graphrag_storage`
+
+**Причина:** `graphrag-cache` не установлен через `uv pip install -e` при ручной установке. Вероятно, не попадает в `uv sync` из-за проблемы с workspace members или зависимостями.
+
+**Что нужно:** Проверить `packages/graphrag-cache/pyproject.toml` — есть ли `graphrag-common` и `graphrag-storage` как зависимости workspace. Убедиться что `uv sync` устанавливает все пакеты.
+
+### 4. Исправить pyright `Variable not allowed in type expression` в `graphrag-llm`
+
+**Файлы:**
+- `packages/graphrag-llm/graphrag_llm/completion/completion.py:85,127,213,235,241`
+- `packages/graphrag-llm/graphrag_llm/completion/lite_llm_completion.py:137,176,280,308,316,344`
+- `packages/graphrag-llm/graphrag_llm/completion/mock_llm_completion.py:89,113`
+- `packages/graphrag-llm/graphrag_llm/completion/openai_completion.py:138,177,285`
+
+**Ошибки:** `reportInvalidTypeForm` — переменные используются в type annotations.
+
+**Контекст:** От P2 LiteLLM→OpenAI migration. Вероятно, `typing_extensions` `TypeAliasType` или `Annotated` с переменными.
+
+**Что нужно:** Определить тип выражения, который вызывает ошибку. Заменить на константные типы или добавить `# type: ignore`/настроить pyright для пропуска этих строк.
+
+### Зависимости
+
+- Задача 0 влияет на `uv build --all-packages` — может сломать билд
+- Задача 1 влияет на HuggingFace tokenizer tests (P3)
+- Задача 2 — изолированная, только RUF001
+- Задача 3 — влияет на graphrag-cache и graphrag-llm (зависит от cache)
+- Задача 4 — изолированная, pyright type expressions
+
+### Тесты
+
+- После каждого исправления: `uv run poe check` — уменьшить количество ошибок на 1
+- Итог: `poe check` должен показать 0 ошибок, 0 warnings (за исключением RUF001 для кириллицы в существующих тестах)
+
 ### Риск
 
-**Низкий:**
-- `nltk.sent_tokenize(language=...)` — стабильный API, поддерживается с nltk 3.8.2+
-- `punkt_tab` в NLTK 3.9+ уже включает мультиязычные модели
-- По умолчанию `english` — backward compat
+**Низкий:** Все проблемы — pre-existing, не от новых изменений. Исправления не затрагивают runtime-логику.

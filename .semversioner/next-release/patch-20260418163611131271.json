@@ -1,0 +1,4 @@
+{
+  "type": "patch",
+  "description": "Fix 9 CI errors: tokenizers import resolution, SLF001 and RUF001 false-positives in test files."
+}

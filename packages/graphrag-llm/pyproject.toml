@@ -40,12 +40,12 @@ dependencies = [
     "openai~=1.60",
     "tiktoken~=0.8",
     "pydantic~=2.10",
+    "tokenizers>=0.21,<0.23",
     "typing-extensions~=4.12"
 ]
 
 [project.optional-dependencies]
 huggingface = [
-    "tokenizers>=0.21,<0.23",
     "sentencepiece>=0.2,<0.3",
     "protobuf>=5.0,<6.0",
 ]

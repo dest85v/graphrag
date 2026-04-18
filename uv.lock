@@ -963,6 +963,7 @@ dependencies = [
     { name = "openai" },
     { name = "pydantic" },
     { name = "tiktoken" },
+    { name = "tokenizers" },
     { name = "typing-extensions" },
 ]
 
@@ -970,7 +971,6 @@ dependencies = [
 huggingface = [
     { name = "protobuf" },
     { name = "sentencepiece" },
-    { name = "tokenizers" },
 ]
 
 [package.metadata]
@@ -985,7 +985,7 @@ requires-dist = [
     { name = "pydantic", specifier = "~=2.10" },
     { name = "sentencepiece", marker = "extra == 'huggingface'", specifier = ">=0.2,<0.3" },
     { name = "tiktoken", specifier = "~=0.8" },
-    { name = "tokenizers", marker = "extra == 'huggingface'", specifier = ">=0.21,<0.23" },
+    { name = "tokenizers", specifier = ">=0.21,<0.23" },
     { name = "typing-extensions", specifier = "~=4.12" },
 ]
 provides-extras = ["huggingface"]

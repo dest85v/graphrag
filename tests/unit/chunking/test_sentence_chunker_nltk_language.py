@@ -109,4 +109,4 @@ class TestSentenceChunkerNltkLanguage:
     def test_sentence_chunker_default_is_english(self):
         """Verify default nltk_language is 'english'."""
         chunker = SentenceChunker()
-        assert chunker._nltk_language == "english"
+        assert chunker._nltk_language == "english"  # noqa: SLF001

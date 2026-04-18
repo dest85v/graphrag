@@ -59,6 +59,8 @@
 - N/A — чистая бизнес-логика (006-language-aware-nlp-factory)
 - Python 3.11–3.13 (per workspace `requires-python`) + `nltk~=3.9` (already in `packages/graphrag/pyproject.toml:49`), `pydantic~=2.10` (in `graphrag-chunking`) (007-multilingual-sentence-tokenizer)
 - N/A (no data layer changes) (007-multilingual-sentence-tokenizer)
+- Python 3.11–3.13 (workspace `requires-python = ">=3.11,<3.14"`) + `ruff` (lint/format), `pyright` (type checking), `tokenizers` (HuggingFace, via `graphrag-llm`) (008-fix-ci-errors)
+- N/A — no data layer changes (008-fix-ci-errors)
 
 ## Recent Changes
 - 001-litellm-to-openai: Added Python 3.11–3.13 (per project `requires-python = ">=3.11,<3.14"`) + `openai~=1.60` (replaces `litellm==1.82.6`), `tiktoken~=0.8` (already transitive, make direct), `azure-identity~=1.25` (unchanged)

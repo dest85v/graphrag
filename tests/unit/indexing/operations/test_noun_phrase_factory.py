@@ -64,7 +64,7 @@ class TestStopWordsSelection:
         assert "И" in extractor.exclude_nouns
         assert "ИЛИ" in extractor.exclude_nouns
         assert "ЧТО" in extractor.exclude_nouns
-        assert "НА" in extractor.exclude_nouns
+        assert "НА" in extractor.exclude_nouns  # noqa: RUF001
         assert "STUFF" not in extractor.exclude_nouns
         assert "THING" not in extractor.exclude_nouns
 
