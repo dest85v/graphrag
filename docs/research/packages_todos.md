@@ -481,7 +481,7 @@ from openai import (
 
 ---
 
-## P3 — Добавить HuggingFace `tokenizers` для не-OpenAI моделей
+## P3 — Добавить HuggingFace `tokenizers` для не-OpenAI моделей ✅ **ВЫПОЛНЕНО**
 
 **Статус:** ✅ Выполнено (2026-04-17)  
 **Зависит от:** P2 (замена LiteLLM на OpenAI SDK) — завершить полностью перед началом.
@@ -819,7 +819,7 @@ RU_NOUN_PHRASE_GRAMMARS = [
 
 ---
 
-## P1 — Language-aware NLP Factory: auto-select stop words и CFG grammars по языку
+## P1 — Language-aware NLP Factory: auto-select stop words и CFG grammars по языку ✅ **ВЫПОЛНЕНО**
 
 **Приоритет:** P1 — следует за P1 (русский язык, строка 679)
 
