@@ -3,6 +3,12 @@
 
 """Config module for graphrag-llm."""
 
+from graphrag_llm.config.mcp_config import (
+    MCPConfig,
+    MCPSSEConfig,
+    MCPStdioConfig,
+    MCPStreamableHTTPConfig,
+)
 from graphrag_llm.config.metrics_config import MetricsConfig
 from graphrag_llm.config.model_config import ModelConfig
 from graphrag_llm.config.rate_limit_config import RateLimitConfig
@@ -25,6 +31,10 @@ from graphrag_llm.config.types import (
 __all__ = [
     "AuthMethod",
     "LLMProviderType",
+    "MCPConfig",
+    "MCPSSEConfig",
+    "MCPStdioConfig",
+    "MCPStreamableHTTPConfig",
     "MetricsConfig",
     "MetricsProcessorType",
     "MetricsStoreType",

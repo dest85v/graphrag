@@ -103,7 +103,7 @@ def with_middleware_pipeline(
             async_middleware=async_model_fn,
             failure_rate=failure_rate_for_testing,
             exception_type=extra_config.get(
-                "failure_rate_for_testing_exception_type", "ValueError"
+                "failure_rate_for_testing_exception_type", "ValueError",
             ),
             exception_args=extra_config.get("failure_rate_for_testing_exception_args"),
         )
@@ -130,6 +130,19 @@ def with_middleware_pipeline(
             async_middleware=async_model_fn,
             retrier=retrier,
         )
+
+    # MCP middleware: intercept tool calls and route through MCP server
+    # Placed after retries (so MCP errors are retried) but before cache
+    # (so tool results are not cached)
+    extra_config = model_config.model_extra or {}
+    mcp_config = extra_config.get("mcp_config")
+    if mcp_config and request_type == "chat":
+        from graphrag_llm.mcp.middleware import MCPCompletionMiddleware
+
+        mcp_middleware = MCPCompletionMiddleware(
+            mcp_config=mcp_config if isinstance(mcp_config, dict) else None,
+        )
+        model_fn, async_model_fn = mcp_middleware.wrap(model_fn, async_model_fn)  # type: ignore[assignment]
 
     if cache:
         model_fn, async_model_fn = with_cache(

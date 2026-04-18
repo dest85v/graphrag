@@ -1,0 +1,4 @@
+{
+  "type": "patch",
+  "description": "Add MCP (Model Context Protocol) support to graphrag-llm with stdio, SSE, and Streamable HTTP transports."
+}

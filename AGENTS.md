@@ -61,6 +61,8 @@
 - N/A (no data layer changes) (007-multilingual-sentence-tokenizer)
 - Python 3.11–3.13 (workspace `requires-python = ">=3.11,<3.14"`) + `ruff` (lint/format), `pyright` (type checking), `tokenizers` (HuggingFace, via `graphrag-llm`) (008-fix-ci-errors)
 - N/A — no data layer changes (008-fix-ci-errors)
+- Python 3.11–3.13 (per workspace `requires-python = ">=3.11,<3.14"`) + `mcp>=1.0.0` (official MCP Python SDK, v1.x branch), `anyio`, `httpx`, `httpx-sse` (transitive from `mcp`) (009-mcp-llm-support)
+- N/A (no persistent storage; runtime-only) (009-mcp-llm-support)
 
 ## Recent Changes
 - 001-litellm-to-openai: Added Python 3.11–3.13 (per project `requires-python = ">=3.11,<3.14"`) + `openai~=1.60` (replaces `litellm==1.82.6`), `tiktoken~=0.8` (already transitive, make direct), `azure-identity~=1.25` (unchanged)

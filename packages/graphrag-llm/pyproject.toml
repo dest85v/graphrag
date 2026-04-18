@@ -45,6 +45,9 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+mcp = [
+    "mcp>=1.0.0,<2.0.0",
+]
 huggingface = [
     "sentencepiece>=0.2,<0.3",
     "protobuf>=5.0,<6.0",
