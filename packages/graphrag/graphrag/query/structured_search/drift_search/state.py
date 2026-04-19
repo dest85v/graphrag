@@ -18,16 +18,16 @@ logger = logging.getLogger(__name__)
 class QueryState:
     """Manage the state of the query, including a graph of actions."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.graph = nx.MultiDiGraph()
 
-    def add_action(self, action: DriftAction, metadata: dict[str, Any] | None = None):
+    def add_action(self, action: DriftAction, metadata: dict[str, Any] | None = None) -> None:
         """Add an action to the graph with optional metadata."""
         self.graph.add_node(action, **(metadata or {}))
 
     def relate_actions(
-        self, parent: DriftAction, child: DriftAction, weight: float = 1.0
-    ):
+        self, parent: DriftAction, child: DriftAction, weight: float = 1.0,
+    ) -> None:
         """Relate two actions in the graph."""
         self.graph.add_edge(parent, child, weight=weight)
 
@@ -36,7 +36,7 @@ class QueryState:
         action: DriftAction,
         follow_ups: list[DriftAction] | list[str],
         weight: float = 1.0,
-    ):
+    ) -> None:
         """Add all follow-up actions and links them to the given action."""
         if len(follow_ups) == 0:
             logger.warning("No follow-up actions for action: %s", action.query)
@@ -46,7 +46,7 @@ class QueryState:
                 follow_up = DriftAction(query=follow_up)
             elif not isinstance(follow_up, DriftAction):
                 logger.warning(
-                    "Follow-up action is not a string, found type: %s", type(follow_up)
+                    "Follow-up action is not a string, found type: %s", type(follow_up),
                 )
 
             self.add_action(follow_up)
@@ -57,7 +57,7 @@ class QueryState:
         return [node for node in self.graph.nodes if not node.is_complete]
 
     def rank_incomplete_actions(
-        self, scorer: Callable[[DriftAction], float] | None = None
+        self, scorer: Callable[[DriftAction], float] | None = None,
     ) -> list[DriftAction]:
         """Rank all unanswered actions in the graph if scorer available."""
         unanswered = self.find_incomplete_actions()
@@ -77,7 +77,7 @@ class QueryState:
         return list(unanswered)
 
     def serialize(
-        self, include_context: bool = True
+        self, include_context: bool = True,
     ) -> dict[str, Any] | tuple[dict[str, Any], dict[str, Any], str]:
         """Serialize the graph to a dictionary, including nodes and edges."""
         # Create a mapping from nodes to unique IDs
@@ -116,7 +116,7 @@ class QueryState:
 
         return {"nodes": nodes, "edges": edges}
 
-    def deserialize(self, data: dict[str, Any]):
+    def deserialize(self, data: dict[str, Any]) -> None:
         """Deserialize the dictionary back to a graph."""
         self.graph.clear()
         id_to_action = {}

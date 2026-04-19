@@ -17,7 +17,7 @@ class TestStableLCC(unittest.TestCase):
 
         # Make sure they're the same
         assert "".join(nx.generate_graphml(graph_out_1)) == "".join(
-            nx.generate_graphml(graph_out_2)
+            nx.generate_graphml(graph_out_2),
         )
 
     def _create_strongly_connected_graph(self, digraph=False):

@@ -41,7 +41,7 @@ async def run_workflow(
         text_units = await reader.text_units()
 
         model_config = config.get_completion_model_config(
-            config.extract_claims.completion_model_id
+            config.extract_claims.completion_model_id,
         )
 
         model = create_completion(
@@ -101,7 +101,7 @@ async def extract_covariates(
         num_threads=num_threads,
         async_type=async_type,
     )
-    text_units.drop(columns=["text_unit_id"], inplace=True)  # don't pollute the global
+    text_units = text_units.drop(columns=["text_unit_id"])  # don't pollute the global
     covariates["id"] = covariates["covariate_type"].apply(lambda _x: str(uuid4()))
     covariates["human_readable_id"] = covariates.index
 

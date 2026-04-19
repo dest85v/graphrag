@@ -41,7 +41,7 @@ async def run_workflow(
 
 
 async def load_input_documents(
-    input_reader: InputReader, documents_table: Table, sample_size: int = 5
+    input_reader: InputReader, documents_table: Table, sample_size: int = 5,
 ) -> tuple[pd.DataFrame, int]:
     """Load and parse input documents into a standard format."""
     sample: list[dict] = []

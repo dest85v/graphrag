@@ -107,7 +107,7 @@ class TestMergeRelationships:
     def test_empty_input(self):
         """Empty relationship list should produce an empty DataFrame."""
         df = pd.DataFrame(
-            columns=["source", "target", "weight", "description", "source_id"]
+            columns=["source", "target", "weight", "description", "source_id"],
         )
         merged = _merge_relationships([df])
 
@@ -225,7 +225,7 @@ class TestFilterOrphanRelationships:
         merged_entities = _merge_entities([entities])
 
         relationships = pd.DataFrame(
-            columns=["source", "target", "weight", "description", "source_id"]
+            columns=["source", "target", "weight", "description", "source_id"],
         )
         merged_rels = _merge_relationships([relationships])
 

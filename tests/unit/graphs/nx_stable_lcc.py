@@ -9,6 +9,7 @@ graphrag.graphs.stable_lcc).
 """
 
 import html
+import operator
 from typing import Any, cast
 
 import networkx as nx
@@ -34,7 +35,7 @@ def _stabilize_graph(graph: nx.Graph) -> nx.Graph:
     fixed_graph = nx.DiGraph() if graph.is_directed() else nx.Graph()
 
     sorted_nodes = graph.nodes(data=True)
-    sorted_nodes = sorted(sorted_nodes, key=lambda x: x[0])
+    sorted_nodes = sorted(sorted_nodes, key=operator.itemgetter(0))
 
     fixed_graph.add_nodes_from(sorted_nodes)
     edges = list(graph.edges(data=True))

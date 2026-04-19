@@ -14,6 +14,6 @@ class DocSelectionType(str, Enum):
     TOP = "top"
     AUTO = "auto"
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return the string representation of the enum value."""
         return self.value

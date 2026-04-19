@@ -190,7 +190,7 @@ def completion_thread_runner(
         quit_process_event: threading.Event,
         output_queue: "LLMCompletionResponseQueue",
         callback: ThreadedLLMCompletionResponseHandler,
-    ):
+    ) -> None:
         while True and not quit_process_event.is_set():
             try:
                 data = output_queue.get(timeout=1)
@@ -204,7 +204,7 @@ def completion_thread_runner(
             if asyncio.iscoroutine(response):
                 response = asyncio.run(response)
 
-    def _process_input(request_id: str, **kwargs: Unpack["LLMCompletionArgs"]):
+    def _process_input(request_id: str, **kwargs: Unpack["LLMCompletionArgs"]) -> None:
         if not request_id:
             msg = "request_id needs to be passed as a keyword argument"
             raise ValueError(msg)
@@ -216,7 +216,7 @@ def completion_thread_runner(
     )
     handle_response_thread.start()
 
-    def _cleanup():
+    def _cleanup() -> None:
         for _ in threads:
             input_queue.put(None)
 

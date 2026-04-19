@@ -64,7 +64,7 @@ def test_init_loggers_file_config():
         log_file = Path(temp_dir) / "logs" / DEFAULT_LOG_FILENAME
         assert log_file.exists()
 
-        with open(log_file) as f:
+        with open(log_file, encoding="utf-8") as f:
             content = f.read()
             assert test_message in content
 
@@ -97,7 +97,7 @@ def test_init_loggers_file_verbose():
         # check that the log file was created
         log_file = Path(temp_dir) / "logs" / DEFAULT_LOG_FILENAME
 
-        with open(log_file) as f:
+        with open(log_file, encoding="utf-8") as f:
             content = f.read()
             assert test_message in content
 

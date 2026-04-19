@@ -4,14 +4,14 @@
 """Base class for noun phrase extractors."""
 
 import logging
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 
 import spacy
 
 logger = logging.getLogger(__name__)
 
 
-class BaseNounPhraseExtractor(metaclass=ABCMeta):
+class BaseNounPhraseExtractor(ABC):
     """Abstract base class for noun phrase extractors."""
 
     def __init__(
@@ -45,7 +45,7 @@ class BaseNounPhraseExtractor(metaclass=ABCMeta):
 
     @staticmethod
     def load_spacy_model(
-        model_name: str, exclude: list[str] | None = None
+        model_name: str, exclude: list[str] | None = None,
     ) -> spacy.language.Language:
         """Load a SpaCy model."""
         if exclude is None:

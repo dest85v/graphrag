@@ -67,7 +67,7 @@ class VectorStore(ABC):
         fields: dict[str, str] | None = None,
         timestamp_exploder: TimestampExploder = explode_timestamp,
         **kwargs: Any,
-    ):
+    ) -> None:
         self.index_name = index_name
         self.id_field = id_field
         self.vector_field = vector_field
@@ -106,11 +106,11 @@ class VectorStore(ABC):
         if not document.create_date:
             document.create_date = self._now_iso()
         document.data.update(
-            self.timestamp_exploder(document.create_date, "create_date")
+            self.timestamp_exploder(document.create_date, "create_date"),
         )
         if document.update_date:
             document.data.update(
-                self.timestamp_exploder(document.update_date, "update_date")
+                self.timestamp_exploder(document.update_date, "update_date"),
             )
 
         # Explode user-defined date fields
@@ -129,7 +129,7 @@ class VectorStore(ABC):
         if not document.update_date:
             document.update_date = self._now_iso()
         document.data.update(
-            self.timestamp_exploder(document.update_date, "update_date")
+            self.timestamp_exploder(document.update_date, "update_date"),
         )
 
     @abstractmethod

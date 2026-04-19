@@ -34,7 +34,7 @@ class BasicSearchContext(BasicContextBuilder):
         text_units: list[TextUnit] | None = None,
         tokenizer: Tokenizer | None = None,
         embedding_vectorstore_key: str = "id",
-    ):
+    ) -> None:
         self.text_embedder = text_embedder
         self.tokenizer = tokenizer or get_tokenizer()
         self.text_units = text_units
@@ -81,7 +81,7 @@ class BasicSearchContext(BasicContextBuilder):
         current_tokens = 0
         text_ids = []
         current_tokens = len(
-            self.tokenizer.encode(text_id_col + column_delimiter + text_col + "\n")
+            self.tokenizer.encode(text_id_col + column_delimiter + text_col + "\n"),
         )
         for i, row in related_text_df.iterrows():
             text = row[text_id_col] + column_delimiter + row[text_col] + "\n"
@@ -96,11 +96,11 @@ class BasicSearchContext(BasicContextBuilder):
         final_text_df = cast(
             "pd.DataFrame",
             related_text_df[related_text_df.index.isin(text_ids)].reset_index(
-                drop=True
+                drop=True,
             ),
         )
         final_text = final_text_df.to_csv(
-            index=False, escapechar="\\", sep=column_delimiter
+            index=False, escapechar="\\", sep=column_delimiter,
         )
 
         return ContextBuilderResult(

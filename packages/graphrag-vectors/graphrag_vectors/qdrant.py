@@ -63,7 +63,7 @@ class QdrantVectorStore(VectorStore):
         hnsw_ef_construct: int | None = None,
         hnsw_ef: int | None = None,
         **kwargs: Any,
-    ):
+    ) -> None:
         super().__init__(**kwargs)
 
         if not url and not db_uri:
@@ -154,17 +154,17 @@ class QdrantVectorStore(VectorStore):
                             value = doc.data[field_name]
                             # Ensure proper types for Qdrant
                             if self.fields.get(field_name) == "int" and isinstance(
-                                value, (float, str)
+                                value, (float, str),
                             ):
                                 value = int(float(value))
                             elif self.fields.get(field_name) == "float" and isinstance(
-                                value, (int, str)
+                                value, (int, str),
                             ):
                                 value = float(value)
                             elif self.fields.get(field_name) == "bool" and isinstance(
-                                value, str
+                                value, str,
                             ):
-                                value = value.lower() in ("true", "1", "yes")
+                                value = value.lower() in {"true", "1", "yes"}
                             payload[field_name] = value
 
                 points.append(
@@ -172,7 +172,7 @@ class QdrantVectorStore(VectorStore):
                         id=_qdrant_id(doc.id),
                         vector=doc.vector,
                         payload=payload,
-                    )
+                    ),
                 )
 
             if points:
@@ -192,9 +192,9 @@ class QdrantVectorStore(VectorStore):
                 return Filter(
                     must_not=[
                         FieldCondition(
-                            key=expr.field, match=MatchValue(value=expr.value)
-                        )
-                    ]
+                            key=expr.field, match=MatchValue(value=expr.value),
+                        ),
+                    ],
                 )
             case Condition() if expr.operator == Operator.exists:
                 if expr.value:
@@ -302,8 +302,8 @@ class QdrantVectorStore(VectorStore):
                         if point.payload
                         else None,
                     ),
-                    score=point.score if point.score else 0.0,
-                )
+                    score=point.score or 0.0,
+                ),
             )
 
         return results
@@ -365,7 +365,7 @@ class QdrantVectorStore(VectorStore):
         self._client.delete(  # type: ignore[union-attr]
             collection_name=self.index_name,
             points_selector=FilterSelector(
-                filter=Filter(must=[HasIdCondition(has_id=qdrant_ids)])
+                filter=Filter(must=[HasIdCondition(has_id=qdrant_ids)]),
             ),
         )
 

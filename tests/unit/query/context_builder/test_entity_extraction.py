@@ -23,7 +23,7 @@ embedding_model = create_embedding(
         model_provider="openai",
         model="text-embedding-3-small",
         mock_responses=[1.0, 1.0, 1.0],
-    )
+    ),
 )
 
 
@@ -78,7 +78,7 @@ class MockVectorStore(VectorStore):
         )[:k]
 
     def search_by_id(
-        self, id: str, select: list[str] | None = None, include_vectors: bool = True
+        self, id: str, select: list[str] | None = None, include_vectors: bool = True,
     ) -> VectorStoreDocument:
         result = self.documents[0]
         result.id = id
@@ -138,7 +138,7 @@ def test_map_query_to_entities():
             short_id="sid2",
             title="t22",
             rank=4,
-        )
+        ),
     ]
 
     assert map_query_to_entities(

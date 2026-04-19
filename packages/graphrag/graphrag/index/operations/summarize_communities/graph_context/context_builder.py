@@ -9,8 +9,8 @@ from typing import cast
 import pandas as pd
 from graphrag_llm.tokenizer import Tokenizer
 
-import graphrag.data_model.schemas as schemas
 from graphrag.callbacks.workflow_callbacks import WorkflowCallbacks
+from graphrag.data_model import schemas
 from graphrag.index.operations.summarize_communities.build_mixed_context import (
     build_mixed_context,
 )
@@ -50,7 +50,7 @@ def build_local_context(
 
     for level in progress_iterable(levels, callbacks.progress, len(levels)):
         communities_at_level_df = _prepare_reports_at_level(
-            nodes, edges, claims, tokenizer, level, max_context_tokens
+            nodes, edges, claims, tokenizer, level, max_context_tokens,
         )
 
         communities_at_level_df.loc[:, schemas.COMMUNITY_LEVEL] = level
@@ -116,17 +116,17 @@ def _prepare_reports_at_level(
 
     # Merge aggregated edges into the node DataFrame
     merged_node_df = level_node_df.merge(
-        source_edges, on=schemas.TITLE, how="left"
+        source_edges, on=schemas.TITLE, how="left",
     ).merge(target_edges, on=schemas.TITLE, how="left")
 
     # Combine source and target edge details into a single column
     merged_node_df.loc[:, schemas.EDGE_DETAILS] = merged_node_df.loc[
-        :, f"{schemas.EDGE_DETAILS}_x"
+        :, f"{schemas.EDGE_DETAILS}_x",
     ].combine_first(merged_node_df.loc[:, f"{schemas.EDGE_DETAILS}_y"])
 
     # Drop intermediate columns
-    merged_node_df.drop(
-        columns=[f"{schemas.EDGE_DETAILS}_x", f"{schemas.EDGE_DETAILS}_y"], inplace=True
+    merged_node_df = merged_node_df.drop(
+        columns=[f"{schemas.EDGE_DETAILS}_x", f"{schemas.EDGE_DETAILS}_y"],
     )
 
     # Aggregate node and edge details
@@ -151,7 +151,7 @@ def _prepare_reports_at_level(
     if claim_df is not None:
         merged_node_df = merged_node_df.merge(
             level_claim_df.loc[
-                :, [schemas.CLAIM_SUBJECT, schemas.CLAIM_DETAILS]
+                :, [schemas.CLAIM_SUBJECT, schemas.CLAIM_DETAILS],
             ].rename(columns={schemas.CLAIM_SUBJECT: schemas.TITLE}),
             on=schemas.TITLE,
             how="left",
@@ -172,7 +172,7 @@ def _prepare_reports_at_level(
         .assign(
             **{schemas.CLAIM_DETAILS: merged_node_df[schemas.CLAIM_DETAILS]}
             if claim_df is not None
-            else {}
+            else {},
         )
         .to_dict(orient="records")
     )
@@ -228,10 +228,10 @@ def build_level_context(
 
     if report_df is None or report_df.empty:
         invalid_context_df.loc[:, schemas.CONTEXT_STRING] = _sort_and_trim_context(
-            invalid_context_df, tokenizer, max_context_tokens
+            invalid_context_df, tokenizer, max_context_tokens,
         )
         invalid_context_df[schemas.CONTEXT_SIZE] = invalid_context_df.loc[
-            :, schemas.CONTEXT_STRING
+            :, schemas.CONTEXT_STRING,
         ].map(tokenizer.num_tokens)
         invalid_context_df[schemas.CONTEXT_EXCEED_FLAG] = False
         return union(valid_context_df, invalid_context_df)
@@ -254,12 +254,12 @@ def build_level_context(
     # this should be rare, but if it happens, we will just trim the local context to fit the limit
     remaining_df = _antijoin_reports(invalid_context_df, community_df)
     remaining_df.loc[:, schemas.CONTEXT_STRING] = _sort_and_trim_context(
-        remaining_df, tokenizer, max_context_tokens
+        remaining_df, tokenizer, max_context_tokens,
     )
 
     result = union(valid_context_df, community_df, remaining_df)
     result[schemas.CONTEXT_SIZE] = result.loc[:, schemas.CONTEXT_STRING].map(
-        tokenizer.num_tokens
+        tokenizer.num_tokens,
     )
 
     result[schemas.CONTEXT_EXCEED_FLAG] = False
@@ -282,42 +282,41 @@ def _antijoin_reports(df: pd.DataFrame, reports: pd.DataFrame) -> pd.DataFrame:
 
 
 def _sort_and_trim_context(
-    df: pd.DataFrame, tokenizer: Tokenizer, max_context_tokens: int
+    df: pd.DataFrame, tokenizer: Tokenizer, max_context_tokens: int,
 ) -> pd.Series:
     """Sort and trim context to fit the limit."""
     series = cast("pd.Series", df[schemas.ALL_CONTEXT])
     return transform_series(
         series,
         lambda x: sort_context(
-            x, tokenizer=tokenizer, max_context_tokens=max_context_tokens
+            x, tokenizer=tokenizer, max_context_tokens=max_context_tokens,
         ),
     )
 
 
 def _build_mixed_context(
-    df: pd.DataFrame, tokenizer: Tokenizer, max_context_tokens: int
+    df: pd.DataFrame, tokenizer: Tokenizer, max_context_tokens: int,
 ) -> pd.Series:
     """Sort and trim context to fit the limit."""
     series = cast("pd.Series", df[schemas.ALL_CONTEXT])
     return transform_series(
         series,
         lambda x: build_mixed_context(
-            x, tokenizer, max_context_tokens=max_context_tokens
+            x, tokenizer, max_context_tokens=max_context_tokens,
         ),
     )
 
 
 def _get_subcontext_df(
-    level: int, report_df: pd.DataFrame, local_context_df: pd.DataFrame
+    level: int, report_df: pd.DataFrame, local_context_df: pd.DataFrame,
 ) -> pd.DataFrame:
     """Get sub-community context for each community."""
     sub_report_df = _drop_community_level(_at_level(level, report_df))
     sub_context_df = _at_level(level, local_context_df)
     sub_context_df = join(sub_context_df, sub_report_df, schemas.COMMUNITY_ID)
-    sub_context_df.rename(
-        columns={schemas.COMMUNITY_ID: schemas.SUB_COMMUNITY}, inplace=True
+    return sub_context_df.rename(
+        columns={schemas.COMMUNITY_ID: schemas.SUB_COMMUNITY},
     )
-    return sub_context_df
 
 
 def _get_community_df(
@@ -341,10 +340,10 @@ def _get_community_df(
     )
 
     invalid_communities = join(
-        community_df, invalid_community_ids, schemas.COMMUNITY_ID, "inner"
+        community_df, invalid_community_ids, schemas.COMMUNITY_ID, "inner",
     )
     community_df = join(
-        invalid_communities, subcontext_selection, schemas.SUB_COMMUNITY
+        invalid_communities, subcontext_selection, schemas.SUB_COMMUNITY,
     )
     community_df[schemas.ALL_CONTEXT] = community_df.apply(
         lambda x: {
@@ -362,7 +361,7 @@ def _get_community_df(
         .reset_index()
     )
     community_df[schemas.CONTEXT_STRING] = _build_mixed_context(
-        community_df, tokenizer, max_context_tokens
+        community_df, tokenizer, max_context_tokens,
     )
     community_df[schemas.COMMUNITY_LEVEL] = level
     return community_df

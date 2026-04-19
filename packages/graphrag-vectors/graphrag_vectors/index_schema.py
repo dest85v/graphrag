@@ -21,7 +21,7 @@ class IndexSchema(BaseModel):
     """The default configuration section for Vector Store Schema."""
 
     index_name: str = Field(
-        description="The index name to use.", default="vector_index"
+        description="The index name to use.", default="vector_index",
     )
 
     id_field: str = Field(

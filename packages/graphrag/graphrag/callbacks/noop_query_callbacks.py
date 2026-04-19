@@ -22,12 +22,12 @@ class NoopQueryCallbacks(QueryCallbacks):
         """Handle the end of map operation."""
 
     def on_reduce_response_start(
-        self, reduce_response_context: str | dict[str, Any]
+        self, reduce_response_context: str | dict[str, Any],
     ) -> None:
         """Handle the start of reduce operation."""
 
     def on_reduce_response_end(self, reduce_response_output: str) -> None:
         """Handle the end of reduce operation."""
 
-    def on_llm_new_token(self, token):
+    def on_llm_new_token(self, token) -> None:
         """Handle when a new token is generated."""

@@ -13,7 +13,7 @@ async def test_json_loader_one_file_one_object():
     storage = create_storage(
         StorageConfig(
             base_dir="tests/unit/indexing/input/data/one-json-one-object",
-        )
+        ),
     )
     reader = create_input_reader(config, storage)
     documents = await reader.read_files()
@@ -32,7 +32,7 @@ async def test_json_loader_one_file_multiple_objects():
     storage = create_storage(
         StorageConfig(
             base_dir="tests/unit/indexing/input/data/one-json-multiple-objects",
-        )
+        ),
     )
     reader = create_input_reader(config, storage)
     documents = await reader.read_files()
@@ -49,7 +49,7 @@ async def test_json_loader_one_file_with_title():
     storage = create_storage(
         StorageConfig(
             base_dir="tests/unit/indexing/input/data/one-json-one-object",
-        )
+        ),
     )
     reader = create_input_reader(config, storage)
     documents = await reader.read_files()
@@ -64,7 +64,7 @@ async def test_json_loader_multiple_files():
     storage = create_storage(
         StorageConfig(
             base_dir="tests/unit/indexing/input/data/multiple-jsons",
-        )
+        ),
     )
     reader = create_input_reader(config, storage)
     documents = await reader.read_files()

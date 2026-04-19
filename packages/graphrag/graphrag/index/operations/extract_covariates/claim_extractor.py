@@ -57,7 +57,7 @@ class ClaimExtractor:
         extraction_prompt: str,
         max_gleanings: int | None = None,
         on_error: ErrorHandlerFn | None = None,
-    ):
+    ) -> None:
         """Init method definition."""
         self._model = model
         self._extraction_prompt = extraction_prompt
@@ -82,7 +82,7 @@ class ClaimExtractor:
             document_id = f"d{doc_index}"
             try:
                 claims = await self._process_document(
-                    text, claim_description, entity_spec
+                    text, claim_description, entity_spec,
                 )
                 all_claims += [
                     self._clean_claim(c, document_id, resolved_entities) for c in claims
@@ -103,7 +103,7 @@ class ClaimExtractor:
         )
 
     def _clean_claim(
-        self, claim: dict, document_id: str, resolved_entities: dict
+        self, claim: dict, document_id: str, resolved_entities: dict,
     ) -> dict:
         # clean the parsed claims to remove any claims with status = False
         obj = claim.get("object_id", claim.get("object"))
@@ -117,14 +117,14 @@ class ClaimExtractor:
         return claim
 
     async def _process_document(
-        self, text: str, claim_description: str, entity_spec: dict
+        self, text: str, claim_description: str, entity_spec: dict,
     ) -> list[dict]:
         messages_builder = CompletionMessagesBuilder().add_user_message(
             self._extraction_prompt.format(**{
                 INPUT_TEXT_KEY: text,
                 INPUT_CLAIM_DESCRIPTION_KEY: claim_description,
                 INPUT_ENTITY_SPEC_KEY: entity_spec,
-            })
+            }),
         )
 
         response: LLMCompletionResponse = await self._model.completion_async(
@@ -145,7 +145,7 @@ class ClaimExtractor:
                 extension = response.content
                 messages_builder.add_assistant_message(extension)
                 claims += RECORD_DELIMITER + extension.strip().removesuffix(
-                    COMPLETION_DELIMITER
+                    COMPLETION_DELIMITER,
                 )
 
                 # If this isn't the last loop, check to see if we should continue

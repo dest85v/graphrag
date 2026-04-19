@@ -7,8 +7,8 @@ import asyncio
 import logging
 from typing import TYPE_CHECKING
 
-import graphrag.api as api
 import streamlit as st
+from graphrag import api
 from knowledge_loader.data_sources.loader import (
     create_datasource,
     load_dataset_listing,
@@ -47,11 +47,11 @@ def initialize() -> SessionVariables:
     return st.session_state["session_variables"]
 
 
-def load_dataset(dataset: str, sv: SessionVariables):
+def load_dataset(dataset: str, sv: SessionVariables) -> None:
     """Load dataset from the dropdown."""
     sv.dataset.value = dataset
     sv.dataset_config.value = next(
-        (d for d in sv.datasets.value if d.key == dataset), None
+        (d for d in sv.datasets.value if d.key == dataset), None,
     )
     if sv.dataset_config.value is not None:
         sv.datasource.value = create_datasource(f"{sv.dataset_config.value.path}")  # type: ignore
@@ -74,7 +74,7 @@ async def run_all_searches(query: str, sv: SessionVariables) -> list[SearchResul
             run_drift_search(
                 query=query,
                 sv=sv,
-            )
+            ),
         )
 
     if sv.include_basic_rag.value:
@@ -82,21 +82,21 @@ async def run_all_searches(query: str, sv: SessionVariables) -> list[SearchResul
             run_basic_search(
                 query=query,
                 sv=sv,
-            )
+            ),
         )
     if sv.include_local_search.value:
         tasks.append(
             run_local_search(
                 query=query,
                 sv=sv,
-            )
+            ),
         )
     if sv.include_global_search.value:
         tasks.append(
             run_global_search(
                 query=query,
                 sv=sv,
-            )
+            ),
         )
 
     return await asyncio.gather(*tasks)
@@ -112,7 +112,7 @@ async def run_generate_questions(query: str, sv: SessionVariables):
         run_global_search_question_generation(
             query=query,
             sv=sv,
-        )
+        ),
     )
 
     return await asyncio.gather(*tasks)
@@ -149,7 +149,7 @@ async def run_local_search(
     sv: SessionVariables,
 ) -> SearchResult:
     """Run local search."""
-    print(f"Local search query: {query}")  # noqa T201
+    print(f"Local search query: {query}")  # noqa: T201
 
     # build local search engine
     response_placeholder = st.session_state[
@@ -173,8 +173,8 @@ async def run_local_search(
             query=query,
         )
 
-        print(f"Local Response: {response}")  # noqa T201
-        print(f"Context data: {context_data}")  # noqa T201
+        print(f"Local Response: {response}")  # noqa: T201
+        print(f"Context data: {context_data}")  # noqa: T201
 
     # display response and reference context to UI
     search_result = SearchResult(
@@ -184,7 +184,7 @@ async def run_local_search(
     )
 
     display_search_result(
-        container=response_container, result=search_result, stats=None
+        container=response_container, result=search_result, stats=None,
     )
 
     if "response_lengths" not in st.session_state:
@@ -200,7 +200,7 @@ async def run_local_search(
 
 async def run_global_search(query: str, sv: SessionVariables) -> SearchResult:
     """Run global search."""
-    print(f"Global search query: {query}")  # noqa T201
+    print(f"Global search query: {query}")  # noqa: T201
 
     # build global search engine
     response_placeholder = st.session_state[
@@ -225,8 +225,8 @@ async def run_global_search(query: str, sv: SessionVariables) -> SearchResult:
             query=query,
         )
 
-        print(f"Context data: {context_data}")  # noqa T201
-        print(f"Global Response: {response}")  # noqa T201
+        print(f"Context data: {context_data}")  # noqa: T201
+        print(f"Global Response: {response}")  # noqa: T201
 
     # display response and reference context to UI
     search_result = SearchResult(
@@ -236,7 +236,7 @@ async def run_global_search(query: str, sv: SessionVariables) -> SearchResult:
     )
 
     display_search_result(
-        container=response_container, result=search_result, stats=None
+        container=response_container, result=search_result, stats=None,
     )
 
     if "response_lengths" not in st.session_state:
@@ -255,7 +255,7 @@ async def run_drift_search(
     sv: SessionVariables,
 ) -> SearchResult:
     """Run drift search."""
-    print(f"Drift search query: {query}")  # noqa T201
+    print(f"Drift search query: {query}")  # noqa: T201
 
     # build drift search engine
     response_placeholder = st.session_state[
@@ -278,8 +278,8 @@ async def run_drift_search(
             query=query,
         )
 
-        print(f"Drift Response: {response}")  # noqa T201
-        print(f"Context data: {context_data}")  # noqa T201
+        print(f"Drift Response: {response}")  # noqa: T201
+        print(f"Context data: {context_data}")  # noqa: T201
 
     # display response and reference context to UI
     search_result = SearchResult(
@@ -289,7 +289,7 @@ async def run_drift_search(
     )
 
     display_search_result(
-        container=response_container, result=search_result, stats=None
+        container=response_container, result=search_result, stats=None,
     )
 
     if "response_lengths" not in st.session_state:
@@ -308,7 +308,7 @@ async def run_basic_search(
     sv: SessionVariables,
 ) -> SearchResult:
     """Run basic search."""
-    print(f"Basic search query: {query}")  # noqa T201
+    print(f"Basic search query: {query}")  # noqa: T201
 
     # build local search engine
     response_placeholder = st.session_state[
@@ -325,8 +325,8 @@ async def run_basic_search(
             query=query,
         )
 
-        print(f"Basic Response: {response}")  # noqa T201
-        print(f"Context data: {context_data}")  # noqa T201
+        print(f"Basic Response: {response}")  # noqa: T201
+        print(f"Context data: {context_data}")  # noqa: T201
 
     # display response and reference context to UI
     search_result = SearchResult(
@@ -336,7 +336,7 @@ async def run_basic_search(
     )
 
     display_search_result(
-        container=response_container, result=search_result, stats=None
+        container=response_container, result=search_result, stats=None,
     )
 
     if "response_lengths" not in st.session_state:
@@ -352,7 +352,7 @@ async def run_basic_search(
 
 def load_knowledge_model(sv: SessionVariables):
     """Load knowledge model from the datasource."""
-    print("Loading knowledge model...", sv.dataset.value, sv.dataset_config.value)  # noqa T201
+    print("Loading knowledge model...", sv.dataset.value, sv.dataset_config.value)  # noqa: T201
     model = load_model(sv.dataset.value, sv.datasource.value)
 
     sv.generated_questions.value = []

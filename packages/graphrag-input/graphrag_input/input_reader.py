@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import logging
 import re
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class InputReader(metaclass=ABCMeta):
+class InputReader(ABC):
     """Provide a cache interface for the pipeline."""
 
     def __init__(
@@ -29,7 +29,7 @@ class InputReader(metaclass=ABCMeta):
         file_pattern: str,
         encoding: str = "utf-8",
         **kwargs,
-    ):
+    ) -> None:
         self._storage = storage
         self._encoding = encoding
         self._file_pattern = file_pattern

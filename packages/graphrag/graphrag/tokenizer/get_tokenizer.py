@@ -73,7 +73,7 @@ def get_tokenizer(
                 TokenizerConfig(
                     type=TokenizerType.Tiktoken,
                     model_id=f"{model_config.model_provider}/{model_config.model}",
-                )
+                ),
             )
 
         # Non-OpenAI model → HuggingFace tokenizer
@@ -81,7 +81,7 @@ def get_tokenizer(
             TokenizerConfig(
                 type=TokenizerType.HuggingFace,
                 model_id=model_config.model,
-            )
+            ),
         )
 
     # Fallback: tiktoken with default encoding model
@@ -91,5 +91,5 @@ def get_tokenizer(
         TokenizerConfig(
             type=TokenizerType.Tiktoken,
             encoding_name=encoding_model,
-        )
+        ),
     )

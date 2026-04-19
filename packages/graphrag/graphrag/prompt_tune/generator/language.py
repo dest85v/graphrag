@@ -28,7 +28,7 @@ async def detect_language(model: "LLMCompletion", docs: str | list[str]) -> str:
     language_prompt = DETECT_LANGUAGE_PROMPT.format(input_text=docs_str)
 
     response: LLMCompletionResponse = await model.completion_async(
-        messages=language_prompt
+        messages=language_prompt,
     )  # type: ignore
 
     return response.content

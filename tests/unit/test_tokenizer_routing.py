@@ -87,7 +87,7 @@ def test_get_tokenizer_llama_routes_to_huggingface_config() -> None:
         # Verify create_tokenizer was called with HuggingFace config
         call_args = mock_create.call_args
         assert call_args is not None
-        args = call_args.args if call_args.args else []
+        args = call_args.args or []
         called_config = args[0] if args else call_args.kwargs.get("tokenizer_config")
         assert called_config is not None
         assert called_config.type == TokenizerType.HuggingFace
@@ -103,7 +103,7 @@ def test_get_tokenizer_unknown_routes_to_huggingface_config() -> None:
         get_tokenizer(model_config=config)
         call_args = mock_create.call_args
         assert call_args is not None
-        args = call_args.args if call_args.args else []
+        args = call_args.args or []
         called_config = args[0] if args else call_args.kwargs.get("tokenizer_config")
         assert called_config is not None
         assert called_config.type == TokenizerType.HuggingFace

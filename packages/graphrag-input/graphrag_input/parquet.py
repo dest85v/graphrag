@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 class ParquetFileReader(StructuredFileReader):
     """Reader implementation for parquet files."""
 
-    def __init__(self, file_pattern: str | None = None, **kwargs):
+    def __init__(self, file_pattern: str | None = None, **kwargs) -> None:
         super().__init__(
             file_pattern=file_pattern if file_pattern is not None else ".*\\.parquet$",
             **kwargs,

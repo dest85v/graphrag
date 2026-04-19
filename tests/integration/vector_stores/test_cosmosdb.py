@@ -18,7 +18,7 @@ WELL_KNOWN_COSMOS_CONNECTION_STRING = "AccountEndpoint=https://127.0.0.1:8081/;A
 # the cosmosdb emulator is only available on windows runners at this time
 if not sys.platform.startswith("win"):
     pytest.skip(
-        "encountered windows-only tests -- will skip for now", allow_module_level=True
+        "encountered windows-only tests -- will skip for now", allow_module_level=True,
     )
 
 
@@ -57,12 +57,12 @@ def test_vector_store_operations():
             return [0.1, 0.2, 0.3, 0.4, 0.5]  # Return fixed embedding
 
         vector_results = vector_store.similarity_search_by_vector(
-            [0.1, 0.2, 0.3, 0.4, 0.5], k=2
+            [0.1, 0.2, 0.3, 0.4, 0.5], k=2,
         )
         assert len(vector_results) > 0
 
         text_results = vector_store.similarity_search_by_text(
-            "test query", mock_embedder, k=2
+            "test query", mock_embedder, k=2,
         )
         assert len(text_results) > 0
     finally:
@@ -134,12 +134,12 @@ def test_vector_store_customization():
             return [0.1, 0.2, 0.3, 0.4, 0.5]  # Return fixed embedding
 
         vector_results = vector_store.similarity_search_by_vector(
-            [0.1, 0.2, 0.3, 0.4, 0.5], k=2
+            [0.1, 0.2, 0.3, 0.4, 0.5], k=2,
         )
         assert len(vector_results) > 0
 
         text_results = vector_store.similarity_search_by_text(
-            "test query", mock_embedder, k=2
+            "test query", mock_embedder, k=2,
         )
         assert len(text_results) > 0
     finally:

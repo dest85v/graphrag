@@ -29,13 +29,13 @@ async def test_update_text_embeddings():
             "text_units",
             "entities",
             "community_reports",
-        ]
+        ],
     )
     context.state["update_timestamp"] = "20260220-000000"
 
     config = get_default_graphrag_config()
     llm_settings = config.get_embedding_model_config(
-        config.embed_text.embedding_model_id
+        config.embed_text.embedding_model_id,
     )
     llm_settings.type = "mock"
     llm_settings.mock_responses = [1.0] * 3072
@@ -58,7 +58,7 @@ async def test_update_text_embeddings():
         assert f"embeddings.{field}.parquet" in parquet_files
 
     entity_embeddings = await context.output_table_provider.read_dataframe(
-        "embeddings.entity_description"
+        "embeddings.entity_description",
     )
     assert len(entity_embeddings.columns) == 2
     assert "id" in entity_embeddings.columns

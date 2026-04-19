@@ -3,6 +3,8 @@
 
 """Test hasher"""
 
+import math
+
 from graphrag_common.hasher import hash_data
 
 
@@ -46,7 +48,7 @@ def test_hash_data() -> None:
     data1 = {
         "bool": True,
         "int": 42,
-        "float": 3.14,
+        "float": math.pi,
         "str": "hello, world",
         "list": [1, 2, 3],
         "dict": {"key": "value"},
@@ -64,7 +66,7 @@ def test_hash_data() -> None:
     data2 = {
         "bool": True,
         "list": [1, 2, 3],
-        "float": 3.14,
+        "float": math.pi,
         "str": "hello, world",
         "int": 42,
         "nested": {

@@ -26,7 +26,7 @@ model = create_completion(
         model_provider="openai",
         model="gpt-4o",
         mock_responses=[SIMPLE_EXTRACTION_RESPONSE],
-    )
+    ),
 )
 
 
@@ -42,7 +42,7 @@ class TestRunChain(unittest.IsolatedAsyncioTestCase):
         )
 
         assert sorted(["TEST_ENTITY_1", "TEST_ENTITY_2", "TEST_ENTITY_3"]) == sorted(
-            entities_df["title"].tolist()
+            entities_df["title"].tolist(),
         )
 
     async def test_run_extract_graph_single_document_correct_edges_returned(self):

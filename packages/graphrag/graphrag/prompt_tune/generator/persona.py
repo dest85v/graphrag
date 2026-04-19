@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 
 async def generate_persona(
-    model: "LLMCompletion", domain: str, task: str = DEFAULT_TASK
+    model: "LLMCompletion", domain: str, task: str = DEFAULT_TASK,
 ) -> str:
     """Generate an LLM persona to use for GraphRAG prompts.
 
@@ -28,7 +28,7 @@ async def generate_persona(
     persona_prompt = GENERATE_PERSONA_PROMPT.format(sample_task=formatted_task)
 
     response: LLMCompletionResponse = await model.completion_async(
-        messages=persona_prompt
+        messages=persona_prompt,
     )  # type: ignore
 
     return response.content

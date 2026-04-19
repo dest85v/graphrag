@@ -73,7 +73,7 @@ class TestAndEvaluate:
             and_=[
                 Condition(field="a", operator=Operator.eq, value=1),
                 Condition(field="b", operator=Operator.eq, value=2),
-            ]
+            ],
         )
         assert expr.evaluate({"a": 1, "b": 2}) is True
 
@@ -82,7 +82,7 @@ class TestAndEvaluate:
             and_=[
                 Condition(field="a", operator=Operator.eq, value=1),
                 Condition(field="b", operator=Operator.eq, value=2),
-            ]
+            ],
         )
         assert expr.evaluate({"a": 1, "b": 99}) is False
 
@@ -98,7 +98,7 @@ class TestOrEvaluate:
             or_=[
                 Condition(field="a", operator=Operator.eq, value=1),
                 Condition(field="b", operator=Operator.eq, value=2),
-            ]
+            ],
         )
         assert expr.evaluate({"a": 1, "b": 99}) is True
 
@@ -107,7 +107,7 @@ class TestOrEvaluate:
             or_=[
                 Condition(field="a", operator=Operator.eq, value=1),
                 Condition(field="b", operator=Operator.eq, value=2),
-            ]
+            ],
         )
         assert expr.evaluate({"a": 0, "b": 0}) is False
 
@@ -277,7 +277,7 @@ class TestJsonRoundtrip:
             and_=[
                 Condition(field="a", operator=Operator.gt, value=1),
                 Condition(field="b", operator=Operator.lt, value=10),
-            ]
+            ],
         )
         restored = self._roundtrip(original)
         assert isinstance(restored, AndExpr)
@@ -288,7 +288,7 @@ class TestJsonRoundtrip:
             or_=[
                 Condition(field="a", operator=Operator.eq, value="x"),
                 Condition(field="b", operator=Operator.eq, value="y"),
-            ]
+            ],
         )
         restored = self._roundtrip(original)
         assert isinstance(restored, OrExpr)
@@ -296,7 +296,7 @@ class TestJsonRoundtrip:
 
     def test_not_roundtrip(self):
         original = NotExpr(
-            not_=Condition(field="z", operator=Operator.in_, value=[1, 2, 3])
+            not_=Condition(field="z", operator=Operator.in_, value=[1, 2, 3]),
         )
         restored = self._roundtrip(original)
         assert isinstance(restored, NotExpr)
@@ -310,10 +310,10 @@ class TestJsonRoundtrip:
                     or_=[
                         Condition(field="a", operator=Operator.eq, value=1),
                         Condition(field="b", operator=Operator.eq, value=2),
-                    ]
+                    ],
                 ),
                 NotExpr(not_=Condition(field="c", operator=Operator.gt, value=10)),
-            ]
+            ],
         )
         restored = self._roundtrip(original)
         assert isinstance(restored, AndExpr)

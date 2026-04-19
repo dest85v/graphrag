@@ -72,7 +72,7 @@ def build_text_unit_context(
 
     if len(all_context_records) > 1:
         record_df = pd.DataFrame(
-            all_context_records[1:], columns=cast("Any", all_context_records[0])
+            all_context_records[1:], columns=cast("Any", all_context_records[0]),
         )
     else:
         record_df = pd.DataFrame()
@@ -80,7 +80,7 @@ def build_text_unit_context(
 
 
 def count_relationships(
-    entity_relationships: list[Relationship], text_unit: TextUnit
+    entity_relationships: list[Relationship], text_unit: TextUnit,
 ) -> int:
     """Count the number of relationships of the selected entity that are associated with the text unit."""
     if not text_unit.relationship_ids:

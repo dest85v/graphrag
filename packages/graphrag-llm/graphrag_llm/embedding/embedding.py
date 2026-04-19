@@ -43,7 +43,7 @@ class LLMEmbedding(ABC):
         cache: "Cache | None" = None,
         cache_key_creator: "CacheKeyCreator",
         **kwargs: Any,
-    ):
+    ) -> None:
         """Initialize the LLMEmbedding.
 
         Args
@@ -74,14 +74,14 @@ class LLMEmbedding(ABC):
 
     @abstractmethod
     def embedding(
-        self, /, **kwargs: Unpack["LLMEmbeddingArgs"]
+        self, /, **kwargs: Unpack["LLMEmbeddingArgs"],
     ) -> "LLMEmbeddingResponse":
         """Sync embedding method."""
         raise NotImplementedError
 
     @abstractmethod
     async def embedding_async(
-        self, /, **kwargs: Unpack["LLMEmbeddingArgs"]
+        self, /, **kwargs: Unpack["LLMEmbeddingArgs"],
     ) -> "LLMEmbeddingResponse":
         """Async embedding method."""
         raise NotImplementedError
@@ -158,7 +158,7 @@ class LLMEmbedding(ABC):
                 A list of embedding responses or exceptions for each input.
         """
         results: list[LLMEmbeddingResponse | Exception] = [None] * len(
-            embedding_requests
+            embedding_requests,
         )  # type: ignore
 
         def handle_response(

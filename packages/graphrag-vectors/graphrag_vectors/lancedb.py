@@ -27,7 +27,7 @@ from graphrag_vectors.vector_store import (
 class LanceDBVectorStore(VectorStore):
     """LanceDB vector storage implementation."""
 
-    def __init__(self, db_uri: str = "lancedb", **kwargs: Any):
+    def __init__(self, db_uri: str = "lancedb", **kwargs: Any) -> None:
         super().__init__(**kwargs)
         self.db_uri = db_uri
 
@@ -64,7 +64,7 @@ class LanceDBVectorStore(VectorStore):
         })
 
         self.document_collection = self.db_connection.create_table(
-            self.index_name if self.index_name else "",
+            self.index_name or "",
             data=data,
             mode="overwrite",
             schema=data.schema,
@@ -72,7 +72,7 @@ class LanceDBVectorStore(VectorStore):
 
         # Create index now that schema exists
         self.document_collection.create_index(
-            vector_column_name=self.vector_field, index_type="IVF_FLAT"
+            vector_column_name=self.vector_field, index_type="IVF_FLAT",
         )
 
         # Remove the dummy document used to set up the schema
@@ -117,7 +117,7 @@ class LanceDBVectorStore(VectorStore):
         self.document_collection.add(data)
 
     def _extract_data(
-        self, doc: dict[str, Any], select: list[str] | None = None
+        self, doc: dict[str, Any], select: list[str] | None = None,
     ) -> dict[str, Any]:
         """Extract additional field data from a document response."""
         fields_to_extract = select if select is not None else list(self.fields.keys())
@@ -196,7 +196,7 @@ class LanceDBVectorStore(VectorStore):
         query_embedding = np.array(query_embedding, dtype=np.float32)
 
         query = self.document_collection.search(
-            query=query_embedding, vector_column_name=self.vector_field
+            query=query_embedding, vector_column_name=self.vector_field,
         )
 
         if filters is not None:

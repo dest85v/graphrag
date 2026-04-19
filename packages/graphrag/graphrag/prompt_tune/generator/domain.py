@@ -28,7 +28,7 @@ async def generate_domain(model: "LLMCompletion", docs: str | list[str]) -> str:
     domain_prompt = GENERATE_DOMAIN_PROMPT.format(input_text=docs_str)
 
     response: LLMCompletionResponse = await model.completion_async(
-        messages=domain_prompt
+        messages=domain_prompt,
     )  # type: ignore
 
     return response.content

@@ -35,7 +35,7 @@ class TestRegexENNounPhraseExtractor:
     def test_extract_filters_exclude_nouns(self):
         """Excluded stop words do not appear in output."""
         extractor = _make_extractor(
-            exclude_nouns=["quick", "brown", "fox", "lazy", "dog", "jumps"]
+            exclude_nouns=["quick", "brown", "fox", "lazy", "dog", "jumps"],
         )
         result = extractor.extract("The quick brown fox jumps over the lazy dog")
         for phrase in result:

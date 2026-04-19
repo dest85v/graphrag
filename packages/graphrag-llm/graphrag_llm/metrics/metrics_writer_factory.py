@@ -42,7 +42,7 @@ def register_metrics_writer(
             The service scope for the metrics writer.
     """
     metrics_writer_factory.register(
-        metrics_writer_type, metrics_writer_initializer, scope
+        metrics_writer_type, metrics_writer_initializer, scope,
     )
 
 

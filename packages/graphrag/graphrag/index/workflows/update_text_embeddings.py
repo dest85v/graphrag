@@ -27,11 +27,11 @@ async def run_workflow(
     logger.info("Workflow started: update_text_embeddings")
 
     output_table_provider, _, _ = get_update_table_providers(
-        config, context.state["update_timestamp"]
+        config, context.state["update_timestamp"],
     )
 
     model_config = config.get_embedding_model_config(
-        config.embed_text.embedding_model_id
+        config.embed_text.embedding_model_id,
     )
     model = create_embedding(
         model_config,

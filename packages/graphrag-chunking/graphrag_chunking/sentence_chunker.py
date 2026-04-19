@@ -29,12 +29,12 @@ class SentenceChunker(Chunker):
         bootstrap()
 
     def chunk(
-        self, text: str, transform: Callable[[str], str] | None = None
+        self, text: str, transform: Callable[[str], str] | None = None,
     ) -> list[TextChunk]:
         """Chunk the text into sentence-based chunks."""
         sentences = nltk.sent_tokenize(text.strip(), language=self._nltk_language)
         results = create_chunk_results(
-            sentences, transform=transform, encode=self._encode
+            sentences, transform=transform, encode=self._encode,
         )
         # nltk sentence tokenizer may trim whitespace, so we need to adjust start/end chars
         for index, result in enumerate(results):

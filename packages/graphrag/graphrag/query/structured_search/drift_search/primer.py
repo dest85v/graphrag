@@ -36,10 +36,10 @@ class PrimerResponse(BaseModel):
         description="This answer should match the level of detail and length found in the community summaries. The intermediate answer should be exactly 2000 characters long. This must be formatted in markdown and must begin with a header that explains how the following text is related to the query.",
     )
     score: int = Field(
-        description="A score on how well the intermediate answer addresses the query. A score of 0 indicates a poor, unfocused answer, while a score of 100 indicates a highly focused, relevant answer that addresses the query in its entirety."
+        description="A score on how well the intermediate answer addresses the query. A score of 0 indicates a poor, unfocused answer, while a score of 100 indicates a highly focused, relevant answer that addresses the query in its entirety.",
     )
     follow_up_queries: list[str] = Field(
-        description="A list of follow-up queries that could be asked to further explore the topic. These should be formatted as a list of strings. Generate at least five good follow-up queries."
+        description="A list of follow-up queries that could be asked to further explore the topic. These should be formatted as a list of strings. Generate at least five good follow-up queries.",
     )
 
 
@@ -52,7 +52,7 @@ class PrimerQueryProcessor:
         text_embedder: "LLMEmbedding",
         reports: list[CommunityReport],
         tokenizer: Tokenizer | None = None,
-    ):
+    ) -> None:
         """
         Initialize the PrimerQueryProcessor.
 
@@ -86,7 +86,7 @@ class PrimerQueryProcessor:
                   Ensure that the hypothetical answer does not reference new named entities that are not present in the original query."""
 
         model_response: LLMCompletionResponse = await self.chat_model.completion_async(
-            messages=prompt
+            messages=prompt,
         )  # type: ignore
         text = model_response.content
 
@@ -116,7 +116,7 @@ class PrimerQueryProcessor:
         hyde_query, token_ct = await self.expand_query(query)
         logger.debug("Expanded query: %s", hyde_query)
         return self.text_embedder.embedding(
-            input=[hyde_query]
+            input=[hyde_query],
         ).first_embedding, token_ct
 
 
@@ -128,7 +128,7 @@ class DRIFTPrimer:
         config: DRIFTSearchConfig,
         chat_model: "LLMCompletion",
         tokenizer: Tokenizer | None = None,
-    ):
+    ) -> None:
         """
         Initialize the DRIFTPrimer.
 
@@ -142,7 +142,7 @@ class DRIFTPrimer:
         self.tokenizer = tokenizer or chat_model.tokenizer
 
     async def decompose_query(
-        self, query: str, reports: pd.DataFrame
+        self, query: str, reports: pd.DataFrame,
     ) -> tuple[dict, dict[str, int]]:
         """
         Decompose the query into subqueries based on the fetched global structures.
@@ -157,12 +157,12 @@ class DRIFTPrimer:
         """
         community_reports = "\n\n".join(reports["full_content"].tolist())
         prompt = DRIFT_PRIMER_PROMPT.format(
-            query=query, community_reports=community_reports
+            query=query, community_reports=community_reports,
         )
         model_response: LLMCompletionResponse[
             PrimerResponse
         ] = await self.chat_model.completion_async(
-            messages=prompt, response_format=PrimerResponse
+            messages=prompt, response_format=PrimerResponse,
         )  # type: ignore
 
         parsed_response = model_response.formatted_response.model_dump()  # type: ignore

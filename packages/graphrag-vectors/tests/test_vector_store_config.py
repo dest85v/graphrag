@@ -100,7 +100,7 @@ class TestVectorStoreConfig:
     def test_index_schema_passthrough(self):
         """Test index schema is accepted and passed through."""
         schema = IndexSchema(
-            index_name="test", vector_size=1536, fields={"label": "str"}
+            index_name="test", vector_size=1536, fields={"label": "str"},
         )
         config = VectorStoreConfig(
             type=VectorStoreType.Qdrant,

@@ -13,7 +13,7 @@ class WorkflowCallbacksManager(WorkflowCallbacks):
 
     _callbacks: list[WorkflowCallbacks]
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Create a new instance of WorkflowCallbacksRegistry."""
         self._callbacks = []
 

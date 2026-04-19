@@ -83,7 +83,7 @@ def test_register_and_create_custom_storage():
     instance.initialized = True
     custom_storage_class.return_value = instance
 
-    register_storage("custom", lambda **kwargs: custom_storage_class(**kwargs))
+    register_storage("custom", custom_storage_class)
     storage = create_storage(StorageConfig(type="custom"))
 
     assert custom_storage_class.called
@@ -117,7 +117,7 @@ def test_register_class_directly_works():
             return iter([])
 
         async def get(
-            self, key: str, as_bytes: bool | None = None, encoding: str | None = None
+            self, key: str, as_bytes: bool | None = None, encoding: str | None = None,
         ) -> Any:
             return None
 

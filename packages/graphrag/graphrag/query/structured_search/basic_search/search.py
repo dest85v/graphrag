@@ -42,7 +42,7 @@ class BasicSearch(BaseSearch[BasicContextBuilder]):
         callbacks: list[QueryCallbacks] | None = None,
         model_params: dict[str, Any] | None = None,
         context_builder_params: dict | None = None,
-    ):
+    ) -> None:
         super().__init__(
             model=model,
             context_builder=context_builder,
@@ -155,7 +155,7 @@ class BasicSearch(BaseSearch[BasicContextBuilder]):
         )
         logger.debug("GENERATE ANSWER: %s. QUERY: %s", start_time, query)
         search_prompt = self.system_prompt.format(
-            context_data=context_result.context_chunks, response_type=self.response_type
+            context_data=context_result.context_chunks, response_type=self.response_type,
         )
 
         messages_builder = (

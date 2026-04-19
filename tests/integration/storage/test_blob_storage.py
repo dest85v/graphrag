@@ -22,7 +22,7 @@ async def test_find():
             assert items == []
 
             await storage.set(
-                "input/christmas.txt", "Merry Christmas!", encoding="utf-8"
+                "input/christmas.txt", "Merry Christmas!", encoding="utf-8",
             )
             items = list(storage.find(file_pattern=re.compile(r".*\.txt$")))
             assert items == ["input/christmas.txt"]

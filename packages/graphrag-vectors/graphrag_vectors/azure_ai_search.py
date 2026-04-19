@@ -57,7 +57,7 @@ class AzureAISearchVectorStore(VectorStore):
         audience: str | None = None,
         vector_search_profile_name: str = "vectorSearchProfile",
         **kwargs: Any,
-    ):
+    ) -> None:
         super().__init__(**kwargs)
         if not url:
             msg = "url must be provided for Azure AI Search."
@@ -106,15 +106,15 @@ class AzureAISearchVectorStore(VectorStore):
                 HnswAlgorithmConfiguration(
                     name="HnswAlg",
                     parameters=HnswParameters(
-                        metric=VectorSearchAlgorithmMetric.COSINE
+                        metric=VectorSearchAlgorithmMetric.COSINE,
                     ),
-                )
+                ),
             ],
             profiles=[
                 VectorSearchProfile(
                     name=self.vector_search_profile_name,
                     algorithm_configuration_name="HnswAlg",
-                )
+                ),
             ],
         )
 
@@ -152,7 +152,7 @@ class AzureAISearchVectorStore(VectorStore):
                     name=field_name,
                     type=FIELD_TYPE_MAPPING[field_type],
                     filterable=True,
-                )
+                ),
             )
 
         # Configure the index
@@ -251,7 +251,7 @@ class AzureAISearchVectorStore(VectorStore):
                 raise ValueError(msg)
 
     def _extract_data(
-        self, doc: dict[str, Any], select: list[str] | None = None
+        self, doc: dict[str, Any], select: list[str] | None = None,
     ) -> dict[str, Any]:
         """Extract additional field data from a document response."""
         fields_to_extract = select if select is not None else list(self.fields.keys())

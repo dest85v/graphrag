@@ -51,7 +51,7 @@ def stable_lcc(
 
     # 2. Filter to the largest connected component
     lcc_nodes = largest_connected_component(
-        edges, source_column=source_column, target_column=target_column
+        edges, source_column=source_column, target_column=target_column,
     )
     edges = edges[
         edges[source_column].isin(lcc_nodes) & edges[target_column].isin(lcc_nodes)
@@ -60,7 +60,7 @@ def stable_lcc(
     # 3. Stabilize edge direction: lesser node always first
     swapped = edges[source_column] > edges[target_column]
     edges.loc[swapped, [source_column, target_column]] = edges.loc[
-        swapped, [target_column, source_column]
+        swapped, [target_column, source_column],
     ].to_numpy()
 
     # 4. Deduplicate edges that were reversed pairs in the original data

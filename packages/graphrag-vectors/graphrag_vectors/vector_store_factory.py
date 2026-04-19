@@ -52,7 +52,7 @@ def register_vector_store(
 
 
 def create_vector_store(
-    config: VectorStoreConfig, index_schema: IndexSchema
+    config: VectorStoreConfig, index_schema: IndexSchema,
 ) -> VectorStore:
     """Create a vector store implementation based on the given type and configuration.
 
@@ -81,7 +81,7 @@ def create_vector_store(
                 from graphrag_vectors.azure_ai_search import AzureAISearchVectorStore
 
                 register_vector_store(
-                    VectorStoreType.AzureAISearch, AzureAISearchVectorStore
+                    VectorStoreType.AzureAISearch, AzureAISearchVectorStore,
                 )
             case VectorStoreType.CosmosDB:
                 from graphrag_vectors.cosmosdb import CosmosDBVectorStore
@@ -99,5 +99,5 @@ def create_vector_store(
     config_model = config.model_dump()
     index_model = index_schema.model_dump()
     return vector_store_factory.create(
-        strategy, init_args={**config_model, **index_model}
+        strategy, init_args={**config_model, **index_model},
     )

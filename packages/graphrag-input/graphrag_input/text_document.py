@@ -40,7 +40,7 @@ class TextDocument:
         2. Otherwise. try to extract it from the raw_data dict. This allows users to specify any column from the original input file.
 
         """
-        if field in ["id", "title", "text", "creation_date"]:
+        if field in {"id", "title", "text", "creation_date"}:
             return getattr(self, field)
 
         raw = self.raw_data or {}

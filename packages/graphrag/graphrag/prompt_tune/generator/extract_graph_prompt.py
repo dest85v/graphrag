@@ -74,11 +74,11 @@ def create_extract_graph_prompt(
         input = docs[i]
         example_formatted = (
             EXAMPLE_EXTRACTION_TEMPLATE.format(
-                n=i + 1, input_text=input, entity_types=entity_types, output=output
+                n=i + 1, input_text=input, entity_types=entity_types, output=output,
             )
             if entity_types
             else UNTYPED_EXAMPLE_EXTRACTION_TEMPLATE.format(
-                n=i + 1, input_text=input, output=output
+                n=i + 1, input_text=input, output=output,
             )
         )
 
@@ -93,7 +93,7 @@ def create_extract_graph_prompt(
 
     prompt = (
         prompt.format(
-            entity_types=entity_types, examples=examples_prompt, language=language
+            entity_types=entity_types, examples=examples_prompt, language=language,
         )
         if entity_types
         else prompt.format(examples=examples_prompt, language=language)
@@ -102,7 +102,7 @@ def create_extract_graph_prompt(
     if output_path:
         output_path.mkdir(parents=True, exist_ok=True)
 
-        output_path = output_path / EXTRACT_GRAPH_FILENAME
+        output_path /= EXTRACT_GRAPH_FILENAME
         # Write file to output path
         with output_path.open("wb") as file:
             file.write(prompt.encode(encoding="utf-8", errors="strict"))

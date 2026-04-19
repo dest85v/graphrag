@@ -13,14 +13,14 @@ from tests.unit.config.utils import get_default_graphrag_config
 
 
 async def run_workflow_1(  # noqa: RUF029
-    _config: GraphRagConfig, context: PipelineRunContext
+    _config: GraphRagConfig, context: PipelineRunContext,
 ):
     context.state["count"] = 1
     return WorkflowFunctionOutput(result=None)
 
 
 async def run_workflow_2(  # noqa: RUF029
-    _config: GraphRagConfig, context: PipelineRunContext
+    _config: GraphRagConfig, context: PipelineRunContext,
 ):
     context.state["count"] += 1
     return WorkflowFunctionOutput(result=None)

@@ -22,7 +22,7 @@ class QueryCallbacks(BaseLLMCallback):
         """Handle the end of map operation."""
 
     def on_reduce_response_start(
-        self, reduce_response_context: str | dict[str, Any]
+        self, reduce_response_context: str | dict[str, Any],
     ) -> None:
         """Handle the start of reduce operation."""
 

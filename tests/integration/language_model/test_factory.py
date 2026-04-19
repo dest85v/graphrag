@@ -65,7 +65,7 @@ def test_create_custom_chat_model():
             type="custom_chat",
             model_provider="custom_provider",
             model="custom_chat_model",
-        )
+        ),
     )
     assert isinstance(model, CustomChatModel)
 
@@ -75,11 +75,11 @@ def test_create_custom_embedding_llm():
         def __init__(self, **kwargs): ...
 
         def embedding(
-            self, /, **kwargs: Unpack["LLMEmbeddingArgs"]
+            self, /, **kwargs: Unpack["LLMEmbeddingArgs"],
         ) -> "LLMEmbeddingResponse": ...
 
         async def embedding_async(
-            self, /, **kwargs: Unpack["LLMEmbeddingArgs"]
+            self, /, **kwargs: Unpack["LLMEmbeddingArgs"],
         ) -> "LLMEmbeddingResponse": ...
 
         @property
@@ -95,7 +95,7 @@ def test_create_custom_embedding_llm():
             type="custom_embedding",
             model_provider="custom_provider",
             model="custom_embedding_model",
-        )
+        ),
     )
 
     assert isinstance(model, CustomEmbeddingModel)

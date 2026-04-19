@@ -24,7 +24,7 @@ class MetricsAggregator:
             cls._instance = super().__new__(cls, *args, **kwargs)
         return cls._instance
 
-    def __init__(self):
+    def __init__(self) -> None:
         if not hasattr(self, "_initialized"):
             self._initialized = True
             self._aggregate_functions = {}
@@ -113,7 +113,7 @@ def _compute_duration_per_response(metrics: "Metrics") -> None:
     """Calculate compute duration per response metric."""
     responses = metrics.get("successful_response_count", 0)
     streaming_responses = metrics.get("streaming_responses", 0)
-    responses = responses - streaming_responses
+    responses -= streaming_responses
     compute_duration = metrics.get("compute_duration_seconds", 0)
     if responses > 0:
         metrics["compute_duration_per_response_seconds"] = compute_duration / responses
@@ -137,6 +137,6 @@ metrics_aggregator.register("retry_rate", _retry_rate)
 metrics_aggregator.register("tokens_per_response", _tokens_per_response)
 metrics_aggregator.register("cost_per_response", _cost_per_response)
 metrics_aggregator.register(
-    "compute_duration_per_response", _compute_duration_per_response
+    "compute_duration_per_response", _compute_duration_per_response,
 )
 metrics_aggregator.register("cache_hit_rate", _cache_hit_rate)

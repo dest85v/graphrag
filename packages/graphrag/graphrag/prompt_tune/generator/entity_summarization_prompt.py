@@ -31,7 +31,7 @@ def create_entity_summarization_prompt(
     if output_path:
         output_path.mkdir(parents=True, exist_ok=True)
 
-        output_path = output_path / ENTITY_SUMMARIZATION_FILENAME
+        output_path /= ENTITY_SUMMARIZATION_FILENAME
         # Write file to output path
         with output_path.open("wb") as file:
             file.write(prompt.encode(encoding="utf-8", errors="strict"))

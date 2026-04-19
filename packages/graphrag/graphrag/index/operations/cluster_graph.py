@@ -64,7 +64,7 @@ def _compute_leiden_communities(
     hi = edge_df[["source", "target"]].max(axis=1)
     edge_df["source"] = lo
     edge_df["target"] = hi
-    edge_df.drop_duplicates(subset=["source", "target"], keep="last", inplace=True)
+    edge_df = edge_df.drop_duplicates(subset=["source", "target"], keep="last")
 
     if use_lcc:
         edge_df = stable_lcc(edge_df)
@@ -80,11 +80,11 @@ def _compute_leiden_communities(
             edge_df["target"].astype(str),
             weights,
             strict=True,
-        )
+        ),
     )
 
     community_mapping = hierarchical_leiden(
-        edge_list, max_cluster_size=max_cluster_size, random_seed=seed
+        edge_list, max_cluster_size=max_cluster_size, random_seed=seed,
     )
     results: dict[int, dict[str, int]] = {}
     hierarchy: dict[int, int] = {}

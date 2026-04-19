@@ -62,7 +62,7 @@ def with_errors_for_testing(
 
             exception_cls = getattr(openai, exception_type, ValueError)
             raise exception_cls(
-                *(exception_args or ["Simulated failure for debugging purposes."])
+                *(exception_args or ["Simulated failure for debugging purposes."]),
             )
 
         return sync_middleware(**kwargs)
@@ -75,7 +75,7 @@ def with_errors_for_testing(
 
             exception_cls = getattr(openai, exception_type, ValueError)
             raise exception_cls(
-                *(exception_args or ["Simulated failure for debugging purposes."])
+                *(exception_args or ["Simulated failure for debugging purposes."]),
             )
 
         return await async_middleware(**kwargs)

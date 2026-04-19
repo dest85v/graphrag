@@ -35,13 +35,13 @@ class MarkItDownFileReader(InputReader):
         bytes = await self._storage.get(path, encoding=self._encoding, as_bytes=True)
         md = MarkItDown()
         result = md.convert_stream(
-            BytesIO(bytes), stream_info=StreamInfo(extension=Path(path).suffix)
+            BytesIO(bytes), stream_info=StreamInfo(extension=Path(path).suffix),
         )
         text = result.markdown
 
         document = TextDocument(
             id=gen_sha512_hash({"text": text}, ["text"]),
-            title=result.title if result.title else str(Path(path).name),
+            title=result.title or str(Path(path).name),
             text=text,
             creation_date=await self._storage.get_creation_date(path),
             raw_data=None,

@@ -34,7 +34,7 @@ def connected_components(
 
     # Initialize every node as its own parent
     all_nodes = pd.concat(
-        [edges[source_column], edges[target_column]], ignore_index=True
+        [edges[source_column], edges[target_column]], ignore_index=True,
     ).unique()
     parent: dict[str, str] = {node: node for node in all_nodes}
 

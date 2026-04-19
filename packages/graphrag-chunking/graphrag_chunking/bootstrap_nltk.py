@@ -12,7 +12,7 @@ warnings.filterwarnings("ignore", message=".*Use no seed for parallelism.*")
 initialized_nltk = False
 
 
-def bootstrap():
+def bootstrap() -> None:
     """Bootstrap definition."""
     global initialized_nltk
     if not initialized_nltk:

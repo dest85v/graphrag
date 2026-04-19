@@ -39,7 +39,7 @@ def register_cache(
 
 
 def create_cache(
-    config: CacheConfig | None = None, storage: Storage | None = None
+    config: CacheConfig | None = None, storage: Storage | None = None,
 ) -> "Cache":
     """Create a cache implementation based on the given configuration.
 

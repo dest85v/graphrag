@@ -30,7 +30,7 @@ class SyntacticNounPhraseExtractor(BaseNounPhraseExtractor):
         exclude_pos_tags: list[str],
         exclude_nouns: list[str],
         word_delimiter: str,
-    ):
+    ) -> None:
         """
         Noun phrase extractor based on dependency parsing and NER using SpaCy.
 
@@ -121,7 +121,7 @@ class SyntacticNounPhraseExtractor(BaseNounPhraseExtractor):
         return list(filtered_noun_phrases)
 
     def _tag_noun_phrases(
-        self, noun_chunk: Span, entities: list[Span]
+        self, noun_chunk: Span, entities: list[Span],
     ) -> dict[str, Any]:
         """Extract attributes of a noun chunk, to be used for filtering."""
         cleaned_tokens = [
@@ -153,7 +153,7 @@ class SyntacticNounPhraseExtractor(BaseNounPhraseExtractor):
             "has_proper_nouns": any(token.pos_ == "PROPN" for token in cleaned_tokens),
             "has_compound_words": is_compound(cleaned_token_texts),
             "has_valid_tokens": has_valid_token_length(
-                cleaned_token_texts, self.max_word_length
+                cleaned_token_texts, self.max_word_length,
             ),
         }
 

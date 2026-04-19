@@ -60,13 +60,13 @@ async def run_pipeline(
         timestamped_storage = update_storage.child(update_timestamp)
         delta_storage = timestamped_storage.child("delta")
         delta_table_provider = create_table_provider(
-            config.table_provider, delta_storage
+            config.table_provider, delta_storage,
         )
         # copy the previous output to a backup folder, so we can replace it with the update
         # we'll read from this later when we merge the old and new indexes
         previous_storage = timestamped_storage.child("previous")
         previous_table_provider = create_table_provider(
-            config.table_provider, previous_storage
+            config.table_provider, previous_storage,
         )
 
         await _copy_previous_output(output_table_provider, previous_table_provider)
@@ -136,7 +136,7 @@ async def _run_pipeline(
 
             context.callbacks.workflow_end(name, result)
             yield PipelineRunResult(
-                workflow=name, result=result.result, state=context.state, error=None
+                workflow=name, result=result.result, state=context.state, error=None,
             )
             context.stats.workflows[name] = profiler.metrics
             await _dump_stats_json(context)
@@ -152,14 +152,14 @@ async def _run_pipeline(
     except Exception as e:
         logger.exception("error running workflow %s", last_workflow)
         yield PipelineRunResult(
-            workflow=last_workflow, result=None, state=context.state, error=e
+            workflow=last_workflow, result=None, state=context.state, error=e,
         )
 
 
 async def _dump_stats_json(context: PipelineRunContext) -> None:
     """Dump stats state to storage."""
     await context.output_storage.set(
-        "stats.json", json.dumps(asdict(context.stats), indent=4, ensure_ascii=False)
+        "stats.json", json.dumps(asdict(context.stats), indent=4, ensure_ascii=False),
     )
 
 
@@ -167,7 +167,7 @@ async def _dump_context_json(context: PipelineRunContext) -> None:
     """Dump context state to storage."""
     # Dump context state, excluding additional_context
     temp_context = context.state.pop(
-        "additional_context", None
+        "additional_context", None,
     )  # Remove reference only, as object size is uncertain
     try:
         state_blob = json.dumps(context.state, indent=4, ensure_ascii=False)

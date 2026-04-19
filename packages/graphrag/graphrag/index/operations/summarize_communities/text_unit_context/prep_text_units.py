@@ -7,7 +7,7 @@ import logging
 
 import pandas as pd
 
-import graphrag.data_model.schemas as schemas
+from graphrag.data_model import schemas
 
 logger = logging.getLogger(__name__)
 
@@ -21,9 +21,9 @@ def prep_text_units(
 
     Returns : dataframe with columns [COMMUNITY_ID, TEXT_UNIT_ID, ALL_DETAILS]
     """
-    node_df.drop(columns=["id"], inplace=True)
+    node_df = node_df.drop(columns=["id"])
     node_to_text_ids = node_df.explode(schemas.TEXT_UNIT_IDS).rename(
-        columns={schemas.TEXT_UNIT_IDS: schemas.ID}
+        columns={schemas.TEXT_UNIT_IDS: schemas.ID},
     )
     node_to_text_ids = node_to_text_ids[
         [schemas.TITLE, schemas.COMMUNITY_ID, schemas.NODE_DEGREE, schemas.ID]

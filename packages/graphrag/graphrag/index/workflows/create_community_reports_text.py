@@ -49,7 +49,7 @@ async def run_workflow(
     text_units = await reader.text_units()
 
     model_config = config.get_completion_model_config(
-        config.community_reports.completion_model_id
+        config.community_reports.completion_model_id,
     )
     model = create_completion(
         model_config,
@@ -98,7 +98,7 @@ async def create_community_reports_text(
     nodes = explode_communities(communities, entities)
 
     local_contexts = build_local_context(
-        communities, text_units, nodes, tokenizer, max_input_length
+        communities, text_units, nodes, tokenizer, max_input_length,
     )
 
     community_reports = await summarize_communities(

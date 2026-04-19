@@ -58,7 +58,7 @@ async def generate_entity_relationship_examples(
     else:
         messages = [
             UNTYPED_ENTITY_RELATIONSHIPS_GENERATION_PROMPT.format(
-                input_text=doc, language=language
+                input_text=doc, language=language,
             )
             for doc in docs_list
         ]

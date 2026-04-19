@@ -3,17 +3,19 @@
 
 """A module containing build_mixed_context method definition."""
 
+import operator
+
 import pandas as pd
 from graphrag_llm.tokenizer import Tokenizer
 
-import graphrag.data_model.schemas as schemas
+from graphrag.data_model import schemas
 from graphrag.index.operations.summarize_communities.graph_context.sort_context import (
     sort_context,
 )
 
 
 def build_mixed_context(
-    context: list[dict], tokenizer: Tokenizer, max_context_tokens: int
+    context: list[dict], tokenizer: Tokenizer, max_context_tokens: int,
 ) -> str:
     """
     Build parent context by concatenating all sub-communities' contexts.
@@ -21,7 +23,7 @@ def build_mixed_context(
     If the context exceeds the limit, we use sub-community reports instead.
     """
     sorted_context = sorted(
-        context, key=lambda x: x[schemas.CONTEXT_SIZE], reverse=True
+        context, key=operator.itemgetter(schemas.CONTEXT_SIZE), reverse=True,
     )
 
     # replace local context with sub-community reports, starting from the biggest sub-community
@@ -65,7 +67,7 @@ def build_mixed_context(
                 schemas.FULL_CONTENT: sub_community_context[schemas.FULL_CONTENT],
             })
             new_context_string = pd.DataFrame(substitute_reports).to_csv(
-                index=False, sep=","
+                index=False, sep=",",
             )
             if tokenizer.num_tokens(new_context_string) > max_context_tokens:
                 break

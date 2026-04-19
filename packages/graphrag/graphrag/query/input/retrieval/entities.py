@@ -21,14 +21,14 @@ def get_entity_by_id(entities: dict[str, Entity], value: str) -> Entity | None:
 
 
 def get_entity_by_key(
-    entities: Iterable[Entity], key: str, value: str | int
+    entities: Iterable[Entity], key: str, value: str | int,
 ) -> Entity | None:
     """Get entity by key."""
     if isinstance(value, str) and is_valid_uuid(value):
         value_no_dashes = value.replace("-", "")
         for entity in entities:
             entity_value = getattr(entity, key)
-            if entity_value in (value, value_no_dashes):
+            if entity_value in {value, value_no_dashes}:
                 return entity
     else:
         for entity in entities:
@@ -43,7 +43,7 @@ def get_entity_by_name(entities: Iterable[Entity], entity_name: str) -> list[Ent
 
 
 def get_entity_by_attribute(
-    entities: Iterable[Entity], attribute_name: str, attribute_value: Any
+    entities: Iterable[Entity], attribute_name: str, attribute_value: Any,
 ) -> list[Entity]:
     """Get entities by attribute."""
     return [
@@ -74,9 +74,9 @@ def to_entity_dataframe(
     records = []
     for entity in entities:
         new_record = [
-            entity.short_id if entity.short_id else "",
+            entity.short_id or "",
             entity.title,
-            entity.description if entity.description else "",
+            entity.description or "",
         ]
         if include_entity_rank:
             new_record.append(str(entity.rank))

@@ -149,7 +149,7 @@ def _prepare_embed_texts(
 
 
 def _reconstitute_embeddings(
-    raw_embeddings: list[list[float]], sizes: list[int]
+    raw_embeddings: list[list[float]], sizes: list[int],
 ) -> list[list[float] | None]:
     """Reconstitute the embeddings into the original input texts."""
     embeddings: list[list[float] | None] = []

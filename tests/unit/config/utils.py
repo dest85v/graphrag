@@ -71,7 +71,7 @@ def assert_retry_configs(actual: RetryConfig, expected: RetryConfig) -> None:
 
 
 def assert_rate_limit_configs(
-    actual: RateLimitConfig, expected: RateLimitConfig
+    actual: RateLimitConfig, expected: RateLimitConfig,
 ) -> None:
     assert actual.type == expected.type
     assert actual.period_in_seconds == expected.period_in_seconds
@@ -126,7 +126,7 @@ def assert_vector_store_configs(
 
 
 def assert_reporting_configs(
-    actual: ReportingConfig, expected: ReportingConfig
+    actual: ReportingConfig, expected: ReportingConfig,
 ) -> None:
     assert actual.type == expected.type
     assert actual.base_dir == expected.base_dir
@@ -160,7 +160,7 @@ def assert_input_configs(actual: InputConfig, expected: InputConfig) -> None:
 
 
 def assert_text_embedding_configs(
-    actual: EmbedTextConfig, expected: EmbedTextConfig
+    actual: EmbedTextConfig, expected: EmbedTextConfig,
 ) -> None:
     assert actual.batch_size == expected.batch_size
     assert actual.batch_max_tokens == expected.batch_max_tokens
@@ -177,14 +177,14 @@ def assert_chunking_configs(actual: ChunkingConfig, expected: ChunkingConfig) ->
 
 
 def assert_snapshots_configs(
-    actual: SnapshotsConfig, expected: SnapshotsConfig
+    actual: SnapshotsConfig, expected: SnapshotsConfig,
 ) -> None:
     assert actual.embeddings == expected.embeddings
     assert actual.graphml == expected.graphml
 
 
 def assert_extract_graph_configs(
-    actual: ExtractGraphConfig, expected: ExtractGraphConfig
+    actual: ExtractGraphConfig, expected: ExtractGraphConfig,
 ) -> None:
     assert actual.prompt == expected.prompt
     assert actual.entity_types == expected.entity_types
@@ -193,7 +193,7 @@ def assert_extract_graph_configs(
 
 
 def assert_text_analyzer_configs(
-    actual: TextAnalyzerConfig, expected: TextAnalyzerConfig
+    actual: TextAnalyzerConfig, expected: TextAnalyzerConfig,
 ) -> None:
     assert actual.extractor_type == expected.extractor_type
     assert actual.model_name == expected.model_name
@@ -208,7 +208,7 @@ def assert_text_analyzer_configs(
 
 
 def assert_extract_graph_nlp_configs(
-    actual: ExtractGraphNLPConfig, expected: ExtractGraphNLPConfig
+    actual: ExtractGraphNLPConfig, expected: ExtractGraphNLPConfig,
 ) -> None:
     assert actual.normalize_edge_weights == expected.normalize_edge_weights
     assert_text_analyzer_configs(actual.text_analyzer, expected.text_analyzer)
@@ -216,7 +216,7 @@ def assert_extract_graph_nlp_configs(
 
 
 def assert_prune_graph_configs(
-    actual: PruneGraphConfig, expected: PruneGraphConfig
+    actual: PruneGraphConfig, expected: PruneGraphConfig,
 ) -> None:
     assert actual.min_node_freq == expected.min_node_freq
     assert actual.max_node_freq_std == expected.max_node_freq_std
@@ -228,7 +228,7 @@ def assert_prune_graph_configs(
 
 
 def assert_summarize_descriptions_configs(
-    actual: SummarizeDescriptionsConfig, expected: SummarizeDescriptionsConfig
+    actual: SummarizeDescriptionsConfig, expected: SummarizeDescriptionsConfig,
 ) -> None:
     assert actual.prompt == expected.prompt
     assert actual.max_length == expected.max_length
@@ -236,7 +236,7 @@ def assert_summarize_descriptions_configs(
 
 
 def assert_community_reports_configs(
-    actual: CommunityReportsConfig, expected: CommunityReportsConfig
+    actual: CommunityReportsConfig, expected: CommunityReportsConfig,
 ) -> None:
     assert actual.graph_prompt == expected.graph_prompt
     assert actual.text_prompt == expected.text_prompt
@@ -246,7 +246,7 @@ def assert_community_reports_configs(
 
 
 def assert_extract_claims_configs(
-    actual: ExtractClaimsConfig, expected: ExtractClaimsConfig
+    actual: ExtractClaimsConfig, expected: ExtractClaimsConfig,
 ) -> None:
     assert actual.enabled == expected.enabled
     assert actual.prompt == expected.prompt
@@ -256,7 +256,7 @@ def assert_extract_claims_configs(
 
 
 def assert_cluster_graph_configs(
-    actual: ClusterGraphConfig, expected: ClusterGraphConfig
+    actual: ClusterGraphConfig, expected: ClusterGraphConfig,
 ) -> None:
     assert actual.max_cluster_size == expected.max_cluster_size
     assert actual.use_lcc == expected.use_lcc
@@ -264,7 +264,7 @@ def assert_cluster_graph_configs(
 
 
 def assert_local_search_configs(
-    actual: LocalSearchConfig, expected: LocalSearchConfig
+    actual: LocalSearchConfig, expected: LocalSearchConfig,
 ) -> None:
     assert actual.prompt == expected.prompt
     assert actual.text_unit_prop == expected.text_unit_prop
@@ -278,7 +278,7 @@ def assert_local_search_configs(
 
 
 def assert_global_search_configs(
-    actual: GlobalSearchConfig, expected: GlobalSearchConfig
+    actual: GlobalSearchConfig, expected: GlobalSearchConfig,
 ) -> None:
     assert actual.map_prompt == expected.map_prompt
     assert actual.reduce_prompt == expected.reduce_prompt
@@ -295,7 +295,7 @@ def assert_global_search_configs(
 
 
 def assert_drift_search_configs(
-    actual: DRIFTSearchConfig, expected: DRIFTSearchConfig
+    actual: DRIFTSearchConfig, expected: DRIFTSearchConfig,
 ) -> None:
     assert actual.prompt == expected.prompt
     assert actual.reduce_prompt == expected.reduce_prompt
@@ -328,7 +328,7 @@ def assert_drift_search_configs(
 
 
 def assert_basic_search_configs(
-    actual: BasicSearchConfig, expected: BasicSearchConfig
+    actual: BasicSearchConfig, expected: BasicSearchConfig,
 ) -> None:
     assert actual.prompt == expected.prompt
     assert actual.k == expected.k
@@ -362,13 +362,13 @@ def assert_graphrag_configs(actual: GraphRagConfig, expected: GraphRagConfig) ->
     assert_snapshots_configs(actual.snapshots, expected.snapshots)
     assert_extract_graph_configs(actual.extract_graph, expected.extract_graph)
     assert_extract_graph_nlp_configs(
-        actual.extract_graph_nlp, expected.extract_graph_nlp
+        actual.extract_graph_nlp, expected.extract_graph_nlp,
     )
     assert_summarize_descriptions_configs(
-        actual.summarize_descriptions, expected.summarize_descriptions
+        actual.summarize_descriptions, expected.summarize_descriptions,
     )
     assert_community_reports_configs(
-        actual.community_reports, expected.community_reports
+        actual.community_reports, expected.community_reports,
     )
     assert_extract_claims_configs(actual.extract_claims, expected.extract_claims)
     assert_prune_graph_configs(actual.prune_graph, expected.prune_graph)

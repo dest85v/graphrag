@@ -75,8 +75,7 @@ def try_parse_json_object(input: str, verbose: bool = True) -> tuple[str, dict]:
     )
 
     # Remove JSON Markdown Frame
-    if input.startswith("```json"):
-        input = input[len("```json") :]
+    input = input.removeprefix("```json")
     if input.endswith("```"):
         input = input[: len(input) - len("```")]
 

@@ -53,15 +53,15 @@ async def _update_community_reports(
 ) -> pd.DataFrame:
     """Update the community reports output."""
     old_community_reports = await DataReader(
-        previous_table_provider
+        previous_table_provider,
     ).community_reports()
     delta_community_reports = await DataReader(delta_table_provider).community_reports()
     merged_community_reports = _update_and_merge_community_reports(
-        old_community_reports, delta_community_reports, community_id_mapping
+        old_community_reports, delta_community_reports, community_id_mapping,
     )
 
     await output_table_provider.write_dataframe(
-        "community_reports", merged_community_reports
+        "community_reports", merged_community_reports,
     )
 
     return merged_community_reports

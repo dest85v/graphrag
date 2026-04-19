@@ -149,7 +149,7 @@ class ExtractGraphDefaults:
 
     prompt: None = None
     entity_types: list[str] = field(
-        default_factory=lambda: ["organization", "person", "geo", "event"]
+        default_factory=lambda: ["organization", "person", "geo", "event"],
     )
     max_gleanings: int = 1
     completion_model_id: str = DEFAULT_COMPLETION_MODEL_ID
@@ -170,11 +170,11 @@ class TextAnalyzerDefaults:
     exclude_nouns: list[str] = field(default_factory=lambda: EN_STOP_WORDS)
     exclude_entity_tags: list[str] = field(default_factory=lambda: ["DATE"])
     exclude_pos_tags: list[str] = field(
-        default_factory=lambda: ["DET", "PRON", "INTJ", "X"]
+        default_factory=lambda: ["DET", "PRON", "INTJ", "X"],
     )
     noun_phrase_tags: list[str] = field(default_factory=lambda: ["PROPN", "NOUNS"])
     noun_phrase_grammars: dict[str, str] = field(
-        default_factory=lambda: EN_NOUN_PHRASE_GRAMMARS
+        default_factory=lambda: EN_NOUN_PHRASE_GRAMMARS,
     )
 
 
@@ -348,7 +348,7 @@ class GraphRagConfigDefaults:
     input_storage: InputStorageDefaults = field(default_factory=InputStorageDefaults)
     output_storage: OutputStorageDefaults = field(default_factory=OutputStorageDefaults)
     update_output_storage: UpdateOutputStorageDefaults = field(
-        default_factory=UpdateOutputStorageDefaults
+        default_factory=UpdateOutputStorageDefaults,
     )
     cache: CacheDefaults = field(default_factory=CacheDefaults)
     input: InputDefaults = field(default_factory=InputDefaults)
@@ -358,13 +358,13 @@ class GraphRagConfigDefaults:
     snapshots: SnapshotsDefaults = field(default_factory=SnapshotsDefaults)
     extract_graph: ExtractGraphDefaults = field(default_factory=ExtractGraphDefaults)
     extract_graph_nlp: ExtractGraphNLPDefaults = field(
-        default_factory=ExtractGraphNLPDefaults
+        default_factory=ExtractGraphNLPDefaults,
     )
     summarize_descriptions: SummarizeDescriptionsDefaults = field(
-        default_factory=SummarizeDescriptionsDefaults
+        default_factory=SummarizeDescriptionsDefaults,
     )
     community_reports: CommunityReportDefaults = field(
-        default_factory=CommunityReportDefaults
+        default_factory=CommunityReportDefaults,
     )
     extract_claims: ExtractClaimsDefaults = field(default_factory=ExtractClaimsDefaults)
     prune_graph: PruneGraphDefaults = field(default_factory=PruneGraphDefaults)
@@ -374,7 +374,7 @@ class GraphRagConfigDefaults:
     drift_search: DriftSearchDefaults = field(default_factory=DriftSearchDefaults)
     basic_search: BasicSearchDefaults = field(default_factory=BasicSearchDefaults)
     vector_store: VectorStoreDefaults = field(
-        default_factory=lambda: VectorStoreDefaults()
+        default_factory=VectorStoreDefaults,
     )
     workflows: None = None
 

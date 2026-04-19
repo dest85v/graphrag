@@ -32,7 +32,7 @@ class SlidingWindowRateLimiter(RateLimiter):
         requests_per_period: int | None = None,
         tokens_per_period: int | None = None,
         **kwargs: Any,
-    ):
+    ) -> None:
         """Initialize the Sliding Window Rate Limiter.
 
         Args

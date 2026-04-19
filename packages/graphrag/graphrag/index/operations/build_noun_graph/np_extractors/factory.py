@@ -43,7 +43,7 @@ class NounPhraseExtractorFactory:
     np_extractor_types: ClassVar[dict[str, type]] = {}
 
     @classmethod
-    def register(cls, np_extractor_type: str, np_extractor: type):
+    def register(cls, np_extractor_type: str, np_extractor: type) -> None:
         """Register a vector store type."""
         cls.np_extractor_types[np_extractor_type] = np_extractor
 

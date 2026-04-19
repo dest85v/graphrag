@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING, Any
 from graphrag_storage import create_storage
 from graphrag_storage.tables.table_provider_factory import create_table_provider
 
-import graphrag.api as api
+from graphrag import api
 from graphrag.callbacks.noop_query_callbacks import NoopQueryCallbacks
 from graphrag.config.load_config import load_config
 from graphrag.config.models.graph_rag_config import GraphRagConfig
@@ -103,7 +103,7 @@ def run_global_search(
             response_type=response_type,
             query=query,
             verbose=verbose,
-        )
+        ),
     )
     print(response)
 
@@ -200,7 +200,7 @@ def run_local_search(
             response_type=response_type,
             query=query,
             verbose=verbose,
-        )
+        ),
     )
     print(response)
 
@@ -292,7 +292,7 @@ def run_drift_search(
             response_type=response_type,
             query=query,
             verbose=verbose,
-        )
+        ),
     )
     print(response)
 
@@ -364,7 +364,7 @@ def run_basic_search(
             response_type=response_type,
             query=query,
             verbose=verbose,
-        )
+        ),
     )
     print(response)
 

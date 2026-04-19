@@ -42,7 +42,7 @@ TIMESTAMP_FIELDS: dict[str, str] = {
 
 
 def explode_timestamp(
-    iso_timestamp: str | None, prefix: str = "create_date"
+    iso_timestamp: str | None, prefix: str = "create_date",
 ) -> dict[str, str | int]:
     """Explode an ISO 8601 timestamp into filterable component fields.
 

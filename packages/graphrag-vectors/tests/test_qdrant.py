@@ -213,14 +213,14 @@ class TestQdrantVectorStore:
                 id="1",
                 vector=None,
                 data={"os": "macos", "category": "bug", "priority": 1},
-            )
+            ),
         )
 
         doc = store.search_by_id("1")
         assert doc.data["os"] == "macos"
 
     def test_similarity_search_by_vector(
-        self, store_with_fields, sample_documents_with_metadata
+        self, store_with_fields, sample_documents_with_metadata,
     ):
         """Test vector similarity search returns ordered results."""
         store = store_with_fields
@@ -232,7 +232,7 @@ class TestQdrantVectorStore:
         assert results[0].score >= results[1].score
 
     def test_similarity_search_k_limit(
-        self, store_with_fields, sample_documents_with_metadata
+        self, store_with_fields, sample_documents_with_metadata,
     ):
         """Test that k parameter limits search results."""
         store = store_with_fields
@@ -242,14 +242,14 @@ class TestQdrantVectorStore:
         assert len(results) == 1
 
     def test_select_limits_fields(
-        self, store_with_fields, sample_documents_with_metadata
+        self, store_with_fields, sample_documents_with_metadata,
     ):
         """Test that select parameter limits returned fields."""
         store = store_with_fields
         store.load_documents(sample_documents_with_metadata)
 
         results = store.similarity_search_by_vector(
-            [0.1, 0.2, 0.3, 0.4, 0.5], k=1, select=["os"]
+            [0.1, 0.2, 0.3, 0.4, 0.5], k=1, select=["os"],
         )
         data = results[0].document.data
         assert "os" in data
@@ -257,14 +257,14 @@ class TestQdrantVectorStore:
         assert "priority" not in data
 
     def test_include_vectors_false(
-        self, store_with_fields, sample_documents_with_metadata
+        self, store_with_fields, sample_documents_with_metadata,
     ):
         """Test include_vectors=False omits vectors from results."""
         store = store_with_fields
         store.load_documents(sample_documents_with_metadata)
 
         results = store.similarity_search_by_vector(
-            [0.1, 0.2, 0.3, 0.4, 0.5], k=1, include_vectors=False
+            [0.1, 0.2, 0.3, 0.4, 0.5], k=1, include_vectors=False,
         )
         assert results[0].document.vector is None
 
@@ -299,29 +299,29 @@ class TestQdrantVectorStore:
         assert ids == {"1", "3"}
 
     def test_filter_gt_gte_lt_lte(
-        self, store_with_fields, sample_documents_with_metadata
+        self, store_with_fields, sample_documents_with_metadata,
     ):
         """Test numeric range filters."""
         store = store_with_fields
         store.load_documents(sample_documents_with_metadata)
 
         results = store.similarity_search_by_vector(
-            [0.1, 0.2, 0.3, 0.4, 0.5], k=10, filters=F.priority > 1
+            [0.1, 0.2, 0.3, 0.4, 0.5], k=10, filters=F.priority > 1,
         )
         assert len(results) == 2
 
         results = store.similarity_search_by_vector(
-            [0.1, 0.2, 0.3, 0.4, 0.5], k=10, filters=F.priority >= 2
+            [0.1, 0.2, 0.3, 0.4, 0.5], k=10, filters=F.priority >= 2,
         )
         assert len(results) == 2
 
         results = store.similarity_search_by_vector(
-            [0.1, 0.2, 0.3, 0.4, 0.5], k=10, filters=F.priority < 3
+            [0.1, 0.2, 0.3, 0.4, 0.5], k=10, filters=F.priority < 3,
         )
         assert len(results) == 2
 
         results = store.similarity_search_by_vector(
-            [0.1, 0.2, 0.3, 0.4, 0.5], k=10, filters=F.priority <= 1
+            [0.1, 0.2, 0.3, 0.4, 0.5], k=10, filters=F.priority <= 1,
         )
         assert len(results) == 1
 

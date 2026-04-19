@@ -15,7 +15,7 @@ async def create_test_context(storage: list[str] | None = None) -> PipelineRunCo
 
     # always set the input docs, but since our stored table is final, drop what wouldn't be in the original source input
     input = load_test_table("documents")
-    input.drop(columns=["text_unit_ids"], inplace=True)
+    input = input.drop(columns=["text_unit_ids"])
     await context.output_table_provider.write_dataframe("documents", input)
 
     if storage:
@@ -32,7 +32,7 @@ def load_test_table(output: str) -> pd.DataFrame:
 
 
 def compare_outputs(
-    actual: pd.DataFrame, expected: pd.DataFrame, columns: list[str] | None = None
+    actual: pd.DataFrame, expected: pd.DataFrame, columns: list[str] | None = None,
 ) -> None:
     """Compare the actual and expected dataframes, optionally specifying columns to compare.
     This uses assert_series_equal since we are sometimes intentionally omitting columns from the actual output.

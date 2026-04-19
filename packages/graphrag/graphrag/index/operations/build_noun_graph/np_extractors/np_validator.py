@@ -19,7 +19,7 @@ def has_valid_token_length(tokens: list[str], max_length: int) -> bool:
 
 def is_valid_entity(entity: tuple[str, str], tokens: list[str]) -> bool:
     """Check if the entity is valid."""
-    return (entity[1] not in ["CARDINAL", "ORDINAL"] and len(tokens) > 0) or (
-        entity[1] in ["CARDINAL", "ORDINAL"]
+    return (entity[1] not in {"CARDINAL", "ORDINAL"} and len(tokens) > 0) or (
+        entity[1] in {"CARDINAL", "ORDINAL"}
         and (len(tokens) > 1 or is_compound(tokens))
     )

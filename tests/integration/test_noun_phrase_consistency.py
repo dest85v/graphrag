@@ -104,7 +104,7 @@ class TestRegexSpacyVsCfgConsistency:
 
         # Overall similarity between all extracted phrases
         overall_jaccard = _jaccard_similarity(
-            set(all_regex_phrases), set(all_cfg_phrases)
+            set(all_regex_phrases), set(all_cfg_phrases),
         )
         print(f"\nOverall Jaccard similarity (regex vs CFG): {overall_jaccard:.2%}")
         print(f"Regex total phrases: {len(all_regex_phrases)}")

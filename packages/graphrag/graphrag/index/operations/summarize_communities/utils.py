@@ -5,11 +5,11 @@
 
 import pandas as pd
 
-import graphrag.data_model.schemas as schemas
+from graphrag.data_model import schemas
 
 
 def get_levels(
-    df: pd.DataFrame, level_column: str = schemas.COMMUNITY_LEVEL
+    df: pd.DataFrame, level_column: str = schemas.COMMUNITY_LEVEL,
 ) -> list[int]:
     """Get the levels of the communities."""
     levels = df[level_column].dropna().unique()

@@ -49,7 +49,7 @@ def with_rate_limiting(
         **kwargs: Any,
     ):
         token_count = int(
-            kwargs.get("max_tokens") or kwargs.get("max_completion_tokens") or 0
+            kwargs.get("max_tokens") or kwargs.get("max_completion_tokens") or 0,
         )
         messages = kwargs.get("messages")  # completion call
         input: list[str] | None = kwargs.get("input")  # embedding call
@@ -65,7 +65,7 @@ def with_rate_limiting(
         **kwargs: Any,
     ):
         token_count = int(
-            kwargs.get("max_tokens") or kwargs.get("max_completion_tokens") or 0
+            kwargs.get("max_tokens") or kwargs.get("max_completion_tokens") or 0,
         )
         messages = kwargs.get("messages")  # completion call
         input = kwargs.get("input")  # embedding call

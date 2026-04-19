@@ -55,7 +55,7 @@ class AzureBlobStorage(Storage):
         )
         if connection_string:
             self._blob_service_client = BlobServiceClient.from_connection_string(
-                connection_string
+                connection_string,
             )
         elif account_url:
             self._blob_service_client = BlobServiceClient(
@@ -125,13 +125,11 @@ class AzureBlobStorage(Storage):
         def _blobname(blob_name: str) -> str:
             if self._base_dir and blob_name.startswith(self._base_dir):
                 blob_name = blob_name.replace(self._base_dir, "", 1)
-            if blob_name.startswith("/"):
-                blob_name = blob_name[1:]
-            return blob_name
+            return blob_name.removeprefix("/")
 
         try:
             container_client = self._blob_service_client.get_container_client(
-                self._container_name
+                self._container_name,
             )
             all_blobs = list(container_client.list_blobs(self._base_dir))
             logger.debug("All blobs: %s", [blob.name for blob in all_blobs])
@@ -159,13 +157,13 @@ class AzureBlobStorage(Storage):
             )
 
     async def get(
-        self, key: str, as_bytes: bool | None = False, encoding: str | None = None
+        self, key: str, as_bytes: bool | None = False, encoding: str | None = None,
     ) -> Any:
         """Get a value from the blob."""
         try:
             key = self._keyname(key)
             container_client = self._blob_service_client.get_container_client(
-                self._container_name
+                self._container_name,
             )
             blob_client = container_client.get_blob_client(key)
             blob_data = blob_client.download_blob().readall()
@@ -183,7 +181,7 @@ class AzureBlobStorage(Storage):
         try:
             key = self._keyname(key)
             container_client = self._blob_service_client.get_container_client(
-                self._container_name
+                self._container_name,
             )
             blob_client = container_client.get_blob_client(key)
             if isinstance(value, bytes):
@@ -198,7 +196,7 @@ class AzureBlobStorage(Storage):
         """Check if a key exists in the blob."""
         key = self._keyname(key)
         container_client = self._blob_service_client.get_container_client(
-            self._container_name
+            self._container_name,
         )
         blob_client = container_client.get_blob_client(key)
         return blob_client.exists()
@@ -207,7 +205,7 @@ class AzureBlobStorage(Storage):
         """Delete a key from the blob."""
         key = self._keyname(key)
         container_client = self._blob_service_client.get_container_client(
-            self._container_name
+            self._container_name,
         )
         blob_client = container_client.get_blob_client(key)
         blob_client.delete_blob()
@@ -242,7 +240,7 @@ class AzureBlobStorage(Storage):
         try:
             key = self._keyname(key)
             container_client = self._blob_service_client.get_container_client(
-                self._container_name
+                self._container_name,
             )
             blob_client = container_client.get_blob_client(key)
             timestamp = blob_client.download_blob().properties.creation_time

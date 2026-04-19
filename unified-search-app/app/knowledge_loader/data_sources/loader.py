@@ -29,13 +29,13 @@ logger = logging.getLogger(__name__)
 
 
 def _get_base_path(
-    dataset: str | None, root: str | None, extra_path: str | None = None
+    dataset: str | None, root: str | None, extra_path: str | None = None,
 ) -> str:
     """Construct and return the base path for the given dataset and extra path."""
     return os.path.join(  # noqa: PTH118
         os.path.dirname(os.path.realpath(__file__)),  # noqa: PTH120
-        root if root else "",
-        dataset if dataset else "",
+        root or "",
+        dataset or "",
         *(extra_path.split("/") if extra_path else []),
     )
 
@@ -59,11 +59,11 @@ def load_dataset_listing() -> list[DatasetConfig]:
             if datasets_str:
                 datasets = json.loads(datasets_str)
         except Exception as e:  # noqa: BLE001
-            print(f"Error loading dataset config: {e}")  # noqa T201
+            print(f"Error loading dataset config: {e}")  # noqa: T201
             return []
     else:
         base_path = _get_base_path(None, local_data_root, LISTING_FILE)
-        with open(base_path, "r") as file:  # noqa: UP015, PTH123
+        with open(base_path, "r", encoding="utf-8") as file:  # noqa: UP015, PTH123
             datasets = json.load(file)
 
     return [DatasetConfig(**d) for d in datasets]

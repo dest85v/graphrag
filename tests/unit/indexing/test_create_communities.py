@@ -8,6 +8,7 @@ the per-level loop, streaming entity reads, streaming writes, etc.)
 can be verified against known output.
 """
 
+import math
 import uuid
 from typing import Any
 
@@ -419,7 +420,7 @@ class TestParentChildTree:
         then Y's parent must be X."""
         entities_df = pd.read_parquet("tests/verbs/data/entities.parquet")
         title_to_entity_id = dict(
-            zip(entities_df["title"], entities_df["id"], strict=False)
+            zip(entities_df["title"], entities_df["id"], strict=False),
         )
         relationships = pd.read_parquet("tests/verbs/data/relationships.parquet")
         result = await _run_create_communities(
@@ -502,7 +503,7 @@ class TestRealDataRegression:
         """Run create_communities on the test fixture data."""
         entities_df = pd.read_parquet("tests/verbs/data/entities.parquet")
         title_to_entity_id = dict(
-            zip(entities_df["title"], entities_df["id"], strict=False)
+            zip(entities_df["title"], entities_df["id"], strict=False),
         )
         relationships = pd.read_parquet("tests/verbs/data/relationships.parquet")
         return await _run_create_communities(
@@ -556,7 +557,7 @@ class TestRealDataRegression:
     async def test_communities_with_children(self, real_result: pd.DataFrame):
         """Pin the expected number of communities that have children."""
         has_children = real_result["children"].apply(
-            lambda x: hasattr(x, "__len__") and len(x) > 0
+            lambda x: hasattr(x, "__len__") and len(x) > 0,
         )
         assert has_children.sum() == 24
 
@@ -590,9 +591,9 @@ class TestSanitizeRow:
 
     def test_np_floating_to_float(self):
         """np.floating values should become native float."""
-        row = {"weight": np.float64(3.14)}
+        row = {"weight": np.float64(math.pi)}
         result = _sanitize_row(row)
-        assert result["weight"] == pytest.approx(3.14)
+        assert result["weight"] == pytest.approx(math.pi)
         assert type(result["weight"]) is float
 
     def test_native_types_pass_through(self):

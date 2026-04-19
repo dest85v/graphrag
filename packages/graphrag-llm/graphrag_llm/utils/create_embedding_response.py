@@ -7,7 +7,7 @@ from graphrag_llm.types import LLMEmbedding, LLMEmbeddingResponse, LLMEmbeddingU
 
 
 def create_embedding_response(
-    embeddings: list[float], batch_size: int = 1
+    embeddings: list[float], batch_size: int = 1,
 ) -> LLMEmbeddingResponse:
     """Create a CreateEmbeddingResponse object.
 

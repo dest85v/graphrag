@@ -27,7 +27,7 @@ class InputDelta:
 
 
 async def get_delta_docs(
-    input_dataset: pd.DataFrame, table_provider: TableProvider
+    input_dataset: pd.DataFrame, table_provider: TableProvider,
 ) -> InputDelta:
     """Get the delta between the input dataset and the final documents.
 

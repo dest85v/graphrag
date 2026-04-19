@@ -34,7 +34,7 @@ def create_completion_response(response: str) -> LLMCompletionResponse:
                     content=response,
                 ),
                 finish_reason="stop",
-            )
+            ),
         ],
         usage=LLMCompletionUsage(
             prompt_tokens=0,

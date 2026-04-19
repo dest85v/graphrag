@@ -39,7 +39,7 @@ def register_table_provider(
 
 
 def create_table_provider(
-    config: TableProviderConfig, storage: Storage | None = None
+    config: TableProviderConfig, storage: Storage | None = None,
 ) -> TableProvider:
     """Create a table provider implementation based on the given configuration.
 

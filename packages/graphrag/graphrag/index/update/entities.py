@@ -12,7 +12,7 @@ from graphrag.data_model.schemas import ENTITIES_FINAL_COLUMNS
 
 
 def _group_and_resolve_entities(
-    old_entities_df: pd.DataFrame, delta_entities_df: pd.DataFrame
+    old_entities_df: pd.DataFrame, delta_entities_df: pd.DataFrame,
 ) -> tuple[pd.DataFrame, dict]:
     """Group and resolve entities.
 
@@ -42,11 +42,11 @@ def _group_and_resolve_entities(
     # Increment human readable id in b by the max of a
     initial_id = old_entities_df["human_readable_id"].max() + 1
     delta_entities_df["human_readable_id"] = np.arange(
-        initial_id, initial_id + len(delta_entities_df)
+        initial_id, initial_id + len(delta_entities_df),
     )
     # Concat A and B
     combined = pd.concat(
-        [old_entities_df, delta_entities_df], ignore_index=True, copy=False
+        [old_entities_df, delta_entities_df], ignore_index=True, copy=False,
     )
 
     # Group by title and resolve conflicts
@@ -60,7 +60,7 @@ def _group_and_resolve_entities(
             "description": lambda x: list(x.astype(str)),  # Ensure str
             # Concatenate nd.array into a single list
             "text_unit_ids": lambda x: list(itertools.chain(*x.tolist())),
-            "degree": "first",  # todo: we could probably re-compute this with the entire new graph
+            "degree": "first",  # TODO: we could probably re-compute this with the entire new graph
         })
         .reset_index()
     )

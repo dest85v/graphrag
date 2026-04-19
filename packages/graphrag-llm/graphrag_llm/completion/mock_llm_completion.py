@@ -96,12 +96,12 @@ class MockLLMCompletion(LLMCompletion):
             raise ValueError(msg)
 
         response = create_completion_response(
-            self._mock_responses[self._mock_index % len(self._mock_responses)]
+            self._mock_responses[self._mock_index % len(self._mock_responses)],
         )
         self._mock_index += 1
         if response_format is not None:
             structured_response = structure_completion_response(
-                response.content, response_format
+                response.content, response_format,
             )
             response.formatted_response = structured_response
         return response

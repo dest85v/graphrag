@@ -18,7 +18,7 @@ FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
 def _load_fixture() -> pd.DataFrame:
     """Load the realistic graph fixture as a relationships DataFrame."""
-    with open(FIXTURES_DIR / "graph.json") as f:
+    with open(FIXTURES_DIR / "graph.json", encoding="utf-8") as f:
         data = json.load(f)
     return pd.DataFrame(data["edges"])
 

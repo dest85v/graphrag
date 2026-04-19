@@ -20,13 +20,13 @@ MOCK_LLM_ENTITY_RESPONSES = [
     ("relationship"<|>COMPANY_A<|>COMPANY_B<|>Company_A and Company_B are related because Company_A is 100% owned by Company_B and the two companies also share the same address)<|>2)
     ##
     ("relationship"<|>COMPANY_A<|>PERSON_C<|>Company_A and Person_C are related because Person_C is director of Company_A<|>1))
-    """.strip()
+    """.strip(),
 ]
 
 MOCK_LLM_SUMMARIZATION_RESPONSES = [
     """
     This is a MOCK response for the LLM. It is summarized!
-    """.strip()
+    """.strip(),
 ]
 
 
@@ -42,7 +42,7 @@ async def test_extract_graph():
     ].mock_responses = MOCK_LLM_ENTITY_RESPONSES
 
     summarize_llm_settings = config.get_completion_model_config(
-        config.summarize_descriptions.completion_model_id
+        config.summarize_descriptions.completion_model_id,
     ).model_dump()
     summarize_llm_settings["type"] = "mock"
     summarize_llm_settings["mock_responses"] = MOCK_LLM_SUMMARIZATION_RESPONSES

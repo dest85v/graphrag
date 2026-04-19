@@ -76,8 +76,8 @@ def _get_parser_for_file(file_path: str | Path) -> Callable[[str], dict[str, Any
         case _:
             msg = (
                 f"Failed to parse, {file_path}. Unsupported file extension, "
-                + f"{file_path.suffix}. Pass in a custom config_parser argument or "
-                + "use one of the supported file extensions, .json, .yaml, .yml, .toml."
+                 f"{file_path.suffix}. Pass in a custom config_parser argument or "
+                 "use one of the supported file extensions, .json, .yaml, .yml, .toml."
             )
             raise ConfigParsingError(msg)
 

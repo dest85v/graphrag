@@ -57,7 +57,7 @@ class OpenAIEmbedding(LLMEmbedding):
         cache_key_creator: "CacheKeyCreator",
         azure_cognitive_services_audience: str = "https://cognitiveservices.azure.com/.default",
         **kwargs: Any,
-    ):
+    ) -> None:
         """Initialize OpenAIEmbedding.
 
         Args
@@ -113,7 +113,7 @@ class OpenAIEmbedding(LLMEmbedding):
         )
 
     def embedding(
-        self, /, **kwargs: Unpack["LLMEmbeddingArgs"]
+        self, /, **kwargs: Unpack["LLMEmbeddingArgs"],
     ) -> "LLMEmbeddingResponse":
         """Sync embedding method."""
         request_metrics: Metrics | None = kwargs.pop("metrics", None) or {}
@@ -127,7 +127,7 @@ class OpenAIEmbedding(LLMEmbedding):
                 self._metrics_store.update_metrics(metrics=request_metrics)
 
     async def embedding_async(
-        self, /, **kwargs: Unpack["LLMEmbeddingArgs"]
+        self, /, **kwargs: Unpack["LLMEmbeddingArgs"],
     ) -> "LLMEmbeddingResponse":
         """Async embedding method."""
         request_metrics: Metrics | None = kwargs.pop("metrics", None) or {}
@@ -189,7 +189,7 @@ def _create_base_embeddings(
 
         if model_provider == "azure":
             client = _get_async_azure_client(
-                model_config, azure_cognitive_services_audience
+                model_config, azure_cognitive_services_audience,
             )
             response = await client.embeddings.create(**filtered)
         else:
@@ -237,7 +237,7 @@ def _get_azure_client(
     }
     if model_config.auth_method == AuthMethod.AzureManagedIdentity:
         kwargs["azure_ad_token_provider"] = get_bearer_token_provider(
-            DefaultAzureCredential(), azure_cognitive_services_audience
+            DefaultAzureCredential(), azure_cognitive_services_audience,
         )
     else:
         kwargs["api_key"] = model_config.api_key
@@ -256,7 +256,7 @@ def _get_async_azure_client(
     }
     if model_config.auth_method == AuthMethod.AzureManagedIdentity:
         kwargs["azure_ad_token_provider"] = get_bearer_token_provider(
-            DefaultAzureCredential(), azure_cognitive_services_audience
+            DefaultAzureCredential(), azure_cognitive_services_audience,
         )
     else:
         kwargs["api_key"] = model_config.api_key

@@ -77,7 +77,7 @@ async def run_workflow(
     logger.info("Workflow started: generate_text_embeddings")
 
     model_config = config.get_embedding_model_config(
-        config.embed_text.embedding_model_id
+        config.embed_text.embedding_model_id,
     )
     model = create_embedding(
         model_config,
@@ -133,13 +133,13 @@ async def generate_text_embeddings(
                     field_config.table_name,
                     truncate=False,
                     transformer=field_config.row_transform,
-                )
+                ),
             )
 
             output_table = None
             if config.snapshots.embeddings:
                 output_table = await stack.enter_async_context(
-                    table_provider.open(f"embeddings.{field_config.name}")
+                    table_provider.open(f"embeddings.{field_config.name}"),
                 )
 
             count = await embed_text(

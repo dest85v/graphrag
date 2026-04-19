@@ -6,7 +6,7 @@
 import numpy as np
 import pandas as pd
 
-import graphrag.data_model.schemas as schemas
+from graphrag.data_model import schemas
 from graphrag.graphs.compute_degree import compute_degree
 from graphrag.graphs.connected_components import largest_connected_component
 
@@ -29,7 +29,7 @@ def prune_graph(
     # -- Compute degrees from the original edge list --------------------------
     degree_df = compute_degree(relationships)
     degree_map: dict[str, int] = dict(
-        zip(degree_df["title"], degree_df["degree"], strict=True)
+        zip(degree_df["title"], degree_df["degree"], strict=True),
     )
 
     # Entity-only nodes (isolated, degree 0) must also be present so that
@@ -90,7 +90,7 @@ def prune_graph(
         and schemas.EDGE_WEIGHT in pruned_rels.columns
     ):
         min_weight = np.percentile(
-            pruned_rels[schemas.EDGE_WEIGHT].to_numpy(), min_edge_weight_pct
+            pruned_rels[schemas.EDGE_WEIGHT].to_numpy(), min_edge_weight_pct,
         )
         pruned_rels = pruned_rels[pruned_rels[schemas.EDGE_WEIGHT] >= min_weight]
 
@@ -107,7 +107,7 @@ def prune_graph(
 
 
 def _get_upper_threshold_by_std(
-    data: list[float] | list[int], std_trim: float
+    data: list[float] | list[int], std_trim: float,
 ) -> float:
     """Get upper threshold by standard deviation."""
     mean = np.mean(data)

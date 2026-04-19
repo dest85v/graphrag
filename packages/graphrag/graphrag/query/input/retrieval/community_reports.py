@@ -57,7 +57,7 @@ def to_community_report_dataframe(
     records = []
     for report in reports:
         new_record = [
-            report.short_id if report.short_id else "",
+            report.short_id or "",
             report.title,
             *[
                 str(report.attributes.get(field, ""))
@@ -67,7 +67,7 @@ def to_community_report_dataframe(
             ],
         ]
         new_record.append(
-            report.summary if use_community_summary else report.full_content
+            report.summary if use_community_summary else report.full_content,
         )
         if include_community_rank:
             new_record.append(str(report.rank))

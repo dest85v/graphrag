@@ -51,7 +51,7 @@ async def load_docs_in_chunks(
 ) -> list[str]:
     """Load docs into chunks for generating prompts."""
     embeddings_llm_settings = config.get_embedding_model_config(
-        config.embed_text.embedding_model_id
+        config.embed_text.embedding_model_id,
     )
     model = create_embedding(embeddings_llm_settings)
     tokenizer = model.tokenizer

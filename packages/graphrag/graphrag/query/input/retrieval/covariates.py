@@ -39,7 +39,7 @@ def to_covariate_dataframe(covariates: list[Covariate]) -> pd.DataFrame:
     records = []
     for covariate in covariates:
         new_record = [
-            covariate.short_id if covariate.short_id else "",
+            covariate.short_id or "",
             covariate.subject_id,
         ]
         for field in attribute_cols:

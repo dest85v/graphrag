@@ -35,7 +35,7 @@ class CommunityReportResponse(BaseModel):
     title: str = Field(description="The title of the report.")
     summary: str = Field(description="A summary of the report.")
     findings: list[FindingModel] = Field(
-        description="A list of findings in the report."
+        description="A list of findings in the report.",
     )
     rating: float = Field(description="The rating of the report.")
     rating_explanation: str = Field(description="An explanation of the rating.")
@@ -64,7 +64,7 @@ class CommunityReportsExtractor:
         extraction_prompt: str,
         max_report_length: int,
         on_error: ErrorHandlerFn | None = None,
-    ):
+    ) -> None:
         """Init method definition."""
         self._model = model
         self._extraction_prompt = extraction_prompt

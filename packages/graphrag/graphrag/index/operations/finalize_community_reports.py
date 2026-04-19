@@ -25,7 +25,7 @@ def finalize_community_reports(
     community_reports["community"] = community_reports["community"].astype(int)
     community_reports["human_readable_id"] = community_reports["community"]
     community_reports["id"] = community_reports.apply(
-        lambda row: gen_sha512_hash(row, ["full_content"]), axis=1
+        lambda row: gen_sha512_hash(row, ["full_content"]), axis=1,
     )
 
     return community_reports.loc[

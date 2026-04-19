@@ -5,7 +5,7 @@
 
 
 def bin_time_intervals(
-    time_values: list[float], time_interval: int
+    time_values: list[float], time_interval: int,
 ) -> list[list[float]]:
     """Bin values."""
     bins: list[list[float]] = []
@@ -24,7 +24,7 @@ def bin_time_intervals(
 
 
 def assert_max_num_values_per_period(
-    periods: list[list[float]], max_values_per_period: int
+    periods: list[list[float]], max_values_per_period: int,
 ):
     """Assert the number of values per period."""
     for period in periods:

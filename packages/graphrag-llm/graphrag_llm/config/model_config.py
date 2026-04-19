@@ -106,6 +106,6 @@ class ModelConfig(BaseModel):
     @model_validator(mode="after")
     def _validate_model(self):
         """Validate model configuration after initialization."""
-        if self.type in (LLMProviderType.OpenAI, LLMProviderType.LiteLLM):
+        if self.type in {LLMProviderType.OpenAI, LLMProviderType.LiteLLM}:
             self._validate_openai_config()
         return self

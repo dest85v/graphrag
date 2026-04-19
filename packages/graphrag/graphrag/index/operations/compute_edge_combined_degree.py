@@ -22,7 +22,7 @@ def compute_edge_combined_degree(
         degree_column = _degree_colname(column)
         result = df.merge(
             node_degree_df.rename(
-                columns={node_name_column: column, node_degree_column: degree_column}
+                columns={node_name_column: column, node_degree_column: degree_column},
             ),
             on=column,
             how="left",

@@ -15,7 +15,7 @@ async def test_markitdown_loader_one_file():
     storage = create_storage(
         StorageConfig(
             base_dir="tests/unit/indexing/input/data/one-html",
-        )
+        ),
     )
     reader = create_input_reader(config, storage)
     documents = await reader.read_files()

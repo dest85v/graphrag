@@ -88,7 +88,7 @@ async def run_extract_claims(
         extraction_prompt=prompt,
         max_gleanings=max_gleanings,
         on_error=lambda e, s, d: logger.error(
-            "Claim Extraction Error", exc_info=e, extra={"stack": s, "details": d}
+            "Claim Extraction Error", exc_info=e, extra={"stack": s, "details": d},
         ),
     )
 

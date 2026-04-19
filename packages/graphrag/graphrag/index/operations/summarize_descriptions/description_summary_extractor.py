@@ -43,7 +43,7 @@ class SummarizeExtractor:
         max_input_tokens: int,
         summarization_prompt: str,
         on_error: ErrorHandlerFn | None = None,
-    ):
+    ) -> None:
         """Init method definition."""
         # TODO: streamline construction
         self._model = model
@@ -73,7 +73,7 @@ class SummarizeExtractor:
         )
 
     async def _summarize_descriptions(
-        self, id: str | tuple[str, str], descriptions: list[str]
+        self, id: str | tuple[str, str], descriptions: list[str],
     ) -> str:
         """Summarize descriptions into a single description."""
         sorted_id = sorted(id) if isinstance(id, list) else id
@@ -88,7 +88,7 @@ class SummarizeExtractor:
 
         # Iterate over descriptions, adding all until the max input tokens is reached
         usable_tokens = self._max_input_tokens - self._tokenizer.num_tokens(
-            self._summarization_prompt
+            self._summarization_prompt,
         )
         descriptions_collected = []
         result = ""
@@ -103,7 +103,7 @@ class SummarizeExtractor:
             ):
                 # Calculate result (final or partial)
                 result = await self._summarize_descriptions_with_llm(
-                    sorted_id, descriptions_collected
+                    sorted_id, descriptions_collected,
                 )
 
                 # If we go for another loop, reset values to new
@@ -118,14 +118,14 @@ class SummarizeExtractor:
         return result
 
     async def _summarize_descriptions_with_llm(
-        self, id: str | tuple[str, str] | list[str], descriptions: list[str]
+        self, id: str | tuple[str, str] | list[str], descriptions: list[str],
     ):
         """Summarize descriptions using the LLM."""
         response: LLMCompletionResponse = await self._model.completion_async(
             messages=self._summarization_prompt.format(**{
                 ENTITY_NAME_KEY: json.dumps(id, ensure_ascii=False),
                 DESCRIPTION_LIST_KEY: json.dumps(
-                    sorted(descriptions), ensure_ascii=False
+                    sorted(descriptions), ensure_ascii=False,
                 ),
                 MAX_LENGTH_KEY: self._max_summary_length,
             }),

@@ -18,7 +18,7 @@ from .util import (
 MOCK_LLM_RESPONSES = [
     """
 (COMPANY A<|>GOVERNMENT AGENCY B<|>ANTI-COMPETITIVE PRACTICES<|>TRUE<|>2022-01-10T00:00:00<|>2022-01-10T00:00:00<|>Company A was found to engage in anti-competitive practices because it was fined for bid rigging in multiple public tenders published by Government Agency B according to an article published on 2022/01/10<|>According to an article published on 2022/01/10, Company A was fined for bid rigging while participating in multiple public tenders published by Government Agency B.)
-    """.strip()
+    """.strip(),
 ]
 
 
@@ -33,7 +33,7 @@ async def test_extract_covariates():
     config.extract_claims.enabled = True
     config.extract_claims.description = "description"
     llm_settings = config.get_completion_model_config(
-        config.extract_claims.completion_model_id
+        config.extract_claims.completion_model_id,
     )
     llm_settings.type = LLMProviderType.MockLLM
     llm_settings.mock_responses = MOCK_LLM_RESPONSES  # type: ignore

@@ -131,7 +131,7 @@ def _initialize_cli(
     from graphrag.cli.initialize import initialize_project_at
 
     initialize_project_at(
-        path=root, force=force, model=model, embedding_model=embedding_model
+        path=root, force=force, model=model, embedding_model=embedding_model,
     )
 
 
@@ -357,7 +357,7 @@ def _prompt_tune_cli(
             n_subset_max=n_subset_max,
             k=k,
             min_examples_required=min_examples_required,
-        )
+        ),
     )
 
 

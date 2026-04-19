@@ -92,12 +92,12 @@ class ConversationHistory:
 
     turns: list[ConversationTurn]
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.turns = []
 
     @classmethod
     def from_list(
-        cls, conversation_turns: list[dict[str, str]]
+        cls, conversation_turns: list[dict[str, str]],
     ) -> "ConversationHistory":
         """
         Create a conversation history from a list of conversation turns.
@@ -109,14 +109,14 @@ class ConversationHistory:
             history.turns.append(
                 ConversationTurn(
                     role=ConversationRole.from_string(
-                        turn.get("role", ConversationRole.USER)
+                        turn.get("role", ConversationRole.USER),
                     ),
                     content=turn.get("content", ""),
-                )
+                ),
             )
         return history
 
-    def add_turn(self, role: ConversationRole, content: str):
+    def add_turn(self, role: ConversationRole, content: str) -> None:
         """Add a new turn to the conversation history."""
         self.turns.append(ConversationTurn(role=role, content=content))
 
@@ -129,9 +129,8 @@ class ConversationHistory:
                 if current_qa_turn:
                     qa_turns.append(current_qa_turn)
                 current_qa_turn = QATurn(user_query=turn, assistant_answers=[])
-            else:
-                if current_qa_turn:
-                    current_qa_turn.assistant_answers.append(turn)  # type: ignore
+            elif current_qa_turn:
+                current_qa_turn.assistant_answers.append(turn)  # type: ignore
         if current_qa_turn:
             qa_turns.append(current_qa_turn)
         return qa_turns
@@ -192,12 +191,12 @@ class ConversationHistory:
         current_context_df = pd.DataFrame()
         for turn in qa_turns:
             turn_list.append({
-                "turn": ConversationRole.USER.__str__(),
+                "turn": str(ConversationRole.USER),
                 "content": turn.user_query.content,
             })
             if turn.assistant_answers:
                 turn_list.append({
-                    "turn": ConversationRole.ASSISTANT.__str__(),
+                    "turn": str(ConversationRole.ASSISTANT),
                     "content": turn.get_answer_text(),
                 })
 
@@ -208,6 +207,6 @@ class ConversationHistory:
 
             current_context_df = context_df
         context_text = header + current_context_df.to_csv(
-            sep=column_delimiter, index=False
+            sep=column_delimiter, index=False,
         )
         return (context_text, {context_name.lower(): current_context_df})

@@ -7,7 +7,7 @@ import shutil
 from pathlib import Path
 
 
-def copy_build_assets():
+def copy_build_assets() -> None:
     """Copy root build assets to package build directories so files are included in pypi distributions."""
     root_dir = Path(__file__).parent.parent
     build_assets = ["LICENSE"]

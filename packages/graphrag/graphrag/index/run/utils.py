@@ -57,7 +57,7 @@ def create_callback_chain(
 
 
 def get_update_table_providers(
-    config: GraphRagConfig, timestamp: str
+    config: GraphRagConfig, timestamp: str,
 ) -> tuple[TableProvider, TableProvider, TableProvider]:
     """Get table providers for the update index run."""
     output_storage = create_storage(config.output_storage)
@@ -68,7 +68,7 @@ def get_update_table_providers(
 
     output_table_provider = create_table_provider(config.table_provider, output_storage)
     previous_table_provider = create_table_provider(
-        config.table_provider, previous_storage
+        config.table_provider, previous_storage,
     )
     delta_table_provider = create_table_provider(config.table_provider, delta_storage)
 

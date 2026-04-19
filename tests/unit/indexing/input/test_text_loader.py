@@ -13,7 +13,7 @@ async def test_text_loader_one_file():
     storage = create_storage(
         StorageConfig(
             base_dir="tests/unit/indexing/input/data/one-txt",
-        )
+        ),
     )
     reader = create_input_reader(config, storage)
     documents = await reader.read_files()
@@ -29,7 +29,7 @@ async def test_text_loader_multiple_files():
     storage = create_storage(
         StorageConfig(
             base_dir="tests/unit/indexing/input/data/multiple-txts",
-        )
+        ),
     )
     reader = create_input_reader(config, storage)
     documents = await reader.read_files()

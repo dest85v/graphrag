@@ -66,7 +66,7 @@ def create_template_engine(
 
     strategy = template_engine_config.type
     template_manager = create_template_manager(
-        template_engine_config=template_engine_config
+        template_engine_config=template_engine_config,
     )
     init_args = template_engine_config.model_dump()
 

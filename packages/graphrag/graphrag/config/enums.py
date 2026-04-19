@@ -16,7 +16,7 @@ class ReportingType(str, Enum):
     blob = "blob"
     """The blob reporting configuration type."""
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Get a string representation."""
         return f'"{self.value}"'
 
@@ -36,7 +36,7 @@ class SearchMethod(Enum):
     DRIFT = "drift"
     BASIC = "basic"
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return the string representation of the enum value."""
         return self.value
 

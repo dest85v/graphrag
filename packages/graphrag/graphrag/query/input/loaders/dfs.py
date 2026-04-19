@@ -59,7 +59,7 @@ def read_entities(
             description=to_optional_str(row, description_col),
             name_embedding=to_optional_list(row, name_embedding_col, item_type=float),
             description_embedding=to_optional_list(
-                row, description_embedding_col, item_type=float
+                row, description_embedding_col, item_type=float,
             ),
             community_ids=to_optional_list(row, community_col, item_type=str),
             text_unit_ids=to_optional_list(row, text_unit_ids_col),
@@ -99,7 +99,7 @@ def read_relationships(
             target=to_str(row, target_col),
             description=to_optional_str(row, description_col),
             description_embedding=to_optional_list(
-                row, description_embedding_col, item_type=float
+                row, description_embedding_col, item_type=float,
             ),
             weight=to_optional_float(row, weight_col),
             text_unit_ids=to_optional_list(row, text_unit_ids_col, item_type=str),
@@ -174,7 +174,7 @@ def read_communities(
             relationship_ids=to_optional_list(row, relationships_col, item_type=str),
             text_unit_ids=to_optional_list(row, text_units_col, item_type=str),
             covariate_ids=to_optional_dict(
-                row, covariates_col, key_type=str, value_type=str
+                row, covariates_col, key_type=str, value_type=str,
             ),
             parent=to_str(row, parent_col),
             children=to_list(row, children_col),
@@ -243,7 +243,7 @@ def read_text_units(
             entity_ids=to_optional_list(row, entities_col, item_type=str),
             relationship_ids=to_optional_list(row, relationships_col, item_type=str),
             covariate_ids=to_optional_dict(
-                row, covariates_col, key_type=str, value_type=str
+                row, covariates_col, key_type=str, value_type=str,
             ),
             n_tokens=to_optional_int(row, tokens_col),
             document_id=to_optional_str(row, document_id_col),

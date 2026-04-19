@@ -130,7 +130,7 @@ async def _flush_embedding_buffer(
             VectorStoreDocument(
                 id=doc_id,
                 vector=doc_vector,
-            )
+            ),
         )
 
     vector_store.load_documents(documents)

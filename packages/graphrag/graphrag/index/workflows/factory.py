@@ -21,18 +21,18 @@ class PipelineFactory:
     pipelines: ClassVar[dict[str, list[str]]] = {}
 
     @classmethod
-    def register(cls, name: str, workflow: WorkflowFunction):
+    def register(cls, name: str, workflow: WorkflowFunction) -> None:
         """Register a custom workflow function."""
         cls.workflows[name] = workflow
 
     @classmethod
-    def register_all(cls, workflows: dict[str, WorkflowFunction]):
+    def register_all(cls, workflows: dict[str, WorkflowFunction]) -> None:
         """Register a dict of custom workflow functions."""
         for name, workflow in workflows.items():
             cls.register(name, workflow)
 
     @classmethod
-    def register_pipeline(cls, name: str, workflows: list[str]):
+    def register_pipeline(cls, name: str, workflows: list[str]) -> None:
         """Register a new pipeline method as a list of workflow names."""
         cls.pipelines[name] = workflows
 
@@ -82,10 +82,10 @@ _update_workflows = [
     "update_clean_state",
 ]
 PipelineFactory.register_pipeline(
-    IndexingMethod.Standard, ["load_input_documents", *_standard_workflows]
+    IndexingMethod.Standard, ["load_input_documents", *_standard_workflows],
 )
 PipelineFactory.register_pipeline(
-    IndexingMethod.Fast, ["load_input_documents", *_fast_workflows]
+    IndexingMethod.Fast, ["load_input_documents", *_fast_workflows],
 )
 PipelineFactory.register_pipeline(
     IndexingMethod.StandardUpdate,

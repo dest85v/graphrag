@@ -87,7 +87,7 @@ async def _run_extract_graph(
         prompt=prompt,
         max_gleanings=max_gleanings,
         on_error=lambda e, s, d: logger.error(
-            "Entity Extraction Error", exc_info=e, extra={"stack": s, "details": d}
+            "Entity Extraction Error", exc_info=e, extra={"stack": s, "details": d},
         ),
     )
     text = text.strip()

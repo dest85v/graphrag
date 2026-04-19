@@ -25,7 +25,7 @@ def test_create_noop_cache():
     cache = create_cache(
         CacheConfig(
             type=CacheType.Noop,
-        )
+        ),
     )
     assert isinstance(cache, NoopCache)
 
@@ -34,7 +34,7 @@ def test_create_memory_cache():
     cache = create_cache(
         CacheConfig(
             type=CacheType.Memory,
-        )
+        ),
     )
     assert isinstance(cache, MemoryCache)
 
@@ -43,7 +43,7 @@ def test_create_file_cache():
     storage = create_storage(
         StorageConfig(
             type=StorageType.Memory,
-        )
+        ),
     )
     cache = create_cache(
         CacheConfig(
@@ -61,7 +61,7 @@ def test_create_blob_cache():
             connection_string=WELL_KNOWN_BLOB_STORAGE_KEY,
             container_name="testcontainer",
             base_dir="testcache",
-        )
+        ),
     )
     cache = create_cache(
         CacheConfig(
@@ -84,7 +84,7 @@ def test_create_cosmosdb_cache():
             connection_string=WELL_KNOWN_COSMOS_CONNECTION_STRING,
             database_name="testdatabase",
             container_name="testcontainer",
-        )
+        ),
     )
     cache = create_cache(
         CacheConfig(
@@ -106,7 +106,7 @@ def test_register_and_create_custom_cache():
     instance.initialized = True
     custom_cache_class.return_value = instance
 
-    register_cache("custom", lambda **kwargs: custom_cache_class(**kwargs))
+    register_cache("custom", custom_cache_class)
     cache = create_cache(CacheConfig(type="custom"))
 
     assert custom_cache_class.called

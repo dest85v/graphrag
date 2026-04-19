@@ -59,9 +59,9 @@ def build_entity_context(
     all_context_records = [header]
     for entity in selected_entities:
         new_context = [
-            entity.short_id if entity.short_id else "",
+            entity.short_id or "",
             entity.title,
-            entity.description if entity.description else "",
+            entity.description or "",
         ]
         if include_entity_rank:
             new_context.append(str(entity.rank))
@@ -82,7 +82,7 @@ def build_entity_context(
 
     if len(all_context_records) > 1:
         record_df = pd.DataFrame(
-            all_context_records[1:], columns=cast("Any", all_context_records[0])
+            all_context_records[1:], columns=cast("Any", all_context_records[0]),
         )
     else:
         record_df = pd.DataFrame()
@@ -126,7 +126,7 @@ def build_covariates_context(
 
     for covariate in selected_covariates:
         new_context = [
-            covariate.short_id if covariate.short_id else "",
+            covariate.short_id or "",
             covariate.subject_id,
         ]
         for field in attribute_cols:
@@ -147,7 +147,7 @@ def build_covariates_context(
 
         if len(all_context_records) > 1:
             record_df = pd.DataFrame(
-                all_context_records[1:], columns=cast("Any", all_context_records[0])
+                all_context_records[1:], columns=cast("Any", all_context_records[0]),
             )
         else:
             record_df = pd.DataFrame()
@@ -197,13 +197,13 @@ def build_relationship_context(
     all_context_records = [header]
     for rel in selected_relationships:
         new_context = [
-            rel.short_id if rel.short_id else "",
+            rel.short_id or "",
             rel.source,
             rel.target,
-            rel.description if rel.description else "",
+            rel.description or "",
         ]
         if include_relationship_weight:
-            new_context.append(str(rel.weight if rel.weight else ""))
+            new_context.append(str(rel.weight or ""))
         for field in attribute_cols:
             field_value = (
                 str(rel.attributes.get(field))
@@ -221,7 +221,7 @@ def build_relationship_context(
 
     if len(all_context_records) > 1:
         record_df = pd.DataFrame(
-            all_context_records[1:], columns=cast("Any", all_context_records[0])
+            all_context_records[1:], columns=cast("Any", all_context_records[0]),
         )
     else:
         record_df = pd.DataFrame()
@@ -267,7 +267,7 @@ def _filter_relationships(
         if relationship.target not in selected_entity_names
     ]
     out_network_entity_names = list(
-        set(out_network_source_names + out_network_target_names)
+        set(out_network_source_names + out_network_target_names),
     )
     out_network_entity_links = defaultdict(int)
     for entity_name in out_network_entity_names:
@@ -337,7 +337,7 @@ def get_candidate_context(
         include_relationship_weight=include_relationship_weight,
     )
     candidate_entities = get_entities_from_relationships(
-        relationships=candidate_relationships, entities=entities
+        relationships=candidate_relationships, entities=entities,
     )
     candidate_context["entities"] = to_entity_dataframe(
         entities=candidate_entities,
@@ -351,7 +351,7 @@ def get_candidate_context(
             covariates=covariates[covariate],
         )
         candidate_context[covariate.lower()] = to_covariate_dataframe(
-            candidate_covariates
+            candidate_covariates,
         )
 
     return candidate_context

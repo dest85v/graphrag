@@ -28,7 +28,7 @@ async def run_workflow(
     )
 
     community_id_mapping = await _update_communities(
-        previous_table_provider, delta_table_provider, output_table_provider
+        previous_table_provider, delta_table_provider, output_table_provider,
     )
 
     context.state["incremental_update_community_id_mapping"] = community_id_mapping
@@ -46,7 +46,7 @@ async def _update_communities(
     old_communities = await DataReader(previous_table_provider).communities()
     delta_communities = await DataReader(delta_table_provider).communities()
     merged_communities, community_id_mapping = _update_and_merge_communities(
-        old_communities, delta_communities
+        old_communities, delta_communities,
     )
 
     await output_table_provider.write_dataframe("communities", merged_communities)

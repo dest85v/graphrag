@@ -37,7 +37,7 @@ async def summarize_descriptions(
     """Summarize entity and relationship descriptions from an entity graph, using a language model."""
 
     async def get_summarized(
-        nodes: pd.DataFrame, edges: pd.DataFrame, semaphore: asyncio.Semaphore
+        nodes: pd.DataFrame, edges: pd.DataFrame, semaphore: asyncio.Semaphore,
     ):
         ticker_length = len(nodes) + len(edges)
 

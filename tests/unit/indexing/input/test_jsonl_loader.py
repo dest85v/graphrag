@@ -13,7 +13,7 @@ async def test_jsonl_loader_one_file_multiple_objects():
     storage = create_storage(
         StorageConfig(
             base_dir="tests/unit/indexing/input/data/one-jsonl",
-        )
+        ),
     )
     reader = create_input_reader(config, storage)
     documents = await reader.read_files()
@@ -34,7 +34,7 @@ async def test_jsonl_loader_one_file_with_title():
     storage = create_storage(
         StorageConfig(
             base_dir="tests/unit/indexing/input/data/one-jsonl",
-        )
+        ),
     )
     reader = create_input_reader(config, storage)
     documents = await reader.read_files()

@@ -39,7 +39,7 @@ async def run_workflow(
     text_units = await reader.text_units()
 
     extraction_model_config = config.get_completion_model_config(
-        config.extract_graph.completion_model_id
+        config.extract_graph.completion_model_id,
     )
     extraction_prompts = config.extract_graph.resolved_prompts()
     extraction_model = create_completion(
@@ -49,7 +49,7 @@ async def run_workflow(
     )
 
     summarization_model_config = config.get_completion_model_config(
-        config.summarize_descriptions.completion_model_id
+        config.summarize_descriptions.completion_model_id,
     )
     summarization_prompts = config.summarize_descriptions.resolved_prompts()
     summarization_model = create_completion(
@@ -79,10 +79,10 @@ async def run_workflow(
 
     if config.snapshots.raw_graph:
         await context.output_table_provider.write_dataframe(
-            "raw_entities", raw_entities
+            "raw_entities", raw_entities,
         )
         await context.output_table_provider.write_dataframe(
-            "raw_relationships", raw_relationships
+            "raw_relationships", raw_relationships,
         )
 
     logger.info("Workflow completed: extract_graph")
@@ -90,7 +90,7 @@ async def run_workflow(
         result={
             "entities": entities,
             "relationships": relationships,
-        }
+        },
     )
 
 
@@ -177,9 +177,9 @@ async def get_summarized_entities_relationships(
     )
 
     relationships = extracted_relationships.drop(columns=["description"]).merge(
-        relationship_summaries, on=["source", "target"], how="left"
+        relationship_summaries, on=["source", "target"], how="left",
     )
 
-    extracted_entities.drop(columns=["description"], inplace=True)
+    extracted_entities = extracted_entities.drop(columns=["description"])
     entities = extracted_entities.merge(entity_summaries, on="title", how="left")
     return entities, relationships

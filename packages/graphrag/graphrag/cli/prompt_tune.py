@@ -6,7 +6,7 @@
 import logging
 from pathlib import Path
 
-import graphrag.api as api
+from graphrag import api
 from graphrag.config.load_config import load_config
 from graphrag.prompt_tune.generator.community_report_summarization import (
     COMMUNITY_SUMMARIZATION_FILENAME,
@@ -37,7 +37,7 @@ async def prompt_tune(
     n_subset_max: int,
     k: int,
     min_examples_required: int,
-):
+) -> None:
     """Prompt tune the model.
 
     Parameters

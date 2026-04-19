@@ -44,7 +44,7 @@ class GraphRagConfig(BaseModel):
         """Get a string representation."""
         return pformat(self, highlight=False)
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Get a string representation."""
         return self.model_dump_json(indent=4)
 
@@ -69,7 +69,7 @@ class GraphRagConfig(BaseModel):
     )
 
     input: InputConfig = Field(
-        description="The input configuration.", default=InputConfig()
+        description="The input configuration.", default=InputConfig(),
     )
     """The input configuration."""
 
@@ -88,7 +88,7 @@ class GraphRagConfig(BaseModel):
                 msg = "input storage base directory is required for file input storage. Please rerun `graphrag init` and set the input storage configuration."
                 raise ValueError(msg)
             self.input_storage.base_dir = str(
-                Path(self.input_storage.base_dir).resolve()
+                Path(self.input_storage.base_dir).resolve(),
             )
 
     chunking: ChunkingConfig = Field(
@@ -119,7 +119,7 @@ class GraphRagConfig(BaseModel):
                 msg = "output base directory is required for file output. Please rerun `graphrag init` and set the output configuration."
                 raise ValueError(msg)
             self.output_storage.base_dir = str(
-                Path(self.output_storage.base_dir).resolve()
+                Path(self.output_storage.base_dir).resolve(),
             )
 
     update_output_storage: StorageConfig = Field(
@@ -137,11 +137,11 @@ class GraphRagConfig(BaseModel):
                 msg = "update_output_storage base directory is required for file output. Please rerun `graphrag init` and set the update_output_storage configuration."
                 raise ValueError(msg)
             self.update_output_storage.base_dir = str(
-                Path(self.update_output_storage.base_dir).resolve()
+                Path(self.update_output_storage.base_dir).resolve(),
             )
 
     table_provider: TableProviderConfig = Field(
-        description="The table provider configuration.", default=TableProviderConfig()
+        description="The table provider configuration.", default=TableProviderConfig(),
     )
     """The table provider configuration. By default we read/write parquet to disk. You can register custom output table storage."""
 
@@ -152,7 +152,7 @@ class GraphRagConfig(BaseModel):
     """The cache configuration."""
 
     reporting: ReportingConfig = Field(
-        description="The reporting configuration.", default=ReportingConfig()
+        description="The reporting configuration.", default=ReportingConfig(),
     )
     """The reporting configuration."""
 
@@ -165,7 +165,7 @@ class GraphRagConfig(BaseModel):
             self.reporting.base_dir = str(Path(self.reporting.base_dir).resolve())
 
     vector_store: VectorStoreConfig = Field(
-        description="The vector store configuration.", default=VectorStoreConfig()
+        description="The vector store configuration.", default=VectorStoreConfig(),
     )
     """The vector store configuration."""
 
@@ -232,22 +232,22 @@ class GraphRagConfig(BaseModel):
     """The snapshots configuration to use."""
 
     local_search: LocalSearchConfig = Field(
-        description="The local search configuration.", default=LocalSearchConfig()
+        description="The local search configuration.", default=LocalSearchConfig(),
     )
     """The local search configuration."""
 
     global_search: GlobalSearchConfig = Field(
-        description="The global search configuration.", default=GlobalSearchConfig()
+        description="The global search configuration.", default=GlobalSearchConfig(),
     )
     """The global search configuration."""
 
     drift_search: DRIFTSearchConfig = Field(
-        description="The drift search configuration.", default=DRIFTSearchConfig()
+        description="The drift search configuration.", default=DRIFTSearchConfig(),
     )
     """The drift search configuration."""
 
     basic_search: BasicSearchConfig = Field(
-        description="The basic search configuration.", default=BasicSearchConfig()
+        description="The basic search configuration.", default=BasicSearchConfig(),
     )
     """The basic search configuration."""
 

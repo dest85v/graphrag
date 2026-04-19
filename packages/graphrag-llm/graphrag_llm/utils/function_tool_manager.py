@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from graphrag_llm.types import LLMCompletionFunctionToolParam, LLMCompletionResponse
 
 FunctionArgumentModel = TypeVar(
-    "FunctionArgumentModel", bound=BaseModel, covariant=True
+    "FunctionArgumentModel", bound=BaseModel, covariant=True,
 )
 
 

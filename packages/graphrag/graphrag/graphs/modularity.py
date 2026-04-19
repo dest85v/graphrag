@@ -76,7 +76,7 @@ def modularity(
         The modularity score.
     """
     components = _modularity_components(
-        edges, partitions, source_column, target_column, weight_column, resolution
+        edges, partitions, source_column, target_column, weight_column, resolution,
     )
     return sum(components.values())
 
@@ -195,10 +195,10 @@ def calculate_graph_modularity(
     """Calculate modularity of the whole graph."""
     if use_root_modularity:
         return calculate_root_modularity(
-            edges, max_cluster_size=max_cluster_size, random_seed=random_seed
+            edges, max_cluster_size=max_cluster_size, random_seed=random_seed,
         )
     return calculate_leaf_modularity(
-        edges, max_cluster_size=max_cluster_size, random_seed=random_seed
+        edges, max_cluster_size=max_cluster_size, random_seed=random_seed,
     )
 
 
@@ -213,10 +213,10 @@ def calculate_lcc_modularity(
     lcc_edges = edges[edges["source"].isin(lcc_nodes) & edges["target"].isin(lcc_nodes)]
     if use_root_modularity:
         return calculate_root_modularity(
-            lcc_edges, max_cluster_size=max_cluster_size, random_seed=random_seed
+            lcc_edges, max_cluster_size=max_cluster_size, random_seed=random_seed,
         )
     return calculate_leaf_modularity(
-        lcc_edges, max_cluster_size=max_cluster_size, random_seed=random_seed
+        lcc_edges, max_cluster_size=max_cluster_size, random_seed=random_seed,
     )
 
 

@@ -70,7 +70,7 @@ class ExtractGraphNLPConfig(BaseModel):
         default=graphrag_config_defaults.extract_graph_nlp.normalize_edge_weights,
     )
     text_analyzer: TextAnalyzerConfig = Field(
-        description="The text analyzer configuration.", default=TextAnalyzerConfig()
+        description="The text analyzer configuration.", default=TextAnalyzerConfig(),
     )
     concurrent_requests: int = Field(
         description="The number of threads to use for the extraction process.",

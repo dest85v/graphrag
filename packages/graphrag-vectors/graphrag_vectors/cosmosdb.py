@@ -38,7 +38,7 @@ class CosmosDBVectorStore(VectorStore):
         connection_string: str | None = None,
         url: str | None = None,
         **kwargs,
-    ):
+    ) -> None:
         super().__init__(**kwargs)
         if self.id_field != "id":
             msg = "CosmosDB requires the id_field to be 'id'."
@@ -55,11 +55,11 @@ class CosmosDBVectorStore(VectorStore):
         """Connect to CosmosDB vector storage."""
         if self.connection_string:
             self._cosmos_client = CosmosClient.from_connection_string(
-                self.connection_string
+                self.connection_string,
             )
         else:
             self._cosmos_client = CosmosClient(
-                url=self.url, credential=DefaultAzureCredential()
+                url=self.url, credential=DefaultAzureCredential(),
             )
 
         self._create_database()
@@ -69,7 +69,7 @@ class CosmosDBVectorStore(VectorStore):
         """Create the database if it doesn't exist."""
         self._cosmos_client.create_database_if_not_exists(id=self.database_name)
         self._database_client = self._cosmos_client.get_database_client(
-            self.database_name
+            self.database_name,
         )
 
     def _delete_database(self) -> None:
@@ -96,8 +96,8 @@ class CosmosDBVectorStore(VectorStore):
                     "dataType": "float32",
                     "distanceFunction": "cosine",
                     "dimensions": self.vector_size,
-                }
-            ]
+                },
+            ],
         }
 
         # Define the vector indexing policy
@@ -115,7 +115,7 @@ class CosmosDBVectorStore(VectorStore):
         try:
             # First try with the standard diskANN policy
             indexing_policy["vectorIndexes"] = [
-                {"path": f"/{self.vector_field}", "type": "diskANN"}
+                {"path": f"/{self.vector_field}", "type": "diskANN"},
             ]
 
             # Create the container and container client
@@ -138,7 +138,7 @@ class CosmosDBVectorStore(VectorStore):
             )
 
         self._container_client = self._database_client.get_container_client(
-            self.index_name
+            self.index_name,
         )
 
     def _delete_container(self) -> None:
@@ -246,7 +246,7 @@ class CosmosDBVectorStore(VectorStore):
                 raise ValueError(msg)
 
     def _extract_data(
-        self, doc: dict[str, Any], select: list[str] | None = None
+        self, doc: dict[str, Any], select: list[str] | None = None,
     ) -> dict[str, Any]:
         """Extract additional field data from a document response."""
         fields_to_extract = select if select is not None else list(self.fields.keys())
@@ -302,7 +302,7 @@ class CosmosDBVectorStore(VectorStore):
                     query=query,
                     parameters=query_params,
                     enable_cross_partition_query=True,
-                )
+                ),
             )
         except (CosmosHttpResponseError, ValueError):
             # Currently, the CosmosDB emulator does not support the VectorDistance function.
@@ -315,7 +315,7 @@ class CosmosDBVectorStore(VectorStore):
                 self._container_client.query_items(
                     query=query,
                     enable_cross_partition_query=True,
-                )
+                ),
             )
 
             # Calculate cosine similarity locally (1 - cosine distance)
@@ -381,7 +381,7 @@ class CosmosDBVectorStore(VectorStore):
             self._container_client.query_items(
                 query=query,
                 enable_cross_partition_query=True,
-            )
+            ),
         )
         return result[0] if result else 0
 
@@ -396,7 +396,7 @@ class CosmosDBVectorStore(VectorStore):
 
         # Read the existing document
         existing = self._container_client.read_item(
-            item=document.id, partition_key=document.id
+            item=document.id, partition_key=document.id,
         )
 
         # Set update_date

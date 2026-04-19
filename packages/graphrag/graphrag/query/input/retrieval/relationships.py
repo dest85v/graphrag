@@ -69,7 +69,7 @@ def get_candidate_relationships(
 
 
 def get_entities_from_relationships(
-    relationships: list[Relationship], entities: list[Entity]
+    relationships: list[Relationship], entities: list[Entity],
 ) -> list[Entity]:
     """Get all entities that are associated with the selected relationships."""
     selected_entity_names = [relationship.source for relationship in relationships] + [
@@ -96,14 +96,14 @@ def sort_relationships_by_rank(
             reverse=True,
         )
     elif ranking_attribute == "rank":
-        relationships.sort(key=lambda x: x.rank if x.rank else 0.0, reverse=True)
+        relationships.sort(key=lambda x: x.rank or 0.0, reverse=True)
     elif ranking_attribute == "weight":
-        relationships.sort(key=lambda x: x.weight if x.weight else 0.0, reverse=True)
+        relationships.sort(key=lambda x: x.weight or 0.0, reverse=True)
     return relationships
 
 
 def to_relationship_dataframe(
-    relationships: list[Relationship], include_relationship_weight: bool = True
+    relationships: list[Relationship], include_relationship_weight: bool = True,
 ) -> pd.DataFrame:
     """Convert a list of relationships to a pandas dataframe."""
     if len(relationships) == 0:
@@ -121,13 +121,13 @@ def to_relationship_dataframe(
     records = []
     for rel in relationships:
         new_record = [
-            rel.short_id if rel.short_id else "",
+            rel.short_id or "",
             rel.source,
             rel.target,
-            rel.description if rel.description else "",
+            rel.description or "",
         ]
         if include_relationship_weight:
-            new_record.append(str(rel.weight if rel.weight else ""))
+            new_record.append(str(rel.weight or ""))
         for field in attribute_cols:
             field_value = (
                 str(rel.attributes.get(field))

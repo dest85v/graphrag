@@ -87,7 +87,7 @@ def test_retries(config: RetryConfig, max_retries: int, expected_time: float) ->
     ],
 )
 async def test_retries_async(
-    config: RetryConfig, max_retries: int, expected_time: float
+    config: RetryConfig, max_retries: int, expected_time: float,
 ) -> None:
     """
     Test various retry strategies with various configurations.
@@ -119,19 +119,19 @@ _OPENAI_RETRY_SKIP_EXCEPTIONS: list[tuple[str, Callable[..., Any]]] = [
     (
         "BadRequestError",
         lambda: openai.BadRequestError(
-            "Oh no!", response=_make_response(400), body=None
+            "Oh no!", response=_make_response(400), body=None,
         ),
     ),
     (
         "AuthenticationError",
         lambda: openai.AuthenticationError(
-            "Oh no!", response=_make_response(401), body=None
+            "Oh no!", response=_make_response(401), body=None,
         ),
     ),
     (
         "PermissionDeniedError",
         lambda: openai.PermissionDeniedError(
-            "Oh no!", response=_make_response(403), body=None
+            "Oh no!", response=_make_response(403), body=None,
         ),
     ),
     (
@@ -141,25 +141,25 @@ _OPENAI_RETRY_SKIP_EXCEPTIONS: list[tuple[str, Callable[..., Any]]] = [
     (
         "UnprocessableEntityError",
         lambda: openai.UnprocessableEntityError(
-            "Oh no!", response=_make_response(422), body=None
+            "Oh no!", response=_make_response(422), body=None,
         ),
     ),
     (
         "APIConnectionError",
         lambda: openai.APIConnectionError(
-            message="Oh no!", request=httpx.Request("GET", "https://api.openai.com")
+            message="Oh no!", request=httpx.Request("GET", "https://api.openai.com"),
         ),
     ),
     (
         "APIError",
         lambda: openai.APIError(
-            "Oh no!", request=httpx.Request("GET", "https://api.openai.com"), body=None
+            "Oh no!", request=httpx.Request("GET", "https://api.openai.com"), body=None,
         ),
     ),
     (
         "APIResponseValidationError",
         lambda: openai.APIResponseValidationError(
-            response=_make_response(500), body=None, message="Oh no!"
+            response=_make_response(500), body=None, message="Oh no!",
         ),
     ),
 ]
@@ -197,7 +197,7 @@ def _make_response(status_code: int) -> httpx.Response:
     _OPENAI_RETRY_SKIP_EXCEPTIONS,
 )
 def test_exponential_backoff_skipping_exceptions(
-    config: RetryConfig, exception: str, exception_factory: Callable[..., Any]
+    config: RetryConfig, exception: str, exception_factory: Callable[..., Any],
 ) -> None:
     """
     Test skipping retries for exceptions that should not cause a retry.

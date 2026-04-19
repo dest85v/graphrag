@@ -22,7 +22,7 @@ class TestCSVTableProvider(unittest.IsolatedAsyncioTestCase):
         self.storage = create_storage(
             StorageConfig(
                 type=StorageType.Memory,
-            )
+            ),
         )
         self.table_provider = CSVTableProvider(storage=self.storage)
 
@@ -46,7 +46,7 @@ class TestCSVTableProvider(unittest.IsolatedAsyncioTestCase):
     async def test_read_nonexistent_table_raises_error(self):
         """Test that reading a nonexistent table raises ValueError."""
         with pytest.raises(
-            ValueError, match=r"Could not find nonexistent\.csv in storage!"
+            ValueError, match=r"Could not find nonexistent\.csv in storage!",
         ):
             await self.table_provider.read_dataframe("nonexistent")
 

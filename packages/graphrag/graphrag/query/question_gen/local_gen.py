@@ -42,7 +42,7 @@ class LocalQuestionGen(BaseQuestionGen):
         callbacks: list[BaseLLMCallback] | None = None,
         model_params: dict[str, Any] | None = None,
         context_builder_params: dict[str, Any] | None = None,
-    ):
+    ) -> None:
         super().__init__(
             model=model,
             context_builder=context_builder,
@@ -94,12 +94,12 @@ class LocalQuestionGen(BaseQuestionGen):
         else:
             context_records = {"context_data": context_data}
         logger.debug(
-            "GENERATE QUESTION: %s. LAST QUESTION: %s", start_time, question_text
+            "GENERATE QUESTION: %s. LAST QUESTION: %s", start_time, question_text,
         )
         system_prompt = ""
         try:
             system_prompt = self.system_prompt.format(
-                context_data=context_data, question_count=question_count
+                context_data=context_data, question_count=question_count,
             )
 
             messages_builder = (
@@ -185,12 +185,12 @@ class LocalQuestionGen(BaseQuestionGen):
         else:
             context_records = {"context_data": context_data}
         logger.debug(
-            "GENERATE QUESTION: %s. QUESTION HISTORY: %s", start_time, question_text
+            "GENERATE QUESTION: %s. QUESTION HISTORY: %s", start_time, question_text,
         )
         system_prompt = ""
         try:
             system_prompt = self.system_prompt.format(
-                context_data=context_data, question_count=question_count
+                context_data=context_data, question_count=question_count,
             )
 
             messages_builder = (

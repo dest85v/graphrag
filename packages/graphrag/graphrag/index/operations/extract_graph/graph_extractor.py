@@ -49,7 +49,7 @@ class GraphExtractor:
         prompt: str,
         max_gleanings: int,
         on_error: ErrorHandlerFn | None = None,
-    ):
+    ) -> None:
         """Init method definition."""
         self._model = model
         self._extraction_prompt = prompt
@@ -57,7 +57,7 @@ class GraphExtractor:
         self._on_error = on_error or (lambda _e, _s, _d: None)
 
     async def __call__(
-        self, text: str, entity_types: list[str], source_id: str
+        self, text: str, entity_types: list[str], source_id: str,
     ) -> tuple[pd.DataFrame, pd.DataFrame]:
         """Extract entities and relationships from the supplied text."""
         try:
@@ -87,7 +87,7 @@ class GraphExtractor:
             self._extraction_prompt.format(**{
                 INPUT_TEXT_KEY: text,
                 ENTITY_TYPES_KEY: ",".join(entity_types),
-            })
+            }),
         )
 
         response: LLMCompletionResponse = await self._model.completion_async(
@@ -184,5 +184,5 @@ def _empty_entities_df() -> pd.DataFrame:
 
 def _empty_relationships_df() -> pd.DataFrame:
     return pd.DataFrame(
-        columns=["source", "target", "weight", "description", "source_id"]
+        columns=["source", "target", "weight", "description", "source_id"],
     )

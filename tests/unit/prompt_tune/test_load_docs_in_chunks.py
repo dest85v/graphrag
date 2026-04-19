@@ -102,7 +102,7 @@ class TestLoadDocsInChunks:
 
     @pytest.mark.asyncio
     async def test_top_selection_returns_limited_chunks(
-        self, mock_config, mock_logger, sample_documents
+        self, mock_config, mock_logger, sample_documents,
     ):
         """Test TOP selection method returns the first N chunks."""
         mock_reader = AsyncMock()
@@ -139,7 +139,7 @@ class TestLoadDocsInChunks:
 
     @pytest.mark.asyncio
     async def test_random_selection_returns_correct_count(
-        self, mock_config, mock_logger, sample_documents
+        self, mock_config, mock_logger, sample_documents,
     ):
         """Test RANDOM selection method returns the correct number of chunks."""
         mock_reader = AsyncMock()
@@ -217,7 +217,7 @@ class TestLoadDocsInChunks:
 
     @pytest.mark.asyncio
     async def test_limit_out_of_range_uses_default(
-        self, mock_config, mock_logger, sample_documents
+        self, mock_config, mock_logger, sample_documents,
     ):
         """Test that invalid limit falls back to default LIMIT."""
         mock_reader = AsyncMock()
@@ -256,7 +256,7 @@ class TestLoadDocsInChunks:
 
     @pytest.mark.asyncio
     async def test_chunks_all_documents(
-        self, mock_config, mock_logger, sample_documents
+        self, mock_config, mock_logger, sample_documents,
     ):
         """Test that all documents are chunked correctly."""
         mock_reader = AsyncMock()

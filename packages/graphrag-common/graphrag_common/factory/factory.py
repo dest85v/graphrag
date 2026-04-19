@@ -34,7 +34,7 @@ class Factory(ABC, Generic[T]):
             cls._instance = super().__new__(cls, *args, **kwargs)
         return cls._instance
 
-    def __init__(self):
+    def __init__(self) -> None:
         if not hasattr(self, "_initialized"):
             self._service_initializers: dict[str, _ServiceDescriptor[T]] = {}
             self._initialized_services: dict[str, T] = {}
@@ -106,7 +106,7 @@ class Factory(ABC, Generic[T]):
 
             if cache_key not in self._initialized_services:
                 self._initialized_services[cache_key] = service_descriptor.initializer(
-                    **init_args
+                    **init_args,
                 )
             return self._initialized_services[cache_key]
 

@@ -129,7 +129,7 @@ def test_split_text_on_tokens():
         chunk_overlap=5,
         chunk_size=10,
         decode=mocked_tokenizer.decode,
-        encode=lambda text: mocked_tokenizer.encode(text),
+        encode=mocked_tokenizer.encode,
     )
     assert result == expected_splits
 

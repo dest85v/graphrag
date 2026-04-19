@@ -38,7 +38,7 @@ async def run_workflow(
 
     async with (
         context.output_table_provider.open(
-            "text_units", truncate=False
+            "text_units", truncate=False,
         ) as text_units_table,
         context.output_table_provider.open("entities") as entities_table,
         context.output_table_provider.open(

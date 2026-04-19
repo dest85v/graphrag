@@ -10,10 +10,10 @@ from typing import TYPE_CHECKING
 import pandas as pd
 from graphrag_llm.tokenizer import Tokenizer
 
-import graphrag.data_model.schemas as schemas
 from graphrag.callbacks.noop_workflow_callbacks import NoopWorkflowCallbacks
 from graphrag.callbacks.workflow_callbacks import WorkflowCallbacks
 from graphrag.config.enums import AsyncType
+from graphrag.data_model import schemas
 from graphrag.index.operations.summarize_communities.community_reports_extractor import (
     CommunityReportsExtractor,
 )
@@ -134,7 +134,7 @@ async def run_extractor(
         extraction_prompt=extraction_prompt,
         max_report_length=max_report_length,
         on_error=lambda e, stack, _data: logger.error(
-            "Community Report Extraction Error", exc_info=e, extra={"stack": stack}
+            "Community Report Extraction Error", exc_info=e, extra={"stack": stack},
         ),
     )
 

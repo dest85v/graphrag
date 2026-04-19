@@ -14,8 +14,8 @@ from streamlit.delta_generator import DeltaGenerator
 
 
 def init_search_ui(
-    container: DeltaGenerator, search_type: SearchType, title: str, caption: str
-):
+    container: DeltaGenerator, search_type: SearchType, title: str, caption: str,
+) -> None:
     """Initialize search UI component."""
     with container:
         st.markdown(title)
@@ -37,8 +37,8 @@ class SearchStats:
 
 
 def display_search_result(
-    container: DeltaGenerator, result: SearchResult, stats: SearchStats | None = None
-):
+    container: DeltaGenerator, result: SearchResult, stats: SearchStats | None = None,
+) -> None:
     """Display search results data into the UI."""
     response_placeholder_attr = (
         result.search_type.value.lower() + "_response_placeholder"
@@ -47,12 +47,12 @@ def display_search_result(
     with container:
         # display response
         response = format_response_hyperlinks(
-            result.response, result.search_type.value.lower()
+            result.response, result.search_type.value.lower(),
         )
 
         if stats is not None and stats.completion_time is not None:
             st.markdown(
-                f"*{stats.prompt_tokens:,} tokens used, {stats.llm_calls} LLM calls, {int(stats.completion_time)} seconds elapsed.*"
+                f"*{stats.prompt_tokens:,} tokens used, {stats.llm_calls} LLM calls, {int(stats.completion_time)} seconds elapsed.*",
             )
         st.session_state[response_placeholder_attr] = st.markdown(
             f"<div id='{result.search_type.value.lower()}-response'>{response}</div>",
@@ -61,8 +61,8 @@ def display_search_result(
 
 
 def display_citations(
-    container: DeltaGenerator | None = None, result: SearchResult | None = None
-):
+    container: DeltaGenerator | None = None, result: SearchResult | None = None,
+) -> None:
     """Display citations into the UI."""
     if container is not None:
         with container:
@@ -78,20 +78,20 @@ def display_citations(
                         key_type = key
                         if key == "sources":
                             st.markdown(
-                                f"Relevant chunks of source documents **({len(value)})**:"
+                                f"Relevant chunks of source documents **({len(value)})**:",
                             )
                             key_type = "sources"
                         elif key == "reports":
                             st.markdown(
-                                f"Relevant AI-generated network reports **({len(value)})**:"
+                                f"Relevant AI-generated network reports **({len(value)})**:",
                             )
                         else:
                             st.markdown(
-                                f"Relevant AI-extracted {key} **({len(value)})**:"
+                                f"Relevant AI-extracted {key} **({len(value)})**:",
                             )
                         st.markdown(
                             render_html_table(
-                                value, result.search_type.value.lower(), key_type
+                                value, result.search_type.value.lower(), key_type,
                             ),
                             unsafe_allow_html=True,
                         )
@@ -100,26 +100,26 @@ def display_citations(
 def format_response_hyperlinks(str_response: str, search_type: str = ""):
     """Format response to show hyperlinks inside the response UI."""
     results_with_hyperlinks = format_response_hyperlinks_by_key(
-        str_response, "Entities", "Entities", search_type
+        str_response, "Entities", "Entities", search_type,
     )
     results_with_hyperlinks = format_response_hyperlinks_by_key(
-        results_with_hyperlinks, "Sources", "Sources", search_type
+        results_with_hyperlinks, "Sources", "Sources", search_type,
     )
     results_with_hyperlinks = format_response_hyperlinks_by_key(
-        results_with_hyperlinks, "Documents", "Sources", search_type
+        results_with_hyperlinks, "Documents", "Sources", search_type,
     )
     results_with_hyperlinks = format_response_hyperlinks_by_key(
-        results_with_hyperlinks, "Relationships", "Relationships", search_type
+        results_with_hyperlinks, "Relationships", "Relationships", search_type,
     )
     results_with_hyperlinks = format_response_hyperlinks_by_key(
-        results_with_hyperlinks, "Reports", "Reports", search_type
+        results_with_hyperlinks, "Reports", "Reports", search_type,
     )
 
     return results_with_hyperlinks  # noqa: RET504
 
 
 def format_response_hyperlinks_by_key(
-    str_response: str, key: str, anchor: str, search_type: str = ""
+    str_response: str, key: str, anchor: str, search_type: str = "",
 ):
     """Format response to show hyperlinks inside the response UI by key."""
     pattern = r"\(\d+(?:,\s*\d+)*(?:,\s*\+more)?\)"
@@ -142,7 +142,7 @@ def format_response_hyperlinks_by_key(
                     )
 
             results_with_hyperlinks = results_with_hyperlinks.replace(
-                occurrence, string_occurrence_hyperlinks
+                occurrence, string_occurrence_hyperlinks,
             )
 
     return results_with_hyperlinks
@@ -266,8 +266,8 @@ def render_html_table(df: pd.DataFrame, search_type: str, key: str):
 
 
 def display_graph_citations(
-    entities: pd.DataFrame, relationships: pd.DataFrame, citation_type: str
-):
+    entities: pd.DataFrame, relationships: pd.DataFrame, citation_type: str,
+) -> None:
     """Display graph citations into the UI."""
     st.markdown("---")
     st.markdown("### Citations")

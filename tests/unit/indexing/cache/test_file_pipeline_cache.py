@@ -2,6 +2,7 @@
 # Licensed under the MIT License
 import asyncio
 import os
+import pathlib
 import unittest
 
 from graphrag_cache import CacheConfig, CacheType
@@ -34,10 +35,8 @@ class TestFilePipelineCache(unittest.IsolatedAsyncioTestCase):
         # Create a cache directory
         if not os.path.exists(TEMP_DIR):
             os.mkdir(TEMP_DIR)
-        with open(f"{TEMP_DIR}/test1", "w") as f:
-            f.write("This is test1 file.")
-        with open(f"{TEMP_DIR}/test2", "w") as f:
-            f.write("This is test2 file.")
+        pathlib.Path(f"{TEMP_DIR}/test1").write_text("This is test1 file.", encoding="utf-8")
+        pathlib.Path(f"{TEMP_DIR}/test2").write_text("This is test2 file.", encoding="utf-8")
 
         # this invokes cache.clear()
         await self.cache.clear()

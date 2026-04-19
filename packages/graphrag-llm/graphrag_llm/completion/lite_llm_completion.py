@@ -161,7 +161,7 @@ class LiteLLMCompletion(LLMCompletion):
             )
             if response_format is not None:
                 structured_response = structure_completion_response(
-                    response.content, response_format
+                    response.content, response_format,
                 )
                 response.formatted_response = structured_response
             return response
@@ -200,7 +200,7 @@ class LiteLLMCompletion(LLMCompletion):
             )
             if response_format is not None:
                 structured_response = structure_completion_response(
-                    response.content, response_format
+                    response.content, response_format,
                 )
                 response.formatted_response = structured_response
             return response
@@ -242,7 +242,7 @@ def _create_base_completions(
             }
             if model_config.auth_method == AuthMethod.AzureManagedIdentity:
                 kwargs["azure_ad_token_provider"] = get_bearer_token_provider(
-                    DefaultAzureCredential(), azure_cognitive_services_audience
+                    DefaultAzureCredential(), azure_cognitive_services_audience,
                 )
             else:
                 kwargs["api_key"] = model_config.api_key
@@ -263,7 +263,7 @@ def _create_base_completions(
             }
             if model_config.auth_method == AuthMethod.AzureManagedIdentity:
                 kwargs["azure_ad_token_provider"] = get_bearer_token_provider(
-                    DefaultAzureCredential(), azure_cognitive_services_audience
+                    DefaultAzureCredential(), azure_cognitive_services_audience,
                 )
             else:
                 kwargs["api_key"] = model_config.api_key

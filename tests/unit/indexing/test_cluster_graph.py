@@ -110,10 +110,10 @@ class TestEdgeNormalization:
             ("F", "E", 1.0),
         ])
         clusters_fwd = cluster_graph(
-            forward, max_cluster_size=10, use_lcc=False, seed=42
+            forward, max_cluster_size=10, use_lcc=False, seed=42,
         )
         clusters_bwd = cluster_graph(
-            backward, max_cluster_size=10, use_lcc=False, seed=42
+            backward, max_cluster_size=10, use_lcc=False, seed=42,
         )
 
         assert _node_sets(clusters_fwd) == _node_sets(clusters_bwd)

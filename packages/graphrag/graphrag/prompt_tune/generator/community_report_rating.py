@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 
 async def generate_community_report_rating(
-    model: "LLMCompletion", domain: str, persona: str, docs: str | list[str]
+    model: "LLMCompletion", domain: str, persona: str, docs: str | list[str],
 ) -> str:
     """Generate an LLM persona to use for GraphRAG prompts.
 
@@ -31,11 +31,11 @@ async def generate_community_report_rating(
     """
     docs_str = " ".join(docs) if isinstance(docs, list) else docs
     domain_prompt = GENERATE_REPORT_RATING_PROMPT.format(
-        domain=domain, persona=persona, input_text=docs_str
+        domain=domain, persona=persona, input_text=docs_str,
     )
 
     response: LLMCompletionResponse = await model.completion_async(
-        messages=domain_prompt
+        messages=domain_prompt,
     )  # type: ignore
 
     return response.content

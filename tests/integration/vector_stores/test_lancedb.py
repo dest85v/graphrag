@@ -77,7 +77,7 @@ class TestLanceDBVectorStore:
         temp_dir = tempfile.mkdtemp()
         try:
             vector_store = LanceDBVectorStore(
-                db_uri=temp_dir, index_name="test_collection", vector_size=5
+                db_uri=temp_dir, index_name="test_collection", vector_size=5,
             )
             vector_store.connect()
             vector_store.create_index()
@@ -94,7 +94,7 @@ class TestLanceDBVectorStore:
             assert np.allclose(doc.vector, [0.1, 0.2, 0.3, 0.4, 0.5])
 
             results = vector_store.similarity_search_by_vector(
-                [0.1, 0.2, 0.3, 0.4, 0.5], k=2
+                [0.1, 0.2, 0.3, 0.4, 0.5], k=2,
             )
             assert 1 <= len(results) <= 2
             assert isinstance(results[0].score, float)
@@ -110,7 +110,7 @@ class TestLanceDBVectorStore:
                 return [0.1, 0.2, 0.3, 0.4, 0.5]
 
             text_results = vector_store.similarity_search_by_text(
-                "test query", mock_embedder, k=2
+                "test query", mock_embedder, k=2,
             )
             assert 1 <= len(text_results) <= 2
             assert isinstance(text_results[0].score, float)
@@ -126,7 +126,7 @@ class TestLanceDBVectorStore:
         temp_dir = tempfile.mkdtemp()
         try:
             vector_store = LanceDBVectorStore(
-                db_uri=temp_dir, index_name="empty_collection", vector_size=5
+                db_uri=temp_dir, index_name="empty_collection", vector_size=5,
             )
             vector_store.connect()
             vector_store.create_index()
@@ -204,14 +204,14 @@ class TestLanceDBVectorStore:
                 id="1",
                 vector=None,
                 data={"os": "macos", "category": "bug", "priority": 1},
-            )
+            ),
         )
 
         doc = store.search_by_id("1")
         assert doc.data["os"] == "macos"
 
     def test_update_sets_update_date(
-        self, store_with_fields, sample_documents_with_metadata
+        self, store_with_fields, sample_documents_with_metadata,
     ):
         """Test that update automatically sets update_date."""
         store = store_with_fields
@@ -225,7 +225,7 @@ class TestLanceDBVectorStore:
                 id="1",
                 vector=None,
                 data={"os": "macos"},
-            )
+            ),
         )
 
         doc_after = store.search_by_id("1")
@@ -233,7 +233,7 @@ class TestLanceDBVectorStore:
         assert doc_after.update_date != "None"
 
     def test_similarity_search_by_vector(
-        self, store_with_fields, sample_documents_with_metadata
+        self, store_with_fields, sample_documents_with_metadata,
     ):
         """Test vector similarity search returns ordered results."""
         store = store_with_fields
@@ -246,7 +246,7 @@ class TestLanceDBVectorStore:
         assert results[0].score >= results[1].score
 
     def test_similarity_search_by_text(
-        self, store_with_fields, sample_documents_with_metadata
+        self, store_with_fields, sample_documents_with_metadata,
     ):
         """Test text-based similarity search."""
         store = store_with_fields
@@ -259,7 +259,7 @@ class TestLanceDBVectorStore:
         assert len(results) == 2
 
     def test_similarity_search_k_limit(
-        self, store_with_fields, sample_documents_with_metadata
+        self, store_with_fields, sample_documents_with_metadata,
     ):
         """Test that k parameter limits search results."""
         store = store_with_fields
@@ -269,7 +269,7 @@ class TestLanceDBVectorStore:
         assert len(results) == 1
 
     def test_fields_returned_in_search(
-        self, store_with_fields, sample_documents_with_metadata
+        self, store_with_fields, sample_documents_with_metadata,
     ):
         """Test that metadata fields appear in search results."""
         store = store_with_fields
@@ -281,14 +281,14 @@ class TestLanceDBVectorStore:
         assert results[0].document.data["priority"] == 1
 
     def test_select_limits_fields(
-        self, store_with_fields, sample_documents_with_metadata
+        self, store_with_fields, sample_documents_with_metadata,
     ):
         """Test that select parameter limits returned fields."""
         store = store_with_fields
         store.load_documents(sample_documents_with_metadata)
 
         results = store.similarity_search_by_vector(
-            [0.1, 0.2, 0.3, 0.4, 0.5], k=1, select=["os"]
+            [0.1, 0.2, 0.3, 0.4, 0.5], k=1, select=["os"],
         )
         data = results[0].document.data
         assert "os" in data
@@ -296,7 +296,7 @@ class TestLanceDBVectorStore:
         assert "priority" not in data
 
     def test_select_on_search_by_id(
-        self, store_with_fields, sample_documents_with_metadata
+        self, store_with_fields, sample_documents_with_metadata,
     ):
         """Test select parameter on search_by_id."""
         store = store_with_fields
@@ -307,14 +307,14 @@ class TestLanceDBVectorStore:
         assert "category" not in doc.data
 
     def test_include_vectors_false(
-        self, store_with_fields, sample_documents_with_metadata
+        self, store_with_fields, sample_documents_with_metadata,
     ):
         """Test include_vectors=False omits vectors from results."""
         store = store_with_fields
         store.load_documents(sample_documents_with_metadata)
 
         results = store.similarity_search_by_vector(
-            [0.1, 0.2, 0.3, 0.4, 0.5], k=1, include_vectors=False
+            [0.1, 0.2, 0.3, 0.4, 0.5], k=1, include_vectors=False,
         )
         assert results[0].document.vector is None
 
@@ -349,7 +349,7 @@ class TestLanceDBVectorStore:
         assert ids == {"1", "3"}
 
     def test_filter_gt_gte_lt_lte(
-        self, store_with_fields, sample_documents_with_metadata
+        self, store_with_fields, sample_documents_with_metadata,
     ):
         """Test numeric range filters."""
         store = store_with_fields
@@ -357,25 +357,25 @@ class TestLanceDBVectorStore:
 
         # gt
         results = store.similarity_search_by_vector(
-            [0.1, 0.2, 0.3, 0.4, 0.5], k=10, filters=F.priority > 1
+            [0.1, 0.2, 0.3, 0.4, 0.5], k=10, filters=F.priority > 1,
         )
         assert len(results) == 2
 
         # gte
         results = store.similarity_search_by_vector(
-            [0.1, 0.2, 0.3, 0.4, 0.5], k=10, filters=F.priority >= 2
+            [0.1, 0.2, 0.3, 0.4, 0.5], k=10, filters=F.priority >= 2,
         )
         assert len(results) == 2
 
         # lt
         results = store.similarity_search_by_vector(
-            [0.1, 0.2, 0.3, 0.4, 0.5], k=10, filters=F.priority < 3
+            [0.1, 0.2, 0.3, 0.4, 0.5], k=10, filters=F.priority < 3,
         )
         assert len(results) == 2
 
         # lte
         results = store.similarity_search_by_vector(
-            [0.1, 0.2, 0.3, 0.4, 0.5], k=10, filters=F.priority <= 1
+            [0.1, 0.2, 0.3, 0.4, 0.5], k=10, filters=F.priority <= 1,
         )
         assert len(results) == 1
 
@@ -434,7 +434,7 @@ class TestLanceDBVectorStore:
         assert ids == {"1", "3"}
 
     def test_filter_combined_with_search(
-        self, store_with_fields, sample_documents_with_metadata
+        self, store_with_fields, sample_documents_with_metadata,
     ):
         """Test filter + vector search together."""
         store = store_with_fields
@@ -456,7 +456,7 @@ class TestLanceDBVectorStore:
             VectorStoreDocument(
                 id="auto_date",
                 vector=[0.1, 0.2, 0.3, 0.4, 0.5],
-            )
+            ),
         )
         doc = store.search_by_id("auto_date")
         assert doc.create_date is not None
@@ -470,7 +470,7 @@ class TestLanceDBVectorStore:
                 id="dated",
                 vector=[0.1, 0.2, 0.3, 0.4, 0.5],
                 create_date="2024-03-15T14:30:00",
-            )
+            ),
         )
         doc = store.search_by_id("dated")
         assert doc.data["create_date_year"] == 2024
@@ -489,14 +489,14 @@ class TestLanceDBVectorStore:
                 id="dec",
                 vector=[0.1, 0.2, 0.3, 0.4, 0.5],
                 create_date="2024-12-25T10:00:00",
-            )
+            ),
         )
         store.insert(
             VectorStoreDocument(
                 id="mar",
                 vector=[0.2, 0.3, 0.4, 0.5, 0.6],
                 create_date="2024-03-15T10:00:00",
-            )
+            ),
         )
 
         results = store.similarity_search_by_vector(
@@ -528,7 +528,7 @@ class TestLanceDBVectorStore:
                         "published_at": "2024-07-04T12:00:00",
                         "category": "news",
                     },
-                )
+                ),
             )
 
             doc = store.search_by_id("pub1")
@@ -573,7 +573,7 @@ class TestLanceDBVectorStore:
             assert np.allclose(doc.vector, [0.1, 0.2, 0.3, 0.4, 0.5])
 
             results = vector_store.similarity_search_by_vector(
-                [0.1, 0.2, 0.3, 0.4, 0.5], k=2
+                [0.1, 0.2, 0.3, 0.4, 0.5], k=2,
             )
             assert 1 <= len(results) <= 2
             assert isinstance(results[0].score, float)

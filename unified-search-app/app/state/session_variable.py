@@ -12,7 +12,7 @@ import streamlit as st
 class SessionVariable:
     """Define the session variable structure that will be used in the app."""
 
-    def __init__(self, default: Any = "", prefix: str = ""):
+    def __init__(self, default: Any = "", prefix: str = "") -> None:
         """Create a managed session variable with a default value and a prefix.
 
         The prefix is used to avoid collisions between variables with the same name.

@@ -162,7 +162,7 @@ class OpenAICompletion(LLMCompletion):
             )
             if response_format is not None:
                 structured_response = structure_completion_response(
-                    response.content, response_format
+                    response.content, response_format,
                 )
                 response.formatted_response = structured_response
             return response
@@ -201,7 +201,7 @@ class OpenAICompletion(LLMCompletion):
             )
             if response_format is not None:
                 structured_response = structure_completion_response(
-                    response.content, response_format
+                    response.content, response_format,
                 )
                 response.formatted_response = structured_response
             return response
@@ -239,7 +239,7 @@ def _create_clients(
 
         if model_config.auth_method == AuthMethod.AzureManagedIdentity:
             kwargs["azure_ad_token_provider"] = get_bearer_token_provider(
-                DefaultAzureCredential(), azure_cognitive_services_audience
+                DefaultAzureCredential(), azure_cognitive_services_audience,
             )
         else:
             kwargs["api_key"] = model_config.api_key
@@ -297,7 +297,7 @@ def _create_base_completions(
             response = create_completion_response(mock_response)
             if response_format := kwargs.get("response_format"):
                 structured = structure_completion_response(
-                    response.content, response_format
+                    response.content, response_format,
                 )
                 response.formatted_response = structured
             return response
@@ -310,7 +310,7 @@ def _create_base_completions(
         filtered = filter_completion_kwargs(merged, model)
 
         response = _get_sync_client(
-            model_config, azure_cognitive_services_audience
+            model_config, azure_cognitive_services_audience,
         ).chat.completions.create(
             **filtered,
         )
@@ -331,7 +331,7 @@ def _create_base_completions(
             response = create_completion_response(mock_response)
             if response_format := kwargs.get("response_format"):
                 structured = structure_completion_response(
-                    response.content, response_format
+                    response.content, response_format,
                 )
                 response.formatted_response = structured
             return response
@@ -342,7 +342,7 @@ def _create_base_completions(
         filtered = filter_completion_kwargs(merged, model)
 
         response = await _get_async_client(
-            model_config, azure_cognitive_services_audience
+            model_config, azure_cognitive_services_audience,
         ).chat.completions.create(
             **filtered,
         )

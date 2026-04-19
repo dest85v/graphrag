@@ -28,7 +28,7 @@ def make_yaml_serializable(data: Any) -> Any:
 
     if isinstance(data, dict):
         return tuple(
-            sorted((key, make_yaml_serializable(value)) for key, value in data.items())
+            sorted((key, make_yaml_serializable(value)) for key, value in data.items()),
         )
 
     return str(data)

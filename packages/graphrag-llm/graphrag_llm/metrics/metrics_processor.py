@@ -22,7 +22,7 @@ class MetricsProcessor(ABC):
     """Abstract base class for metrics processors."""
 
     @abstractmethod
-    def __init__(self, **kwargs: Any):
+    def __init__(self, **kwargs: Any) -> None:
         """Initialize MetricsProcessor."""
         raise NotImplementedError
 

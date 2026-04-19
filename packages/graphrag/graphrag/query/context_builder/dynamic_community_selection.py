@@ -43,7 +43,7 @@ class DynamicCommunitySelection:
         max_level: int = 2,
         concurrent_coroutines: int = 8,
         model_params: dict[str, Any] | None = None,
-    ):
+    ) -> None:
         self.model = model
         self.tokenizer = tokenizer
         self.rate_query = rate_query
@@ -53,7 +53,7 @@ class DynamicCommunitySelection:
         self.keep_parent = keep_parent
         self.max_level = max_level
         self.semaphore = asyncio.Semaphore(concurrent_coroutines)
-        self.model_params = model_params if model_params else {}
+        self.model_params = model_params or {}
 
         self.reports = {report.community_id: report for report in community_reports}
         self.communities = {community.short_id: community for community in communities}

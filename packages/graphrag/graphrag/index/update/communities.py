@@ -69,12 +69,12 @@ def _update_and_merge_communities(
 
     # Merge the final communities
     merged_communities = pd.concat(
-        [old_communities, delta_communities], ignore_index=True, copy=False
+        [old_communities, delta_communities], ignore_index=True, copy=False,
     )
 
     # Rename title
     merged_communities["title"] = "Community " + merged_communities["community"].astype(
-        str
+        str,
     )
     # Re-assign the human_readable_id
     merged_communities["human_readable_id"] = merged_communities["community"]
@@ -136,7 +136,7 @@ def _update_and_merge_community_reports(
 
     # Merge the final community reports
     merged_community_reports = pd.concat(
-        [old_community_reports, delta_community_reports], ignore_index=True, copy=False
+        [old_community_reports, delta_community_reports], ignore_index=True, copy=False,
     )
 
     # Maintain type compat with query

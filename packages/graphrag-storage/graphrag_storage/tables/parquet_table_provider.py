@@ -63,7 +63,7 @@ class ParquetTableProvider(TableProvider):
         try:
             logger.info("reading table from storage: %s", filename)
             return pd.read_parquet(
-                BytesIO(await self._storage.get(filename, as_bytes=True))
+                BytesIO(await self._storage.get(filename, as_bytes=True)),
             )
         except Exception:
             logger.exception("error loading table from storage: %s", filename)

@@ -72,7 +72,7 @@ def test_register_and_create_custom_vector_store():
     custom_vector_store_class.return_value = instance
 
     VectorStoreFactory().register(
-        "custom", lambda **kwargs: custom_vector_store_class(**kwargs)
+        "custom", custom_vector_store_class,
     )
 
     vector_store = VectorStoreFactory().create("custom", {})

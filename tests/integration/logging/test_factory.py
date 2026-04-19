@@ -39,7 +39,7 @@ def test_register_and_create_custom_logger():
     instance.initialized = True
     custom_logger_class.return_value = instance
 
-    LoggerFactory().register("custom", lambda **kwargs: custom_logger_class(**kwargs))
+    LoggerFactory().register("custom", custom_logger_class)
     logger = LoggerFactory().create("custom")
 
     assert custom_logger_class.called

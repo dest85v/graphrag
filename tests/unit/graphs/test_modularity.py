@@ -77,7 +77,7 @@ def nx_modularity(
 ) -> float:
     """NX reference: compute modularity from a networkx graph."""
     components = _nx_modularity_components(
-        graph, partitions, weight_attribute, resolution
+        graph, partitions, weight_attribute, resolution,
     )
     return sum(components.values())
 
@@ -89,7 +89,7 @@ def nx_modularity(
 
 def _load_fixture() -> pd.DataFrame:
     """Load the realistic graph fixture as a relationships DataFrame."""
-    with open(FIXTURES_DIR / "graph.json") as f:
+    with open(FIXTURES_DIR / "graph.json", encoding="utf-8") as f:
         data = json.load(f)
     return pd.DataFrame(data["edges"])
 

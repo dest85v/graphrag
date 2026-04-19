@@ -66,7 +66,7 @@ def map_query_to_entities(
         )
         for result in search_results:
             if embedding_vectorstore_key == EntityVectorStoreKey.ID and isinstance(
-                result.document.id, str
+                result.document.id, str,
             ):
                 matched = get_entity_by_id(all_entities_dict, result.document.id)
             else:
@@ -78,7 +78,7 @@ def map_query_to_entities(
             if matched:
                 matched_entities.append(matched)
     else:
-        all_entities.sort(key=lambda x: x.rank if x.rank else 0, reverse=True)
+        all_entities.sort(key=lambda x: x.rank or 0, reverse=True)
         matched_entities = all_entities[:k]
 
     # filter out excluded entities
@@ -109,17 +109,17 @@ def find_nearest_neighbors_by_entity_rank(
     entity_relationships = [
         rel
         for rel in all_relationships
-        if rel.source == entity_name or rel.target == entity_name
+        if entity_name in {rel.source, rel.target}
     ]
     source_entity_names = {rel.source for rel in entity_relationships}
     target_entity_names = {rel.target for rel in entity_relationships}
     related_entity_names = (source_entity_names.union(target_entity_names)).difference(
-        set(exclude_entity_names)
+        set(exclude_entity_names),
     )
     top_relations = [
         entity for entity in all_entities if entity.title in related_entity_names
     ]
-    top_relations.sort(key=lambda x: x.rank if x.rank else 0, reverse=True)
+    top_relations.sort(key=lambda x: x.rank or 0, reverse=True)
     if k:
         return top_relations[:k]
     return top_relations

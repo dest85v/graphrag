@@ -29,7 +29,7 @@ class TokenChunker(Chunker):
         self._decode = decode
 
     def chunk(
-        self, text: str, transform: Callable[[str], str] | None = None
+        self, text: str, transform: Callable[[str], str] | None = None,
     ) -> list[TextChunk]:
         """Chunk the text into token-based chunks."""
         chunks = split_text_on_tokens(

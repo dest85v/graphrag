@@ -53,7 +53,7 @@ class ParquetTable(Table):
         table_name: str,
         transformer: RowTransformer | None = None,
         truncate: bool = True,
-    ):
+    ) -> None:
         """Initialize with storage backend and table name.
 
         Args:

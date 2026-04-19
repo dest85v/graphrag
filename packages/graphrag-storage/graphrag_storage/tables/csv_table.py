@@ -57,7 +57,7 @@ class CSVTable(Table):
         transformer: RowTransformer | None = None,
         truncate: bool = True,
         encoding: str = "utf-8",
-    ):
+    ) -> None:
         """Initialize with storage backend and table name.
 
         Args:

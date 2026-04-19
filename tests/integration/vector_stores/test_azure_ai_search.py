@@ -13,7 +13,7 @@ from graphrag_vectors import (
 from graphrag_vectors.azure_ai_search import AzureAISearchVectorStore
 
 TEST_AZURE_AI_SEARCH_URL = os.environ.get(
-    "TEST_AZURE_AI_SEARCH_URL", "https://test-url.search.windows.net"
+    "TEST_AZURE_AI_SEARCH_URL", "https://test-url.search.windows.net",
 )
 TEST_AZURE_AI_SEARCH_KEY = os.environ.get("TEST_AZURE_AI_SEARCH_KEY", "test_api_key")
 
@@ -84,7 +84,7 @@ class TestAzureAISearchVectorStore:
         ]
 
     async def test_vector_store_operations(
-        self, vector_store, sample_documents, mock_search_client, mock_index_client
+        self, vector_store, sample_documents, mock_search_client, mock_index_client,
     ):
         """Test basic vector store operations with Azure AI Search."""
         # Setup mock responses
@@ -117,7 +117,7 @@ class TestAzureAISearchVectorStore:
         assert mock_search_client.upload_documents.called
 
         vector_results = vector_store.similarity_search_by_vector(
-            [0.1, 0.2, 0.3, 0.4, 0.5], k=2
+            [0.1, 0.2, 0.3, 0.4, 0.5], k=2,
         )
         assert len(vector_results) == 2
         assert vector_results[0].document.id == "doc1"
@@ -128,7 +128,7 @@ class TestAzureAISearchVectorStore:
             return [0.1, 0.2, 0.3, 0.4, 0.5]
 
         text_results = vector_store.similarity_search_by_text(
-            "test query", mock_embedder, k=2
+            "test query", mock_embedder, k=2,
         )
         assert len(text_results) == 2
 
@@ -143,7 +143,7 @@ class TestAzureAISearchVectorStore:
             return None
 
         results = vector_store.similarity_search_by_text(
-            "test query", none_embedder, k=1
+            "test query", none_embedder, k=1,
         )
         assert not mock_search_client.search.called
         assert len(results) == 0
@@ -186,7 +186,7 @@ class TestAzureAISearchVectorStore:
         assert mock_search_client.upload_documents.called
 
         vector_results = vector_store_custom.similarity_search_by_vector(
-            [0.1, 0.2, 0.3, 0.4, 0.5], k=2
+            [0.1, 0.2, 0.3, 0.4, 0.5], k=2,
         )
         assert len(vector_results) == 2
         assert vector_results[0].document.id == "doc1"
@@ -197,7 +197,7 @@ class TestAzureAISearchVectorStore:
             return [0.1, 0.2, 0.3, 0.4, 0.5]
 
         text_results = vector_store_custom.similarity_search_by_text(
-            "test query", mock_embedder, k=2
+            "test query", mock_embedder, k=2,
         )
         assert len(text_results) == 2
 

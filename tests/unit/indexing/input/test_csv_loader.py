@@ -13,7 +13,7 @@ async def test_csv_loader_one_file():
     storage = create_storage(
         StorageConfig(
             base_dir="tests/unit/indexing/input/data/one-csv",
-        )
+        ),
     )
     reader = create_input_reader(config, storage)
     documents = await reader.read_files()
@@ -34,7 +34,7 @@ async def test_csv_loader_one_file_with_title():
     storage = create_storage(
         StorageConfig(
             base_dir="tests/unit/indexing/input/data/one-csv",
-        )
+        ),
     )
     reader = create_input_reader(config, storage)
     documents = await reader.read_files()
@@ -49,7 +49,7 @@ async def test_csv_loader_multiple_files():
     storage = create_storage(
         StorageConfig(
             base_dir="tests/unit/indexing/input/data/multiple-csvs",
-        )
+        ),
     )
     reader = create_input_reader(config, storage)
     documents = await reader.read_files()

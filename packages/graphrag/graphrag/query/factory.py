@@ -48,13 +48,13 @@ def get_local_search_engine(
 ) -> LocalSearch:
     """Create a local search engine based on data + configuration."""
     model_settings = config.get_completion_model_config(
-        config.local_search.completion_model_id
+        config.local_search.completion_model_id,
     )
 
     chat_model = create_completion(model_settings)
 
     embedding_settings = config.get_embedding_model_config(
-        config.local_search.embedding_model_id
+        config.local_search.embedding_model_id,
     )
 
     embedding_model = create_embedding(embedding_settings)
@@ -114,7 +114,7 @@ def get_global_search_engine(
 ) -> GlobalSearch:
     """Create a global search engine based on data + configuration."""
     model_settings = config.get_completion_model_config(
-        config.global_search.completion_model_id
+        config.global_search.completion_model_id,
     )
 
     model = create_completion(model_settings)
@@ -194,13 +194,13 @@ def get_drift_search_engine(
 ) -> DRIFTSearch:
     """Create a local search engine based on data + configuration."""
     chat_model_settings = config.get_completion_model_config(
-        config.drift_search.completion_model_id
+        config.drift_search.completion_model_id,
     )
 
     chat_model = create_completion(chat_model_settings)
 
     embedding_model_settings = config.get_embedding_model_config(
-        config.drift_search.embedding_model_id
+        config.drift_search.embedding_model_id,
     )
 
     embedding_model = create_embedding(embedding_model_settings)
@@ -237,13 +237,13 @@ def get_basic_search_engine(
 ) -> BasicSearch:
     """Create a basic search engine based on data + configuration."""
     chat_model_settings = config.get_completion_model_config(
-        config.basic_search.completion_model_id
+        config.basic_search.completion_model_id,
     )
 
     chat_model = create_completion(chat_model_settings)
 
     embedding_model_settings = config.get_embedding_model_config(
-        config.basic_search.embedding_model_id
+        config.basic_search.embedding_model_id,
     )
 
     embedding_model = create_embedding(embedding_model_settings)

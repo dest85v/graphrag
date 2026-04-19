@@ -19,7 +19,7 @@ class TestParquetTableProvider(unittest.IsolatedAsyncioTestCase):
         self.storage = create_storage(
             StorageConfig(
                 type=StorageType.Memory,
-            )
+            ),
         )
         self.table_provider = ParquetTableProvider(storage=self.storage)
 
@@ -40,7 +40,7 @@ class TestParquetTableProvider(unittest.IsolatedAsyncioTestCase):
 
     async def test_read_nonexistent_table_raises_error(self):
         with pytest.raises(
-            ValueError, match=r"Could not find nonexistent\.parquet in storage!"
+            ValueError, match=r"Could not find nonexistent\.parquet in storage!",
         ):
             await self.table_provider.read_dataframe("nonexistent")
 

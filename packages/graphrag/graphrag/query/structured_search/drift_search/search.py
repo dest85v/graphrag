@@ -44,7 +44,7 @@ class DRIFTSearch(BaseSearch[DRIFTSearchContextBuilder]):
         tokenizer: Tokenizer | None = None,
         query_state: QueryState | None = None,
         callbacks: list[QueryCallbacks] | None = None,
-    ):
+    ) -> None:
         """
         Initialize the DRIFTSearch class.
 
@@ -109,7 +109,7 @@ class DRIFTSearch(BaseSearch[DRIFTSearchContextBuilder]):
         )
 
     def _process_primer_results(
-        self, query: str, search_results: SearchResult
+        self, query: str, search_results: SearchResult,
     ) -> DriftAction:
         """
         Process the results from the primer search to extract intermediate answers and follow-up queries.
@@ -225,7 +225,7 @@ class DRIFTSearch(BaseSearch[DRIFTSearchContextBuilder]):
             output_tokens["build_context"] = token_ct["output_tokens"]
 
             primer_response = await self.primer.search(
-                query=query, top_k_reports=primer_context
+                query=query, top_k_reports=primer_context,
             )
             llm_calls["primer"] = primer_response.llm_calls
             prompt_tokens["primer"] = primer_response.prompt_tokens
@@ -272,7 +272,7 @@ class DRIFTSearch(BaseSearch[DRIFTSearchContextBuilder]):
 
         # Package up context data
         response_state, context_data, context_text = self.query_state.serialize(
-            include_context=True
+            include_context=True,
         )
 
         reduced_response = response_state
@@ -311,7 +311,7 @@ class DRIFTSearch(BaseSearch[DRIFTSearchContextBuilder]):
         )
 
     async def stream_search(
-        self, query: str, conversation_history: ConversationHistory | None = None
+        self, query: str, conversation_history: ConversationHistory | None = None,
     ) -> AsyncGenerator[str, None]:
         """
         Perform a streaming DRIFT search asynchronously.
@@ -321,7 +321,7 @@ class DRIFTSearch(BaseSearch[DRIFTSearchContextBuilder]):
             conversation_history (ConversationHistory, optional): The conversation history.
         """
         result = await self.search(
-            query=query, conversation_history=conversation_history, reduce=False
+            query=query, conversation_history=conversation_history, reduce=False,
         )
 
         if isinstance(result.response, list):
@@ -403,7 +403,7 @@ class DRIFTSearch(BaseSearch[DRIFTSearchContextBuilder]):
 
         llm_calls["reduce"] = 1
         prompt_tokens["reduce"] = len(self.tokenizer.encode(search_prompt)) + len(
-            self.tokenizer.encode(query)
+            self.tokenizer.encode(query),
         )
         output_tokens["reduce"] = len(self.tokenizer.encode(reduced_response))
 
@@ -454,7 +454,7 @@ class DRIFTSearch(BaseSearch[DRIFTSearchContextBuilder]):
         response_search: AsyncIterator[
             LLMCompletionChunk
         ] = await self.model.completion_async(
-            messages=messages_builder.build(), stream=True, **model_params
+            messages=messages_builder.build(), stream=True, **model_params,
         )  # type: ignore
 
         async for chunk in response_search:

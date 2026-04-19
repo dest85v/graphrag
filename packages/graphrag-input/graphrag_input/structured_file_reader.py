@@ -23,7 +23,7 @@ class StructuredFileReader(InputReader):
         title_column: str | None = None,
         text_column: str = "text",
         **kwargs,
-    ):
+    ) -> None:
         super().__init__(**kwargs)
         self._id_column = id_column
         self._title_column = title_column
@@ -60,6 +60,6 @@ class StructuredFileReader(InputReader):
                     text=text,
                     creation_date=creation_date,
                     raw_data=row,
-                )
+                ),
             )
         return documents

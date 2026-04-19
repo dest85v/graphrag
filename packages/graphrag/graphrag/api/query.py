@@ -165,7 +165,7 @@ def global_search_streaming(
         dynamic_community_selection=dynamic_community_selection,
     )
     entities_ = read_indexer_entities(
-        entities, communities, community_level=community_level
+        entities, communities, community_level=community_level,
     )
     map_prompt = load_search_prompt(config.global_search.map_prompt)
     reduce_prompt = load_search_prompt(config.global_search.reduce_prompt)

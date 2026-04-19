@@ -8,14 +8,14 @@ from app_logic import dataset_name, load_dataset
 from state.session_variables import SessionVariables
 
 
-def reset_app():
+def reset_app() -> None:
     """Reset app to its original state."""
     st.cache_data.clear()
     st.session_state.clear()
     st.rerun()
 
 
-def update_dataset(sv: SessionVariables):
+def update_dataset(sv: SessionVariables) -> None:
     """Update dataset from the dropdown."""
     value = st.session_state[sv.dataset.key]
     st.cache_data.clear()
@@ -25,27 +25,27 @@ def update_dataset(sv: SessionVariables):
     load_dataset(value, sv)
 
 
-def update_basic_rag(sv: SessionVariables):
+def update_basic_rag(sv: SessionVariables) -> None:
     """Update basic rag state."""
     sv.include_basic_rag.value = st.session_state[sv.include_basic_rag.key]
 
 
-def update_drift_search(sv: SessionVariables):
+def update_drift_search(sv: SessionVariables) -> None:
     """Update drift rag state."""
     sv.include_drift_search.value = st.session_state[sv.include_drift_search.key]
 
 
-def update_local_search(sv: SessionVariables):
+def update_local_search(sv: SessionVariables) -> None:
     """Update local rag state."""
     sv.include_local_search.value = st.session_state[sv.include_local_search.key]
 
 
-def update_global_search(sv: SessionVariables):
+def update_global_search(sv: SessionVariables) -> None:
     """Update global rag state."""
     sv.include_global_search.value = st.session_state[sv.include_global_search.key]
 
 
-def create_side_bar(sv: SessionVariables):
+def create_side_bar(sv: SessionVariables) -> None:
     """Create a side bar panel.."""
     with st.sidebar:
         st.subheader("Options")

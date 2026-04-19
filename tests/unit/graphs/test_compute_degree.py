@@ -27,7 +27,7 @@ def _normalize(df: pd.DataFrame) -> pd.DataFrame:
 def _compute_degree_via_nx(relationships: pd.DataFrame) -> pd.DataFrame:
     """Compute degree using NetworkX directly."""
     graph = nx.from_pandas_edgelist(
-        relationships, source="source", target="target", edge_attr=["weight"]
+        relationships, source="source", target="target", edge_attr=["weight"],
     )
     return pd.DataFrame([
         {"title": node, "degree": int(degree)} for node, degree in graph.degree
@@ -121,7 +121,7 @@ def test_larger_graph():
 
 def test_fixture_graph():
     """Degree computation on the realistic A Christmas Carol fixture should match NetworkX."""
-    with open(FIXTURES_DIR / "graph.json") as f:
+    with open(FIXTURES_DIR / "graph.json", encoding="utf-8") as f:
         data = json.load(f)
     rels = pd.DataFrame(data["edges"])
     nx_result = _normalize(_compute_degree_via_nx(rels))

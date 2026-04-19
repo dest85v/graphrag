@@ -44,7 +44,7 @@ class Datasource(ABC):
         raise NotImplementedError
 
     def write(
-        self, table: str, df: pd.DataFrame, mode: WriteMode | None = None
+        self, table: str, df: pd.DataFrame, mode: WriteMode | None = None,
     ) -> None:
         """Write method definition."""
         raise NotImplementedError

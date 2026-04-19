@@ -56,7 +56,7 @@ def calculate_pmi_edge_weights(
         .rename(columns={"prop_occurrence": "target_prop"})
     )
     edges_df[edge_weight_col] = edges_df["prop_weight"] * np.log2(
-        edges_df["prop_weight"] / (edges_df["source_prop"] * edges_df["target_prop"])
+        edges_df["prop_weight"] / (edges_df["source_prop"] * edges_df["target_prop"]),
     )
 
     return edges_df.drop(columns=["prop_weight", "source_prop", "target_prop"])
@@ -88,7 +88,7 @@ def calculate_rrf_edge_weights(
 
     edges_df["pmi_rank"] = edges_df[edge_weight_col].rank(method="min", ascending=False)
     edges_df["raw_weight_rank"] = edges_df[edge_weight_col].rank(
-        method="min", ascending=False
+        method="min", ascending=False,
     )
     edges_df[edge_weight_col] = edges_df.apply(
         lambda x: (

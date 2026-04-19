@@ -37,7 +37,7 @@ def transform_series(series: pd.Series, fn: Callable[[Any], Any]) -> pd.Series:
 
 
 def join(
-    left: pd.DataFrame, right: pd.DataFrame, key: str, strategy: MergeHow = "left"
+    left: pd.DataFrame, right: pd.DataFrame, key: str, strategy: MergeHow = "left",
 ) -> pd.DataFrame:
     """Perform a table join."""
     return left.merge(right, on=key, how=strategy)

@@ -11,7 +11,7 @@ from pathlib import Path
 
 from graphrag_cache.cache_type import CacheType
 
-import graphrag.api as api
+from graphrag import api
 from graphrag.callbacks.console_workflow_callbacks import ConsoleWorkflowCallbacks
 from graphrag.config.enums import IndexingMethod
 from graphrag.config.load_config import load_config
@@ -24,10 +24,10 @@ warnings.filterwarnings("ignore", message=".*NumbaDeprecationWarning.*")
 logger = logging.getLogger(__name__)
 
 
-def _register_signal_handlers():
+def _register_signal_handlers() -> None:
     import signal
 
-    def handle_signal(signum, _):
+    def handle_signal(signum, _) -> None:
         # Handle the signal here
         logger.debug(f"Received signal {signum}, exiting...")  # noqa: G004
         for task in asyncio.all_tasks():
@@ -48,7 +48,7 @@ def index_cli(
     cache: bool,
     dry_run: bool,
     skip_validation: bool,
-):
+) -> None:
     """Run the pipeline with the given config."""
     config = load_config(root_dir=root_dir)
     _run_index(
@@ -68,7 +68,7 @@ def update_cli(
     verbose: bool,
     cache: bool,
     skip_validation: bool,
-):
+) -> None:
     """Run the pipeline with the given config."""
     config = load_config(
         root_dir=root_dir,
@@ -93,7 +93,7 @@ def _run_index(
     cache,
     dry_run,
     skip_validation,
-):
+) -> None:
     # Configure the root logger with the specified log level
     from graphrag.logger.standard_logging import init_loggers
 
@@ -128,7 +128,7 @@ def _run_index(
             is_update_run=is_update_run,
             callbacks=[ConsoleWorkflowCallbacks(verbose=verbose)],
             verbose=verbose,
-        )
+        ),
     )
     encountered_errors = any(output.error is not None for output in outputs)
 

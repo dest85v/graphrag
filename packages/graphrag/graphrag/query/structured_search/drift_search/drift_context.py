@@ -56,7 +56,7 @@ class DRIFTSearchContextBuilder(DRIFTContextBuilder):
         local_mixed_context: LocalSearchMixedContext | None = None,
         reduce_system_prompt: str | None = None,
         response_type: str | None = None,
-    ):
+    ) -> None:
         """Initialize the DRIFT search context builder with necessary components."""
         self.config = config
         self.model = model
@@ -137,7 +137,7 @@ class DRIFTSearchContextBuilder(DRIFTContextBuilder):
                 missing_embedding_error.format(
                     missing=report_df["full_content_embedding"].isna().sum(),
                     total=len(report_df),
-                )
+                ),
             )
         return report_df
 
@@ -166,7 +166,7 @@ class DRIFTSearchContextBuilder(DRIFTContextBuilder):
         )
 
     async def build_context(
-        self, query: str, **kwargs
+        self, query: str, **kwargs,
     ) -> tuple[pd.DataFrame, dict[str, int]]:
         """
         Build DRIFT search context.
@@ -205,7 +205,7 @@ class DRIFTSearchContextBuilder(DRIFTContextBuilder):
 
         # Check compatibility between query embedding and document embeddings
         if not self.check_query_doc_encodings(
-            query_embedding, report_df["full_content_embedding"].iloc[0]
+            query_embedding, report_df["full_content_embedding"].iloc[0],
         ):
             error_message = (
                 "Query and document embeddings are not compatible. "
@@ -216,10 +216,10 @@ class DRIFTSearchContextBuilder(DRIFTContextBuilder):
         # Vectorized cosine similarity computation
         query_norm = np.linalg.norm(query_embedding)
         document_norms = np.linalg.norm(
-            report_df["full_content_embedding"].to_list(), axis=1
+            report_df["full_content_embedding"].to_list(), axis=1,
         )
         dot_products = np.dot(
-            np.vstack(report_df["full_content_embedding"].to_list()), query_embedding
+            np.vstack(report_df["full_content_embedding"].to_list()), query_embedding,
         )
         report_df["similarity"] = dot_products / (document_norms * query_norm)
 

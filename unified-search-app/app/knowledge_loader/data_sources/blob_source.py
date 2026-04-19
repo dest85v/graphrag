@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 @st.cache_data(ttl=60 * 60 * 24)
 def _get_container(account_name: str, container_name: str) -> ContainerClient:
     """Return container from blob storage."""
-    print("LOGIN---------------")  # noqa T201
+    print("LOGIN---------------")  # noqa: T201
     account_url = f"https://{account_name}.blob.core.windows.net"
     default_credential = DefaultAzureCredential()
     blob_service_client = BlobServiceClient(account_url, credential=default_credential)
@@ -79,7 +79,7 @@ def load_blob_file(
 class BlobDatasource(Datasource):
     """Datasource that reads from a blob storage parquet file."""
 
-    def __init__(self, database: str):
+    def __init__(self, database: str) -> None:
         """Init method definition."""
         self._database = database
 

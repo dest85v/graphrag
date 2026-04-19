@@ -63,7 +63,7 @@ class LocalSearchMixedContext(LocalContextBuilder):
         covariates: dict[str, list[Covariate]] | None = None,
         tokenizer: Tokenizer | None = None,
         embedding_vectorstore_key: str = EntityVectorStoreKey.ID,
-    ):
+    ) -> None:
         if community_reports is None:
             community_reports = []
         if relationships is None:
@@ -130,7 +130,7 @@ class LocalSearchMixedContext(LocalContextBuilder):
         # if there is conversation history, attached the previous user questions to the current query
         if conversation_history:
             pre_user_questions = "\n".join(
-                conversation_history.get_user_turns(conversation_history_max_turns)
+                conversation_history.get_user_turns(conversation_history_max_turns),
             )
             query = f"{query}\n{pre_user_questions}"
 
@@ -165,8 +165,8 @@ class LocalSearchMixedContext(LocalContextBuilder):
             if conversation_history_context.strip() != "":
                 final_context.append(conversation_history_context)
                 final_context_data = conversation_history_context_data
-                max_context_tokens = max_context_tokens - len(
-                    self.tokenizer.encode(conversation_history_context)
+                max_context_tokens -= len(
+                    self.tokenizer.encode(conversation_history_context),
                 )
 
         # build community context
@@ -286,19 +286,18 @@ class LocalSearchMixedContext(LocalContextBuilder):
             if context_key not in context_data:
                 context_data[context_key] = candidate_context_data
                 context_data[context_key]["in_context"] = False
+            elif (
+                "id" in candidate_context_data.columns
+                and "id" in context_data[context_key].columns
+            ):
+                candidate_context_data["in_context"] = candidate_context_data[
+                    "id"
+                ].isin(  # cspell:disable-line
+                    context_data[context_key]["id"],
+                )
+                context_data[context_key] = candidate_context_data
             else:
-                if (
-                    "id" in candidate_context_data.columns
-                    and "id" in context_data[context_key].columns
-                ):
-                    candidate_context_data["in_context"] = candidate_context_data[
-                        "id"
-                    ].isin(  # cspell:disable-line
-                        context_data[context_key]["id"]
-                    )
-                    context_data[context_key] = candidate_context_data
-                else:
-                    context_data[context_key]["in_context"] = True
+                context_data[context_key]["in_context"] = True
         return (str(context_text), context_data)
 
     def _build_text_unit_context(
@@ -323,14 +322,14 @@ class LocalSearchMixedContext(LocalContextBuilder):
             entity_relationships = [
                 rel
                 for rel in relationship_values
-                if rel.source == entity.title or rel.target == entity.title
+                if entity.title in {rel.source, rel.target}
             ]
 
             for text_id in entity.text_unit_ids or []:
                 if text_id not in text_unit_ids_set and text_id in self.text_units:
                     selected_unit = deepcopy(self.text_units[text_id])
                     num_relationships = count_relationships(
-                        entity_relationships, selected_unit
+                        entity_relationships, selected_unit,
                     )
                     text_unit_ids_set.add(text_id)
                     unit_info_list.append((selected_unit, index, num_relationships))
@@ -358,17 +357,16 @@ class LocalSearchMixedContext(LocalContextBuilder):
             if context_key not in context_data:
                 candidate_context_data["in_context"] = False
                 context_data[context_key] = candidate_context_data
+            elif (
+                "id" in candidate_context_data.columns
+                and "id" in context_data[context_key].columns
+            ):
+                candidate_context_data["in_context"] = candidate_context_data[
+                    "id"
+                ].isin(context_data[context_key]["id"])
+                context_data[context_key] = candidate_context_data
             else:
-                if (
-                    "id" in candidate_context_data.columns
-                    and "id" in context_data[context_key].columns
-                ):
-                    candidate_context_data["in_context"] = candidate_context_data[
-                        "id"
-                    ].isin(context_data[context_key]["id"])
-                    context_data[context_key] = candidate_context_data
-                else:
-                    context_data[context_key]["in_context"] = True
+                context_data[context_key]["in_context"] = True
 
         return (str(context_text), context_data)
 
@@ -426,7 +424,7 @@ class LocalSearchMixedContext(LocalContextBuilder):
             current_context.append(relationship_context)
             current_context_data["relationships"] = relationship_context_data
             total_tokens = entity_tokens + len(
-                self.tokenizer.encode(relationship_context)
+                self.tokenizer.encode(relationship_context),
             )
 
             # build covariate context
@@ -445,7 +443,7 @@ class LocalSearchMixedContext(LocalContextBuilder):
 
             if total_tokens > max_context_tokens:
                 logger.warning(
-                    "Reached token limit - reverting to previous context state"
+                    "Reached token limit - reverting to previous context state",
                 )
                 break
 
@@ -480,7 +478,7 @@ class LocalSearchMixedContext(LocalContextBuilder):
                         candidate_df["in_context"] = candidate_df[
                             "id"
                         ].isin(  # cspell:disable-line
-                            in_context_df["id"]
+                            in_context_df["id"],
                         )
                         final_context_data[key] = candidate_df
                     else:

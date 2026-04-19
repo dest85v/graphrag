@@ -115,12 +115,12 @@ async def prepare_azurite_data(input_path: str, azure: dict) -> Callable[[], Non
         )
         await input_storage.set(file_path, text, encoding="utf-8")
 
-    return lambda: input_storage._delete_container()  # noqa: SLF001
+    return input_storage._delete_container  # noqa: SLF001
 
 
 class TestIndexer:
     params: ClassVar[dict[str, list[tuple[str, dict[str, Any]]]]] = {
-        "test_fixture": _load_fixtures()
+        "test_fixture": _load_fixtures(),
     }
 
     def __run_indexer(
@@ -148,7 +148,7 @@ class TestIndexer:
         )
 
     def __assert_indexer_outputs(
-        self, root: Path, workflow_config: dict[str, dict[str, Any]]
+        self, root: Path, workflow_config: dict[str, dict[str, Any]],
     ):
         output_path = root / "output"
 
@@ -180,7 +180,7 @@ class TestIndexer:
                     output_df = pd.read_parquet(output_path / artifact)
                 elif artifact.endswith(".csv"):
                     output_df = pd.read_csv(
-                        output_path / artifact, keep_default_na=False
+                        output_path / artifact, keep_default_na=False,
                     )
                 else:
                     continue

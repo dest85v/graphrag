@@ -73,7 +73,7 @@ class CompletionThread(threading.Thread):
         self._output_queue = output_queue
         self._completion = completion
 
-    def run(self):
+    def run(self) -> None:
         """Run the completion thread."""
         while True and not self._quit_process_event.is_set():
             try:

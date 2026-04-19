@@ -10,11 +10,11 @@ import pandas as pd
 from graphrag_llm.completion import create_completion
 from graphrag_llm.tokenizer import Tokenizer
 
-import graphrag.data_model.schemas as schemas
 from graphrag.cache.cache_key_creator import cache_key_creator
 from graphrag.callbacks.workflow_callbacks import WorkflowCallbacks
 from graphrag.config.enums import AsyncType
 from graphrag.config.models.graph_rag_config import GraphRagConfig
+from graphrag.data_model import schemas
 from graphrag.data_model.data_reader import DataReader
 from graphrag.index.operations.finalize_community_reports import (
     finalize_community_reports,
@@ -51,12 +51,12 @@ async def run_workflow(
 
     claims = None
     if config.extract_claims.enabled and await context.output_table_provider.has(
-        "covariates"
+        "covariates",
     ):
         claims = await reader.covariates()
 
     model_config = config.get_completion_model_config(
-        config.community_reports.completion_model_id
+        config.community_reports.completion_model_id,
     )
     prompts = config.community_reports.resolved_prompts()
 
@@ -144,7 +144,7 @@ def _prep_nodes(input: pd.DataFrame) -> pd.DataFrame:
     """Prepare nodes by filtering, filling missing descriptions, and creating NODE_DETAILS."""
     # Fill missing values in DESCRIPTION
     input.loc[:, schemas.DESCRIPTION] = input.loc[:, schemas.DESCRIPTION].fillna(
-        "No Description"
+        "No Description",
     )
 
     # Create NODE_DETAILS column
@@ -163,7 +163,7 @@ def _prep_nodes(input: pd.DataFrame) -> pd.DataFrame:
 
 def _prep_edges(input: pd.DataFrame) -> pd.DataFrame:
     # Fill missing DESCRIPTION
-    input.fillna(value={schemas.DESCRIPTION: "No Description"}, inplace=True)
+    input = input.fillna(value={schemas.DESCRIPTION: "No Description"})
 
     # Create EDGE_DETAILS column
     input.loc[:, schemas.EDGE_DETAILS] = input.loc[  # type: ignore
@@ -182,7 +182,7 @@ def _prep_edges(input: pd.DataFrame) -> pd.DataFrame:
 
 def _prep_claims(input: pd.DataFrame) -> pd.DataFrame:
     # Fill missing DESCRIPTION
-    input.fillna(value={schemas.DESCRIPTION: "No Description"}, inplace=True)
+    input = input.fillna(value={schemas.DESCRIPTION: "No Description"})
 
     # Create CLAIM_DETAILS column
     input.loc[:, schemas.CLAIM_DETAILS] = input.loc[  # type: ignore

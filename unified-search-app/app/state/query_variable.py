@@ -17,7 +17,7 @@ class QueryVariable:
     We just push them up to the query to keep it updated.
     """
 
-    def __init__(self, key: str, default: Any | None):
+    def __init__(self, key: str, default: Any | None) -> None:
         """Init method definition."""
         self._key = key
         val = st.query_params[key].lower() if key in st.query_params else default

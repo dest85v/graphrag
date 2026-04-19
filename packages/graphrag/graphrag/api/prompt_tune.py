@@ -117,12 +117,12 @@ async def generate_indexing_prompts(
 
     logger.info("Generating community report ranking description...")
     community_report_ranking = await generate_community_report_rating(
-        llm, domain=domain, persona=persona, docs=doc_list
+        llm, domain=domain, persona=persona, docs=doc_list,
     )
 
     entity_types = None
     extract_graph_llm_settings = config.get_completion_model_config(
-        config.extract_graph.completion_model_id
+        config.extract_graph.completion_model_id,
     )
     if discover_entity_types:
         logger.info("Generating entity types...")
@@ -164,7 +164,7 @@ async def generate_indexing_prompts(
 
     logger.info("Generating community reporter role...")
     community_reporter_role = await generate_community_reporter_role(
-        llm, domain=domain, persona=persona, docs=doc_list
+        llm, domain=domain, persona=persona, docs=doc_list,
     )
 
     logger.info("Generating community summarization prompt...")

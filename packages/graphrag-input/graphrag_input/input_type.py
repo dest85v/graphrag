@@ -22,6 +22,6 @@ class InputType(StrEnum):
     Parquet = "parquet"
     """The Parquet input type."""
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Get a string representation."""
         return f'"{self.value}"'

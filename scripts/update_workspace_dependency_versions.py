@@ -23,7 +23,7 @@ def _get_package_paths() -> list[Path]:
     return [p.resolve() for p in root_dir.glob("packages/*") if p.is_dir()]
 
 
-def update_workspace_dependency_versions():
+def update_workspace_dependency_versions() -> None:
     """Update dependency versions across workspace packages.
 
     Iterate through all the workspace packages and update cross-package

@@ -79,7 +79,7 @@ class ThreadedLLMEmbeddingFunction(Protocol):
     """
 
     def __call__(
-        self, /, request_id: str, **kwargs: Unpack["LLMEmbeddingArgs"]
+        self, /, request_id: str, **kwargs: Unpack["LLMEmbeddingArgs"],
     ) -> None:
         """Threaded embedding function."""
         ...
@@ -163,7 +163,7 @@ def embedding_thread_runner(
         quit_process_event: threading.Event,
         output_queue: "LLMEmbeddingResponseQueue",
         callback: ThreadedLLMEmbeddingResponseHandler,
-    ):
+    ) -> None:
         while True and not quit_process_event.is_set():
             try:
                 data = output_queue.get(timeout=1)
@@ -177,7 +177,7 @@ def embedding_thread_runner(
             if asyncio.iscoroutine(response):
                 response = asyncio.run(response)
 
-    def _process_input(request_id: str, **kwargs: Unpack["LLMEmbeddingArgs"]):
+    def _process_input(request_id: str, **kwargs: Unpack["LLMEmbeddingArgs"]) -> None:
         if not request_id:
             msg = "request_id needs to be passed as a keyword argument"
             raise ValueError(msg)
@@ -189,7 +189,7 @@ def embedding_thread_runner(
     )
     handle_response_thread.start()
 
-    def _cleanup():
+    def _cleanup() -> None:
         for _ in threads:
             input_queue.put(None)
 

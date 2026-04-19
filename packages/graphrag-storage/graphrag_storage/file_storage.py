@@ -43,7 +43,7 @@ class FileStorage(Storage):
     ) -> Iterator[str]:
         """Find files in the storage using a file pattern."""
         logger.info(
-            "Search [%s] for files matching [%s]", self._base_dir, file_pattern.pattern
+            "Search [%s] for files matching [%s]", self._base_dir, file_pattern.pattern,
         )
         all_files = list(self._base_dir.rglob("**/*"))
         logger.debug("All files and folders: %s", [file.name for file in all_files])
@@ -68,7 +68,7 @@ class FileStorage(Storage):
         )
 
     async def get(
-        self, key: str, as_bytes: bool | None = False, encoding: str | None = None
+        self, key: str, as_bytes: bool | None = False, encoding: str | None = None,
     ) -> Any:
         """Get method definition."""
         file_path = _join_path(self._base_dir, key)

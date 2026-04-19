@@ -28,7 +28,7 @@ class RegexENNounPhraseExtractor(BaseNounPhraseExtractor):
         max_word_length: int,
         exclude_nouns: list[str],
         word_delimiter: str,
-    ):
+    ) -> None:
         """
         Noun phrase extractor for English based on spaCy's noun_chunks and POS tagging.
 
@@ -78,7 +78,7 @@ class RegexENNounPhraseExtractor(BaseNounPhraseExtractor):
                 start += 1
             if start < len(tokens):
                 noun_phrase_texts.append(
-                    self.word_delimiter.join(t.text for t in tokens[start:])
+                    self.word_delimiter.join(t.text for t in tokens[start:]),
                 )
 
         tagged_noun_phrases = [
@@ -96,7 +96,7 @@ class RegexENNounPhraseExtractor(BaseNounPhraseExtractor):
         return list(filtered_noun_phrases)
 
     def _tag_noun_phrases(
-        self, noun_phrase: str, all_proper_nouns: set[str] | None = None
+        self, noun_phrase: str, all_proper_nouns: set[str] | None = None,
     ) -> dict[str, Any]:
         """Extract attributes of a noun chunk, to be used for filtering."""
         if all_proper_nouns is None:
@@ -112,7 +112,7 @@ class RegexENNounPhraseExtractor(BaseNounPhraseExtractor):
         )
         has_compound_words = is_compound(cleaned_tokens)
         has_valid_tokens = has_valid_token_length(
-            cleaned_tokens, self.max_word_length
+            cleaned_tokens, self.max_word_length,
         ) and all(self._is_valid_token(token) for token in cleaned_tokens)
         return {
             "cleaned_tokens": cleaned_tokens,

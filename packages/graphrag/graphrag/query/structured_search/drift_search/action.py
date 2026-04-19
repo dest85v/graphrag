@@ -24,7 +24,7 @@ class DriftAction:
         query: str,
         answer: str | None = None,
         follow_ups: list["DriftAction"] | None = None,
-    ):
+    ) -> None:
         """
         Initialize the DriftAction with a query, optional answer, and follow-up actions.
 
@@ -106,7 +106,7 @@ class DriftAction:
 
         return self
 
-    def compute_score(self, scorer: Any):
+    def compute_score(self, scorer: Any) -> None:
         """
         Compute the score for the action using the provided scorer.
 
@@ -172,7 +172,7 @@ class DriftAction:
 
     @classmethod
     def from_primer_response(
-        cls, query: str, response: str | dict[str, Any] | list[dict[str, Any]]
+        cls, query: str, response: str | dict[str, Any] | list[dict[str, Any]],
     ) -> "DriftAction":
         """
         Create a DriftAction from a DRIFTPrimer response.

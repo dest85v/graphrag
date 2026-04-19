@@ -78,12 +78,12 @@ class CompletionMessagesBuilder:
         if name:
             self._messages.append(
                 ChatCompletionSystemMessageParam(
-                    role="system", content=content, name=name
-                )
+                    role="system", content=content, name=name,
+                ),
             )
         else:
             self._messages.append(
-                ChatCompletionSystemMessageParam(role="system", content=content)
+                ChatCompletionSystemMessageParam(role="system", content=content),
             )
         return self
 
@@ -110,12 +110,12 @@ class CompletionMessagesBuilder:
         if name:
             self._messages.append(
                 ChatCompletionDeveloperMessageParam(
-                    role="developer", content=content, name=name
-                )
+                    role="developer", content=content, name=name,
+                ),
             )
         else:
             self._messages.append(
-                ChatCompletionDeveloperMessageParam(role="developer", content=content)
+                ChatCompletionDeveloperMessageParam(role="developer", content=content),
             )
 
         return self
@@ -142,8 +142,8 @@ class CompletionMessagesBuilder:
         """
         self._messages.append(
             ChatCompletionToolMessageParam(
-                role="tool", content=content, tool_call_id=tool_call_id
-            )
+                role="tool", content=content, tool_call_id=tool_call_id,
+            ),
         )
 
         return self
@@ -168,8 +168,8 @@ class CompletionMessagesBuilder:
         """
         self._messages.append(
             ChatCompletionFunctionMessageParam(
-                role="function", content=content, name=function_name
-            )
+                role="function", content=content, name=function_name,
+            ),
         )
 
         return self
@@ -196,11 +196,11 @@ class CompletionMessagesBuilder:
         """
         if name:
             self._messages.append(
-                ChatCompletionUserMessageParam(role="user", content=content, name=name)
+                ChatCompletionUserMessageParam(role="user", content=content, name=name),
             )
         else:
             self._messages.append(
-                ChatCompletionUserMessageParam(role="user", content=content)
+                ChatCompletionUserMessageParam(role="user", content=content),
             )
 
         return self
@@ -267,12 +267,12 @@ class CompletionContentPartBuilder:
         None
         """
         self._content_parts.append(
-            ChatCompletionContentPartTextParam(text=text, type="text")
+            ChatCompletionContentPartTextParam(text=text, type="text"),
         )
         return self
 
     def add_image_part(
-        self, url: str, detail: Literal["auto", "low", "high"]
+        self, url: str, detail: Literal["auto", "low", "high"],
     ) -> "CompletionContentPartBuilder":
         """Add image part.
 
@@ -289,13 +289,13 @@ class CompletionContentPartBuilder:
         """
         self._content_parts.append(
             ChatCompletionContentPartImageParam(
-                image_url=ImageURL(url=url, detail=detail), type="image_url"
-            )
+                image_url=ImageURL(url=url, detail=detail), type="image_url",
+            ),
         )
         return self
 
     def add_audio_part(
-        self, data: str, _format: Literal["wav", "mp3"]
+        self, data: str, _format: Literal["wav", "mp3"],
     ) -> "CompletionContentPartBuilder":
         """Add audio part.
 
@@ -312,8 +312,8 @@ class CompletionContentPartBuilder:
         """
         self._content_parts.append(
             ChatCompletionContentPartInputAudioParam(
-                input_audio=InputAudio(data=data, format=_format), type="input_audio"
-            )
+                input_audio=InputAudio(data=data, format=_format), type="input_audio",
+            ),
         )
         return self
 

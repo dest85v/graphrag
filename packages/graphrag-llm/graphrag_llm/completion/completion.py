@@ -48,7 +48,7 @@ class LLMCompletion(ABC):
         cache: "Cache | None" = None,
         cache_key_creator: "CacheKeyCreator",
         **kwargs: Any,
-    ):
+    ) -> None:
         """Initialize the LLMCompletion.
 
         Args
@@ -239,7 +239,7 @@ class LLMCompletion(ABC):
         def handle_response(
             request_id: str,
             resp: "LLMCompletionResponse[ResponseFormat] | Iterator[LLMCompletionChunk] | Exception",
-        ):
+        ) -> None:
             responses[int(request_id)] = resp
 
         with self.completion_thread_pool(

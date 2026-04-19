@@ -114,7 +114,7 @@ class LLMCompletionResponse(ChatCompletion, Generic[ResponseFormat]):
 
 
 class LLMCompletionArgs(
-    TypedDict, Generic[ResponseFormat], total=False, extra_items=Any
+    TypedDict, Generic[ResponseFormat], total=False, extra_items=Any,
 ):
     """Arguments for LLMCompletionFunction.
 
@@ -167,7 +167,7 @@ class LLMCompletionFunction(Protocol):
     """
 
     def __call__(
-        self, /, **kwargs: Unpack[LLMCompletionArgs[ResponseFormat]]
+        self, /, **kwargs: Unpack[LLMCompletionArgs[ResponseFormat]],
     ) -> LLMCompletionResponse[ResponseFormat] | Iterator[LLMCompletionChunk]:
         """Completion function."""
         ...
@@ -182,7 +182,7 @@ class AsyncLLMCompletionFunction(Protocol):
     """
 
     def __call__(
-        self, /, **kwargs: Unpack[LLMCompletionArgs[ResponseFormat]]
+        self, /, **kwargs: Unpack[LLMCompletionArgs[ResponseFormat]],
     ) -> Awaitable[
         LLMCompletionResponse[ResponseFormat] | AsyncIterator[LLMCompletionChunk]
     ]:
@@ -267,7 +267,7 @@ and rate limiting can be reused for both completions and embeddings.
 """
 
 AsyncLLMFunction = TypeVar(
-    "AsyncLLMFunction", AsyncLLMCompletionFunction, AsyncLLMEmbeddingFunction
+    "AsyncLLMFunction", AsyncLLMCompletionFunction, AsyncLLMEmbeddingFunction,
 )
 """Generic representation of asynchronous completion and embedding functions.
 

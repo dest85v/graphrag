@@ -18,7 +18,7 @@ async def test_prune_graph():
 
     config = get_default_graphrag_config()
     config.prune_graph = PruneGraphConfig(
-        min_node_freq=4, min_node_degree=0, min_edge_weight_pct=0
+        min_node_freq=4, min_node_degree=0, min_edge_weight_pct=0,
     )
 
     await run_workflow(config, context)

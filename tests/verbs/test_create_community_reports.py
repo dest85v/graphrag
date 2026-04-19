@@ -27,13 +27,13 @@ MOCK_RESPONSES = [
         rating_explanation="<rating_explanation>",
         findings=[
             FindingModel(
-                summary="<insight_1_summary>", explanation="<insight_1_explanation"
+                summary="<insight_1_summary>", explanation="<insight_1_explanation",
             ),
             FindingModel(
-                summary="<insight_2_summary>", explanation="<insight_2_explanation"
+                summary="<insight_2_summary>", explanation="<insight_2_explanation",
             ),
         ],
-    ).model_dump_json()
+    ).model_dump_json(),
 ]
 
 
@@ -46,7 +46,7 @@ async def test_create_community_reports():
             "relationships",
             "entities",
             "communities",
-        ]
+        ],
     )
 
     config = get_default_graphrag_config()

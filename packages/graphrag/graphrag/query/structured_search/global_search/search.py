@@ -6,6 +6,7 @@
 import asyncio
 import json
 import logging
+import operator
 import time
 from collections.abc import AsyncGenerator, AsyncIterator
 from dataclasses import dataclass
@@ -74,7 +75,7 @@ class GlobalSearch(BaseSearch[GlobalContextBuilder]):
         reduce_max_length: int = 2000,
         context_builder_params: dict[str, Any] | None = None,
         concurrent_coroutines: int = 32,
-    ):
+    ) -> None:
         super().__init__(
             model=model,
             context_builder=context_builder,
@@ -91,8 +92,8 @@ class GlobalSearch(BaseSearch[GlobalContextBuilder]):
         self.callbacks = callbacks or []
         self.max_data_tokens = max_data_tokens
 
-        self.map_llm_params = map_llm_params if map_llm_params else {}
-        self.reduce_llm_params = reduce_llm_params if reduce_llm_params else {}
+        self.map_llm_params = map_llm_params or {}
+        self.reduce_llm_params = reduce_llm_params or {}
         if json_mode:
             self.map_llm_params["response_format_json_object"] = True
         else:
@@ -225,7 +226,7 @@ class GlobalSearch(BaseSearch[GlobalContextBuilder]):
         search_prompt = ""
         try:
             search_prompt = self.map_system_prompt.format(
-                context_data=context_data, max_length=max_length
+                context_data=context_data, max_length=max_length,
             )
 
             messages_builder = (
@@ -247,7 +248,7 @@ class GlobalSearch(BaseSearch[GlobalContextBuilder]):
                 processed_response = self._parse_search_response(search_response)
             except ValueError:
                 logger.warning(
-                    "Warning: Error parsing search response json - skipping this batch"
+                    "Warning: Error parsing search response json - skipping this batch",
                 )
                 processed_response = []
 
@@ -340,7 +341,7 @@ class GlobalSearch(BaseSearch[GlobalContextBuilder]):
             if len(filtered_key_points) == 0 and not self.allow_general_knowledge:
                 # return no data answer if no key points are found
                 logger.warning(
-                    "Warning: All map responses have score 0 (i.e., no relevant information found from the dataset), returning a canned 'I do not know' answer. You can try enabling `allow_general_knowledge` to encourage the LLM to incorporate relevant general knowledge, at the risk of increasing hallucinations."
+                    "Warning: All map responses have score 0 (i.e., no relevant information found from the dataset), returning a canned 'I do not know' answer. You can try enabling `allow_general_knowledge` to encourage the LLM to incorporate relevant general knowledge, at the risk of increasing hallucinations.",
                 )
                 return SearchResult(
                     response=NO_DATA_ANSWER,
@@ -354,7 +355,7 @@ class GlobalSearch(BaseSearch[GlobalContextBuilder]):
 
             filtered_key_points = sorted(
                 filtered_key_points,
-                key=lambda x: x["score"],  # type: ignore
+                key=operator.itemgetter("score"),  # type: ignore
                 reverse=True,  # type: ignore
             )
 
@@ -363,10 +364,10 @@ class GlobalSearch(BaseSearch[GlobalContextBuilder]):
             for point in filtered_key_points:
                 formatted_response_data = []
                 formatted_response_data.append(
-                    f"----Analyst {point['analyst'] + 1}----"
+                    f"----Analyst {point['analyst'] + 1}----",
                 )
                 formatted_response_data.append(
-                    f"Importance Score: {point['score']}"  # type: ignore
+                    f"Importance Score: {point['score']}",  # type: ignore
                 )
                 formatted_response_data.append(point["answer"])  # type: ignore
                 formatted_response_text = "\n".join(formatted_response_data)
@@ -463,14 +464,14 @@ class GlobalSearch(BaseSearch[GlobalContextBuilder]):
         if len(filtered_key_points) == 0 and not self.allow_general_knowledge:
             # return no data answer if no key points are found
             logger.warning(
-                "Warning: All map responses have score 0 (i.e., no relevant information found from the dataset), returning a canned 'I do not know' answer. You can try enabling `allow_general_knowledge` to encourage the LLM to incorporate relevant general knowledge, at the risk of increasing hallucinations."
+                "Warning: All map responses have score 0 (i.e., no relevant information found from the dataset), returning a canned 'I do not know' answer. You can try enabling `allow_general_knowledge` to encourage the LLM to incorporate relevant general knowledge, at the risk of increasing hallucinations.",
             )
             yield NO_DATA_ANSWER
             return
 
         filtered_key_points = sorted(
             filtered_key_points,
-            key=lambda x: x["score"],  # type: ignore
+            key=operator.itemgetter("score"),  # type: ignore
             reverse=True,  # type: ignore
         )
 

@@ -11,7 +11,7 @@ from graphrag.index.typing.workflow import Workflow
 class Pipeline:
     """Encapsulates running workflows."""
 
-    def __init__(self, workflows: list[Workflow]):
+    def __init__(self, workflows: list[Workflow]) -> None:
         self.workflows = workflows
 
     def run(self) -> Generator[Workflow]:

@@ -19,6 +19,6 @@ class Chunker(ABC):
 
     @abstractmethod
     def chunk(
-        self, text: str, transform: Callable[[str], str] | None = None
+        self, text: str, transform: Callable[[str], str] | None = None,
     ) -> list[TextChunk]:
         """Chunk method definition."""

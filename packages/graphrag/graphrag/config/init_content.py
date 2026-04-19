@@ -67,7 +67,7 @@ cache:
   storage:
     type: {graphrag_config_defaults.cache.storage.type} # [file, blob, cosmosdb]
     base_dir: "{graphrag_config_defaults.cache.storage.base_dir}"
-    
+
 vector_store:
   type: {vector_store_defaults.type}
   db_uri: {vector_store_defaults.db_uri}

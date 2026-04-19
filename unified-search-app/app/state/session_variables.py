@@ -13,7 +13,7 @@ from state.session_variable import SessionVariable
 class SessionVariables:
     """Define all the session variables that will be used in the app."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Init method definition."""
         self.dataset = QueryVariable("dataset", "")
         self.datasets = SessionVariable([])

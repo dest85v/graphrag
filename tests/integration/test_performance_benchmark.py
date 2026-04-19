@@ -105,7 +105,7 @@ def test_performance():
     print("\nPerformance Summary:")
     print(f"  Short docs (~50 words): avg={avg_short * 1000:.1f}ms")
     print(
-        f"  Medium docs (~500 words): avg={avg_medium * 1000:.1f}ms, p95={p95_medium * 1000:.1f}ms"
+        f"  Medium docs (~500 words): avg={avg_medium * 1000:.1f}ms, p95={p95_medium * 1000:.1f}ms",
     )
     print(f"  Large docs (~2000 words): avg={avg_large * 1000:.1f}ms")
 

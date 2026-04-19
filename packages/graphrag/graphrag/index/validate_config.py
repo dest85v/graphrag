@@ -35,8 +35,8 @@ def validate_config_names(parameters: GraphRagConfig) -> None:
         try:
             response = asyncio.run(
                 embed_llm.embedding_async(
-                    input=["This is an LLM Embedding Test String"]
-                )
+                    input=["This is an LLM Embedding Test String"],
+                ),
             )
             logger.info("Embedding LLM Config Params Validated")
 

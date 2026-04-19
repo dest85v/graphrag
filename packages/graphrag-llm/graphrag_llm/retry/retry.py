@@ -12,7 +12,7 @@ class Retry(ABC):
     """Retry Abstract Base Class."""
 
     @abstractmethod
-    def __init__(self, /, **kwargs: Any):
+    def __init__(self, /, **kwargs: Any) -> None:
         """Initialize Retry."""
         raise NotImplementedError
 

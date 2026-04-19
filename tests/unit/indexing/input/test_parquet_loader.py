@@ -13,7 +13,7 @@ async def test_parquet_loader_one_file():
     storage = create_storage(
         StorageConfig(
             base_dir="tests/unit/indexing/input/data/one-parquet",
-        )
+        ),
     )
     reader = create_input_reader(config, storage)
     documents = await reader.read_files()
@@ -34,7 +34,7 @@ async def test_parquet_loader_one_file_with_title():
     storage = create_storage(
         StorageConfig(
             base_dir="tests/unit/indexing/input/data/one-parquet",
-        )
+        ),
     )
     reader = create_input_reader(config, storage)
     documents = await reader.read_files()
@@ -52,7 +52,7 @@ async def test_parquet_loader_text_content():
     storage = create_storage(
         StorageConfig(
             base_dir="tests/unit/indexing/input/data/one-parquet",
-        )
+        ),
     )
     reader = create_input_reader(config, storage)
     documents = await reader.read_files()

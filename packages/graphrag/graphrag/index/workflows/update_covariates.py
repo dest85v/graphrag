@@ -29,11 +29,11 @@ async def run_workflow(
     )
 
     if await previous_table_provider.has(
-        "covariates"
+        "covariates",
     ) and await delta_table_provider.has("covariates"):
         logger.info("Updating Covariates")
         await _update_covariates(
-            previous_table_provider, delta_table_provider, output_table_provider
+            previous_table_provider, delta_table_provider, output_table_provider,
         )
 
     logger.info("Workflow completed: update_covariates")
@@ -54,7 +54,7 @@ async def _update_covariates(
 
 
 def _merge_covariates(
-    old_covariates: pd.DataFrame, delta_covariates: pd.DataFrame
+    old_covariates: pd.DataFrame, delta_covariates: pd.DataFrame,
 ) -> pd.DataFrame:
     """Merge the covariates.
 
@@ -73,7 +73,7 @@ def _merge_covariates(
     # Get the max human readable id from the old covariates and update the delta covariates
     initial_id = old_covariates["human_readable_id"].max() + 1
     delta_covariates["human_readable_id"] = np.arange(
-        initial_id, initial_id + len(delta_covariates)
+        initial_id, initial_id + len(delta_covariates),
     )
 
     # Concatenate the old and delta covariates

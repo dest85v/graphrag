@@ -60,7 +60,7 @@ def test_load_config():
 
     # Load from dir
     config = load_config(
-        config_initializer=TestConfigModel, config_path=config_directory, set_cwd=False
+        config_initializer=TestConfigModel, config_path=config_directory, set_cwd=False,
     )
 
     assert config.name == "test_name"

@@ -23,7 +23,7 @@ def load_local_prompt_config(base_path="") -> dict[str, str]:
     prompts = {}
 
     for path in os.listdir(base_path):  # noqa: PTH208
-        with open(os.path.join(base_path, path), "r") as f:  # noqa: UP015, PTH123, PTH118
+        with open(os.path.join(base_path, path), "r", encoding="utf-8") as f:  # noqa: UP015, PTH123, PTH118
             map_name = path.split(".")[0]
             prompts[map_name] = f.read()
     return prompts
@@ -34,7 +34,7 @@ class LocalDatasource(Datasource):
 
     _base_path: str
 
-    def __init__(self, base_path: str):
+    def __init__(self, base_path: str) -> None:
         """Init method definition."""
         self._base_path = base_path
 
@@ -52,7 +52,7 @@ class LocalDatasource(Datasource):
                 error_msg = f"Table {table} does not exist"
                 raise FileNotFoundError(error_msg)
 
-            print(f"Table {table} does not exist")  # noqa T201
+            print(f"Table {table} does not exist")  # noqa: T201
             return (
                 pd.DataFrame(data=[], columns=columns)
                 if columns is not None

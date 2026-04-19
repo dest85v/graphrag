@@ -39,7 +39,7 @@ class BaseQuestionGen(ABC):
         tokenizer: Tokenizer | None = None,
         model_params: dict[str, Any] | None = None,
         context_builder_params: dict[str, Any] | None = None,
-    ):
+    ) -> None:
         self.model = model
         self.context_builder = context_builder
         self.tokenizer = tokenizer or model.tokenizer

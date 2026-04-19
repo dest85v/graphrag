@@ -15,7 +15,7 @@ class ConsoleWorkflowCallbacks(NoopWorkflowCallbacks):
 
     _verbose = False
 
-    def __init__(self, verbose=False):
+    def __init__(self, verbose=False) -> None:
         self._verbose = verbose
 
     def pipeline_start(self, names: list[str]) -> None:
@@ -32,7 +32,7 @@ class ConsoleWorkflowCallbacks(NoopWorkflowCallbacks):
 
     def workflow_end(self, name: str, instance: object) -> None:
         """Execute this callback when a workflow ends."""
-        print("")  # account for potential return on prior progress
+        print()  # account for potential return on prior progress
         print(f"Workflow complete: {name}")
         if self._verbose:
             print(instance)

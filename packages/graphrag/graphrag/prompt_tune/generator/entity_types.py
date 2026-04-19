@@ -69,6 +69,6 @@ async def generate_entity_types(
         return parsed_model.entity_types if parsed_model else []
 
     non_json_response: LLMCompletionResponse = await model.completion_async(
-        messages=messages
+        messages=messages,
     )  # type: ignore
     return non_json_response.content

@@ -24,7 +24,7 @@ ItemType = TypeVar("ItemType")
 class ParallelizationError(ValueError):
     """Exception for invalid parallel processing."""
 
-    def __init__(self, num_errors: int, example: str | None = None):
+    def __init__(self, num_errors: int, example: str | None = None) -> None:
         msg = f"{num_errors} Errors occurred while running parallel transformation, could not complete!"
         if example:
             msg += f"\nExample error: {example}"
@@ -44,11 +44,11 @@ async def derive_from_rows(
     match async_type:
         case AsyncType.AsyncIO:
             return await derive_from_rows_asyncio(
-                input, transform, callbacks, num_threads, progress_msg
+                input, transform, callbacks, num_threads, progress_msg,
             )
         case AsyncType.Threaded:
             return await derive_from_rows_asyncio_threads(
-                input, transform, callbacks, num_threads, progress_msg
+                input, transform, callbacks, num_threads, progress_msg,
             )
         case _:
             msg = f"Unsupported scheduling type {async_type}"
@@ -81,7 +81,7 @@ async def derive_from_rows_asyncio_threads(
         return await asyncio.gather(*[execute_task(task) for task in tasks])
 
     return await _derive_from_rows_base(
-        input, transform, callbacks, gather, progress_msg
+        input, transform, callbacks, gather, progress_msg,
     )
 
 
@@ -112,7 +112,7 @@ async def derive_from_rows_asyncio(
         return await asyncio.gather(*tasks)
 
     return await _derive_from_rows_base(
-        input, transform, callbacks, gather, progress_msg
+        input, transform, callbacks, gather, progress_msg,
     )
 
 
@@ -135,7 +135,7 @@ async def _derive_from_rows_base(
     This is useful for IO bound operations.
     """
     tick = progress_ticker(
-        callbacks.progress, num_total=len(input), description=progress_msg
+        callbacks.progress, num_total=len(input), description=progress_msg,
     )
     errors: list[tuple[BaseException, str]] = []
 
@@ -158,7 +158,7 @@ async def _derive_from_rows_base(
 
     for error, stack in errors:
         logger.error(
-            "parallel transformation error", exc_info=error, extra={"stack": stack}
+            "parallel transformation error", exc_info=error, extra={"stack": stack},
         )
 
     if len(errors) > 0:

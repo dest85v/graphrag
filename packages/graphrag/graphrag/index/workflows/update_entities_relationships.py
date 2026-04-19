@@ -71,7 +71,7 @@ async def _update_entities_and_relationships(
     delta_entities = await DataReader(delta_table_provider).entities()
 
     merged_entities_df, entity_id_mapping = _group_and_resolve_entities(
-        old_entities, delta_entities
+        old_entities, delta_entities,
     )
 
     # Update Relationships
@@ -83,11 +83,11 @@ async def _update_entities_and_relationships(
     )
 
     merged_relationships_df = filter_orphan_relationships(
-        merged_relationships_df, merged_entities_df
+        merged_relationships_df, merged_entities_df,
     )
 
     summarization_model_config = config.get_completion_model_config(
-        config.summarize_descriptions.completion_model_id
+        config.summarize_descriptions.completion_model_id,
     )
     prompts = config.summarize_descriptions.resolved_prompts()
     model = create_completion(
@@ -113,7 +113,7 @@ async def _update_entities_and_relationships(
     # Save the updated entities back to storage
     await output_table_provider.write_dataframe("entities", merged_entities_df)
     await output_table_provider.write_dataframe(
-        "relationships", merged_relationships_df
+        "relationships", merged_relationships_df,
     )
 
     return merged_entities_df, merged_relationships_df, entity_id_mapping

@@ -28,7 +28,7 @@ class BlobWorkflowLogger(logging.Handler):
         base_dir: str | None = None,
         account_url: str | None = None,
         level: int = logging.NOTSET,
-    ):
+    ) -> None:
         """Create a new instance of the BlobWorkflowLogger class."""
         super().__init__(level)
 
@@ -44,7 +44,7 @@ class BlobWorkflowLogger(logging.Handler):
 
         if self._connection_string:
             self._blob_service_client = BlobServiceClient.from_connection_string(
-                self._connection_string
+                self._connection_string,
             )
         else:
             if account_url is None:
@@ -62,7 +62,7 @@ class BlobWorkflowLogger(logging.Handler):
         self._blob_name = str(Path(base_dir or "") / blob_name)
         self._container_name = container_name
         self._blob_client = self._blob_service_client.get_blob_client(
-            self._container_name, self._blob_name
+            self._container_name, self._blob_name,
         )
         if not self._blob_client.exists():
             self._blob_client.create_append_blob()
@@ -98,7 +98,7 @@ class BlobWorkflowLogger(logging.Handler):
             return "warning"
         return "log"
 
-    def _write_log(self, log: dict[str, Any]):
+    def _write_log(self, log: dict[str, Any]) -> None:
         """Write log data to blob storage."""
         # create a new file when block count hits close 25k
         if (
@@ -111,7 +111,7 @@ class BlobWorkflowLogger(logging.Handler):
             )
 
         blob_client = self._blob_service_client.get_blob_client(
-            self._container_name, self._blob_name
+            self._container_name, self._blob_name,
         )
         blob_client.append_block(json.dumps(log, indent=4, ensure_ascii=False) + "\n")
 

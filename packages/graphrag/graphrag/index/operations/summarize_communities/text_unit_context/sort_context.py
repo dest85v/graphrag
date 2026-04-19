@@ -4,11 +4,12 @@
 """Sort local context by total degree of associated nodes in descending order."""
 
 import logging
+import operator
 
 import pandas as pd
 from graphrag_llm.tokenizer import Tokenizer
 
-import graphrag.data_model.schemas as schemas
+from graphrag.data_model import schemas
 
 logger = logging.getLogger(__name__)
 
@@ -63,7 +64,7 @@ def sort_context(
 ) -> str:
     """Sort local context (list of text units) by total degree of associated nodes in descending order."""
     sorted_text_units = sorted(
-        local_context, key=lambda x: x[schemas.ENTITY_DEGREE], reverse=True
+        local_context, key=operator.itemgetter(schemas.ENTITY_DEGREE), reverse=True,
     )
 
     current_text_units = []
@@ -72,7 +73,7 @@ def sort_context(
         current_text_units.append(record)
         if max_context_tokens:
             new_context_string = get_context_string(
-                current_text_units, sub_community_reports
+                current_text_units, sub_community_reports,
             )
             if tokenizer.num_tokens(new_context_string) > max_context_tokens:
                 break

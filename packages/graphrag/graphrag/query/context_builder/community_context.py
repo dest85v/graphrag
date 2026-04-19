@@ -63,10 +63,10 @@ def build_community_context(
         return header
 
     def _report_context_text(
-        report: CommunityReport, attributes: list[str]
+        report: CommunityReport, attributes: list[str],
     ) -> tuple[str, list[str]]:
         context: list[str] = [
-            report.short_id if report.short_id else "",
+            report.short_id or "",
             report.title,
             *[
                 str(report.attributes.get(field, "")) if report.attributes else ""
@@ -182,7 +182,7 @@ def build_community_context(
         return ([], {})
 
     return all_context_text, {
-        context_name.lower(): pd.concat(all_context_records, ignore_index=True)
+        context_name.lower(): pd.concat(all_context_records, ignore_index=True),
     }
 
 
@@ -207,7 +207,7 @@ def _compute_community_weights(
         if not report.attributes:
             report.attributes = {}
         report.attributes[weight_attribute] = len(
-            set(community_text_units.get(report.community_id, []))
+            set(community_text_units.get(report.community_id, [])),
         )
     if normalize:
         # normalize by max weight
@@ -219,9 +219,7 @@ def _compute_community_weights(
         max_weight = max(all_weights)
         for report in community_reports:
             if report.attributes:
-                report.attributes[weight_attribute] = (
-                    report.attributes[weight_attribute] / max_weight
-                )
+                report.attributes[weight_attribute] /= max_weight
     return community_reports
 
 
@@ -239,7 +237,7 @@ def _rank_report_context(
         rank_attributes.append(rank_column)
         report_df[rank_column] = report_df[rank_column].astype(float)
     if len(rank_attributes) > 0:
-        report_df.sort_values(by=rank_attributes, ascending=False, inplace=True)
+        report_df = report_df.sort_values(by=rank_attributes, ascending=False)
     return report_df
 
 

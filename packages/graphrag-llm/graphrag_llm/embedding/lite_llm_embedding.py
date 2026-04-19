@@ -62,7 +62,7 @@ class LiteLLMEmbedding(LLMEmbedding):
         azure_cognitive_services_audience: str = "https://cognitiveservices.azure.com/.default",
         drop_unsupported_params: bool = True,
         **kwargs: Any,
-    ):
+    ) -> None:
         """Initialize LiteLLMEmbedding (OpenAI SDK backend).
 
         Args
@@ -121,7 +121,7 @@ class LiteLLMEmbedding(LLMEmbedding):
         )
 
     def embedding(
-        self, /, **kwargs: Unpack["LLMEmbeddingArgs"]
+        self, /, **kwargs: Unpack["LLMEmbeddingArgs"],
     ) -> "LLMEmbeddingResponse":
         """Sync embedding method."""
         request_metrics: Metrics | None = kwargs.pop("metrics", None) or {}
@@ -135,7 +135,7 @@ class LiteLLMEmbedding(LLMEmbedding):
                 self._metrics_store.update_metrics(metrics=request_metrics)
 
     async def embedding_async(
-        self, /, **kwargs: Unpack["LLMEmbeddingArgs"]
+        self, /, **kwargs: Unpack["LLMEmbeddingArgs"],
     ) -> "LLMEmbeddingResponse":
         """Async embedding method."""
         request_metrics: Metrics | None = kwargs.pop("metrics", None) or {}
@@ -178,7 +178,7 @@ def _create_base_embeddings(
             }
             if model_config.auth_method == AuthMethod.AzureManagedIdentity:
                 kwargs["azure_ad_token_provider"] = get_bearer_token_provider(
-                    DefaultAzureCredential(), azure_cognitive_services_audience
+                    DefaultAzureCredential(), azure_cognitive_services_audience,
                 )
             else:
                 kwargs["api_key"] = model_config.api_key
@@ -199,7 +199,7 @@ def _create_base_embeddings(
             }
             if model_config.auth_method == AuthMethod.AzureManagedIdentity:
                 kwargs["azure_ad_token_provider"] = get_bearer_token_provider(
-                    DefaultAzureCredential(), azure_cognitive_services_audience
+                    DefaultAzureCredential(), azure_cognitive_services_audience,
                 )
             else:
                 kwargs["api_key"] = model_config.api_key

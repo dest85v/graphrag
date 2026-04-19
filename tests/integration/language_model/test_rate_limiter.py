@@ -46,7 +46,7 @@ def test_rpm():
             type=RateLimitType.SlidingWindow,
             period_in_seconds=_period_in_seconds,
             requests_per_period=_rpm,
-        )
+        ),
     )
 
     time_values: list[float] = []
@@ -78,7 +78,7 @@ def test_tpm():
             type=RateLimitType.SlidingWindow,
             period_in_seconds=_period_in_seconds,
             tokens_per_period=_tpm,
-        )
+        ),
     )
 
     time_values: list[float] = []
@@ -115,7 +115,7 @@ def test_token_in_request_exceeds_tpm():
             type=RateLimitType.SlidingWindow,
             period_in_seconds=_period_in_seconds,
             tokens_per_period=_tpm,
-        )
+        ),
     )
 
     time_values: list[float] = []
@@ -144,7 +144,7 @@ def test_rpm_and_tpm_with_rpm_as_limiting_factor():
             period_in_seconds=_period_in_seconds,
             requests_per_period=_rpm,
             tokens_per_period=_tpm,
-        )
+        ),
     )
 
     time_values: list[float] = []
@@ -178,7 +178,7 @@ def test_rpm_and_tpm_with_tpm_as_limiting_factor():
             period_in_seconds=_period_in_seconds,
             requests_per_period=_rpm,
             tokens_per_period=_tpm,
-        )
+        ),
     )
 
     time_values: list[float] = []
@@ -227,7 +227,7 @@ def test_rpm_threaded():
             period_in_seconds=_period_in_seconds,
             requests_per_period=_rpm,
             tokens_per_period=_tpm,
-        )
+        ),
     )
 
     input_queue: Queue[int | None] = Queue()
@@ -292,7 +292,7 @@ def test_tpm_threaded():
             period_in_seconds=_period_in_seconds,
             requests_per_period=_rpm,
             tokens_per_period=_tpm,
-        )
+        ),
     )
 
     input_queue: Queue[int | None] = Queue()

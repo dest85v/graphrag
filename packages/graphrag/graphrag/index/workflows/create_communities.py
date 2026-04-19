@@ -95,7 +95,7 @@ async def create_communities(
         title_to_entity_id[row["title"]] = row["id"]
 
     communities = pd.DataFrame(
-        clusters, columns=pd.Index(["level", "community", "parent", "title"])
+        clusters, columns=pd.Index(["level", "community", "parent", "title"]),
     ).explode("title")
     communities["community"] = communities["community"].astype(int)
 
@@ -118,10 +118,10 @@ async def create_communities(
     for level in communities["level"].unique():
         level_comms = communities[communities["level"] == level]
         with_source = relationships.merge(
-            level_comms, left_on="source", right_on="title", how="inner"
+            level_comms, left_on="source", right_on="title", how="inner",
         )
         with_both = with_source.merge(
-            level_comms, left_on="target", right_on="title", how="inner"
+            level_comms, left_on="target", right_on="title", how="inner",
         )
         intra = with_both[with_both["community_x"] == with_both["community_y"]]
         if intra.empty:
@@ -143,15 +143,15 @@ async def create_communities(
         columns={
             "community_x": "community",
             "parent_x": "parent",
-        }
+        },
     )
 
     # deduplicate the lists
     all_grouped["relationship_ids"] = all_grouped["relationship_ids"].apply(
-        lambda x: sorted(set(x))
+        lambda x: sorted(set(x)),
     )
     all_grouped["text_unit_ids"] = all_grouped["text_unit_ids"].apply(
-        lambda x: sorted(set(x))
+        lambda x: sorted(set(x)),
     )
 
     # join it all up and add some new fields
@@ -159,7 +159,7 @@ async def create_communities(
     final_communities["id"] = [str(uuid4()) for _ in range(len(final_communities))]
     final_communities["human_readable_id"] = final_communities["community"]
     final_communities["title"] = "Community " + final_communities["community"].astype(
-        str
+        str,
     )
     final_communities["parent"] = final_communities["parent"].astype(int)
     # collect the children so we have a tree going both ways
@@ -175,7 +175,7 @@ async def create_communities(
     )
     # replace NaN children with empty list
     final_communities["children"] = final_communities["children"].apply(
-        lambda x: x if isinstance(x, np.ndarray) else []  # type: ignore
+        lambda x: x if isinstance(x, np.ndarray) else [],  # type: ignore
     )
     # add fields for incremental update tracking
     final_communities["period"] = datetime.now(timezone.utc).date().isoformat()

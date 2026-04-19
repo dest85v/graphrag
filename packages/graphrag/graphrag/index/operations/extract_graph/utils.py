@@ -41,7 +41,7 @@ def filter_orphan_relationships(
     entity_titles = set(entities["title"])
     before_count = len(relationships)
     mask = relationships["source"].isin(entity_titles) & relationships["target"].isin(
-        entity_titles
+        entity_titles,
     )
     filtered = relationships[mask].reset_index(drop=True)
     dropped = before_count - len(filtered)

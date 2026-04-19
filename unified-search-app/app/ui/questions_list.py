@@ -7,7 +7,7 @@ import streamlit as st
 from state.session_variables import SessionVariables
 
 
-def create_questions_list_ui(sv: SessionVariables):
+def create_questions_list_ui(sv: SessionVariables) -> None:
     """Return question list UI component."""
     selection = st.dataframe(
         sv.generated_questions.value,

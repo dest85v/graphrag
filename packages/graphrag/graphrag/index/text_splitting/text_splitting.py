@@ -42,7 +42,7 @@ class TokenTextSplitter(ABC):
         add_start_index: bool = False,
         strip_whitespace: bool = True,
         tokenizer: Tokenizer | None = None,
-    ):
+    ) -> None:
         """Init method definition."""
         self._chunk_size = chunk_size
         self._chunk_overlap = chunk_overlap

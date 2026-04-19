@@ -33,7 +33,7 @@ class MockLLMEmbedding(LLMEmbedding):
         tokenizer: "Tokenizer",
         metrics_store: "MetricsStore",
         **kwargs: Any,
-    ):
+    ) -> None:
         """Initialize MockLLMEmbedding."""
         self._tokenizer = tokenizer
         self._metrics_store = metrics_store
@@ -50,18 +50,18 @@ class MockLLMEmbedding(LLMEmbedding):
         self._mock_responses = mock_responses  # type: ignore
 
     def embedding(
-        self, /, **kwargs: Unpack["LLMEmbeddingArgs"]
+        self, /, **kwargs: Unpack["LLMEmbeddingArgs"],
     ) -> "LLMEmbeddingResponse":
         """Sync embedding method."""
         input = kwargs.get("input")
         response = create_embedding_response(
-            self._mock_responses, batch_size=len(input)
+            self._mock_responses, batch_size=len(input),
         )
         self._mock_index += 1
         return response
 
     async def embedding_async(
-        self, /, **kwargs: Unpack["LLMEmbeddingArgs"]
+        self, /, **kwargs: Unpack["LLMEmbeddingArgs"],
     ) -> "LLMEmbeddingResponse":
         """Async embedding method."""
         return self.embedding(**kwargs)

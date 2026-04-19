@@ -23,12 +23,12 @@ async def test_generate_text_embeddings():
             "text_units",
             "entities",
             "community_reports",
-        ]
+        ],
     )
 
     config = get_default_graphrag_config()
     llm_settings = config.get_embedding_model_config(
-        config.embed_text.embedding_model_id
+        config.embed_text.embedding_model_id,
     )
     llm_settings.type = "mock"
     llm_settings.mock_responses = [1.0] * 3072
@@ -45,7 +45,7 @@ async def test_generate_text_embeddings():
 
     # entity description should always be here, let's assert its format
     entity_description_embeddings = await context.output_table_provider.read_dataframe(
-        "embeddings.entity_description"
+        "embeddings.entity_description",
     )
 
     assert len(entity_description_embeddings.columns) == 2

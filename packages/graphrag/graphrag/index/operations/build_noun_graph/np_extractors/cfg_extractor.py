@@ -53,7 +53,7 @@ class CFGNounPhraseExtractor(BaseNounPhraseExtractor):
         word_delimiter: str,
         noun_phrase_grammars: dict[tuple, str],
         noun_phrase_tags: list[str],
-    ):
+    ) -> None:
         """
         Noun phrase extractor combining CFG-based noun-chunk extraction and NER.
 
@@ -79,11 +79,11 @@ class CFGNounPhraseExtractor(BaseNounPhraseExtractor):
         self.exclude_entity_tags = exclude_entity_tags
         if not include_named_entities:
             self.nlp = self.load_spacy_model(
-                model_name, exclude=["lemmatizer", "parser", "ner"]
+                model_name, exclude=["lemmatizer", "parser", "ner"],
             )
         else:
             self.nlp = self.load_spacy_model(
-                model_name, exclude=["lemmatizer", "parser"]
+                model_name, exclude=["lemmatizer", "parser"],
             )
 
         self.exclude_pos_tags = exclude_pos_tags
@@ -173,7 +173,7 @@ class CFGNounPhraseExtractor(BaseNounPhraseExtractor):
         return [t for t in tagged_tokens if t[1] in self.noun_phrase_tags]
 
     def _tag_noun_phrases(
-        self, noun_chunk: tuple[str, str], entities: set[str] | None = None
+        self, noun_chunk: tuple[str, str], entities: set[str] | None = None,
     ) -> dict[str, Any]:
         """Extract attributes of a noun chunk, to be used for filtering."""
         tokens = noun_chunk[0].split(self.word_delimiter)
@@ -195,7 +195,7 @@ class CFGNounPhraseExtractor(BaseNounPhraseExtractor):
             "has_proper_nouns": (noun_chunk[1] == "PROPN"),
             "has_compound_words": is_compound(cleaned_tokens),
             "has_valid_tokens": has_valid_token_length(
-                cleaned_tokens, self.max_word_length
+                cleaned_tokens, self.max_word_length,
             ),
         }
 

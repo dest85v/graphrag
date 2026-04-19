@@ -96,14 +96,14 @@ class AzureCosmosStorage(Storage):
     def _create_database(self) -> None:
         """Create the database if it doesn't exist."""
         self._database_client = self._cosmos_client.create_database_if_not_exists(
-            id=self._database_name
+            id=self._database_name,
         )
 
     def _delete_database(self) -> None:
         """Delete the database if it exists."""
         if self._database_client:
             self._database_client = self._cosmos_client.delete_database(
-                self._database_client
+                self._database_client,
             )
         self._container_client = None
 
@@ -122,7 +122,7 @@ class AzureCosmosStorage(Storage):
         """Delete the container with the current container name if it exists."""
         if self._database_client and self._container_client:
             self._container_client = self._database_client.delete_container(
-                self._container_client
+                self._container_client,
             )
 
     def find(
@@ -149,7 +149,7 @@ class AzureCosmosStorage(Storage):
         try:
             query = "SELECT * FROM c WHERE RegexMatch(c.id, @pattern)"
             parameters: list[dict[str, Any]] = [
-                {"name": "@pattern", "value": file_pattern.pattern}
+                {"name": "@pattern", "value": file_pattern.pattern},
             ]
 
             items = self._query_all_items(
@@ -172,7 +172,7 @@ class AzureCosmosStorage(Storage):
                     num_filtered += 1
 
             progress_status = _create_progress_status(
-                num_loaded, num_filtered, num_total
+                num_loaded, num_filtered, num_total,
             )
             logger.debug(
                 "Progress: %s (%d/%d completed)",
@@ -182,11 +182,11 @@ class AzureCosmosStorage(Storage):
             )
         except Exception:  # noqa: BLE001
             logger.warning(
-                "An error occurred while searching for documents in Cosmos DB."
+                "An error occurred while searching for documents in Cosmos DB.",
             )
 
     async def get(
-        self, key: str, as_bytes: bool | None = None, encoding: str | None = None
+        self, key: str, as_bytes: bool | None = None, encoding: str | None = None,
     ) -> Any:
         """Fetch all items in a container that match the given key."""
         try:
@@ -212,14 +212,14 @@ class AzureCosmosStorage(Storage):
 
                 items_json_str = json.dumps(items_list)
                 items_df = pd.read_json(
-                    StringIO(items_json_str), orient="records", lines=False
+                    StringIO(items_json_str), orient="records", lines=False,
                 )
 
                 if prefix == "entities":
                     # Always preserve the Cosmos suffix for debugging/migrations
                     items_df["cosmos_id"] = items_df["id"]
                     items_df["id"] = items_df["id"].astype(
-                        str
+                        str,
                     )  # Only restore pipeline UUID id if we actually have it
 
                     if "human_readable_id" in items_df.columns:
@@ -233,12 +233,12 @@ class AzureCosmosStorage(Storage):
                         # Fresh run case: extract_graph entities may not have entity_id yet
                         # Keep id as the suffix (stable_key/index) for now.
                         logger.info(
-                            "Entities loaded without entity_id; leaving id as cosmos suffix."
+                            "Entities loaded without entity_id; leaving id as cosmos suffix.",
                         )
 
                 if items_df.empty:
                     logger.warning(
-                        "No rows returned for prefix %s (key=%s)", prefix, key
+                        "No rows returned for prefix %s (key=%s)", prefix, key,
                     )
                     return None
                 return items_df.to_parquet()
@@ -269,7 +269,7 @@ class AzureCosmosStorage(Storage):
                     self._no_id_prefixes.add(prefix)
 
                 cosmosdb_item_list = json.loads(
-                    value_df.to_json(orient="records", lines=False, force_ascii=False)
+                    value_df.to_json(orient="records", lines=False, force_ascii=False),
                 )
 
                 for index, cosmosdb_item in enumerate(cosmosdb_item_list):
@@ -285,12 +285,11 @@ class AzureCosmosStorage(Storage):
                         # Cosmos identity must be stable and NEVER change
                         cosmosdb_item["id"] = cosmos_id
 
+                    # Original behavior for non-entity prefixes
+                    elif df_has_id:
+                        cosmosdb_item["id"] = f"{prefix}:{cosmosdb_item['id']}"
                     else:
-                        # Original behavior for non-entity prefixes
-                        if df_has_id:
-                            cosmosdb_item["id"] = f"{prefix}:{cosmosdb_item['id']}"
-                        else:
-                            cosmosdb_item["id"] = f"{prefix}:{index}"
+                        cosmosdb_item["id"] = f"{prefix}:{index}"
 
                     self._container_client.upsert_item(body=cosmosdb_item)
             else:
@@ -381,7 +380,7 @@ class AzureCosmosStorage(Storage):
                 )
                 for item in items:
                     self._container_client.delete_item(
-                        item=item["id"], partition_key=item["id"]
+                        item=item["id"], partition_key=item["id"],
                     )
             else:
                 self._container_client.delete_item(item=key, partition_key=key)
@@ -409,7 +408,7 @@ class AzureCosmosStorage(Storage):
 
     def _get_prefix(self, key: str) -> str:
         """Get the prefix of the filename key."""
-        return key.split(".")[0]
+        return key.split(".", maxsplit=1)[0]
 
     async def get_creation_date(self, key: str) -> str:
         """Get a value from the cache."""
@@ -418,7 +417,7 @@ class AzureCosmosStorage(Storage):
                 return ""
             item = self._container_client.read_item(item=key, partition_key=key)
             return get_timestamp_formatted_with_local_tz(
-                datetime.fromtimestamp(item["_ts"], tz=timezone.utc)
+                datetime.fromtimestamp(item["_ts"], tz=timezone.utc),
             )
 
         except Exception:  # noqa: BLE001
@@ -427,7 +426,7 @@ class AzureCosmosStorage(Storage):
 
 
 def _create_progress_status(
-    num_loaded: int, num_filtered: int, num_total: int
+    num_loaded: int, num_filtered: int, num_total: int,
 ) -> Progress:
     return Progress(
         total_items=num_total,

@@ -17,24 +17,24 @@ from ui.search import display_citations, format_suggested_questions, init_search
 from ui.sidebar import create_side_bar
 
 
-async def main():
+async def main() -> None:
     """Return main streamlit component to render the app."""
     sv = initialize()
 
     create_side_bar(sv)
 
     st.markdown(
-        "#### GraphRAG: A Novel Knowledge Graph-based Approach to Retrieval Augmented Generation (RAG)"
+        "#### GraphRAG: A Novel Knowledge Graph-based Approach to Retrieval Augmented Generation (RAG)",
     )
     st.markdown("##### Dataset selected: " + dataset_name(sv.dataset.value, sv))
     st.markdown(sv.dataset_config.value.description)
 
-    def on_click_reset(sv: SessionVariables):
+    def on_click_reset(sv: SessionVariables) -> None:
         sv.generated_questions.value = []
         sv.selected_question.value = ""
         sv.show_text_input.value = True
 
-    def on_change(sv: SessionVariables):
+    def on_change(sv: SessionVariables) -> None:
         sv.question.value = st.session_state[question_input]
 
     question_input = "question_input"
@@ -58,7 +58,7 @@ async def main():
                     sv.generated_questions.value = questions
                     sv.show_text_input.value = False
             except Exception as e:  # noqa: BLE001
-                print(f"Search exception: {e}")  # noqa T201
+                print(f"Search exception: {e}")  # noqa: T201
                 st.write(e)
 
     if sv.show_text_input.value is True:
@@ -202,7 +202,7 @@ async def main():
                 with ss_drift_citations:
                     st.empty()
 
-        if question != "" and question != sv.question_in_progress.value:
+        if question not in {"", sv.question_in_progress.value}:
             sv.question_in_progress.value = question
             try:
                 await run_all_searches(query=question, sv=sv)
@@ -232,7 +232,7 @@ async def main():
                             result=result["result"],
                         )
             except Exception as e:  # noqa: BLE001
-                print(f"Search exception: {e}")  # noqa T201
+                print(f"Search exception: {e}")  # noqa: T201
                 st.write(e)
 
     if tab_id == 1:

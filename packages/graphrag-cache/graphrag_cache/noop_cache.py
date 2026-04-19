@@ -28,7 +28,7 @@ class NoopCache(Cache):
         return None
 
     async def set(
-        self, key: str, value: str | bytes | None, debug_data: dict | None = None
+        self, key: str, value: str | bytes | None, debug_data: dict | None = None,
     ) -> None:
         """Set the value for the given key.
 

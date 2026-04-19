@@ -163,7 +163,7 @@ class TestUpdatePathOrphanFiltering:
 
         old_rels = pd.DataFrame([
             _finalized_relationship_row(
-                "A", "B", relationship_id="r0", human_readable_id=0
+                "A", "B", relationship_id="r0", human_readable_id=0,
             ),
         ])
         delta_rels = pd.DataFrame([
@@ -208,15 +208,15 @@ class TestUpdatePathOrphanFiltering:
 
         old_rels = pd.DataFrame([
             _finalized_relationship_row(
-                "A", "REMOVED", relationship_id="r1", human_readable_id=0
+                "A", "REMOVED", relationship_id="r1", human_readable_id=0,
             ),
             _finalized_relationship_row(
-                "A", "B", relationship_id="r2", human_readable_id=1
+                "A", "B", relationship_id="r2", human_readable_id=1,
             ),
         ])
         delta_rels = pd.DataFrame([
             _finalized_relationship_row(
-                "B", "A", relationship_id="r3", human_readable_id=0
+                "B", "A", relationship_id="r3", human_readable_id=0,
             ),
         ])
         merged_rels = _update_and_merge_relationships(old_rels, delta_rels)
