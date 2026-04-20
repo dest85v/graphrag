@@ -3,11 +3,13 @@
 
 """LLMCompletion based on the OpenAI SDK."""
 
+import inspect
 from collections.abc import AsyncIterator, Iterator
 from typing import TYPE_CHECKING, Any, Unpack
 
 import openai
 from azure.identity import DefaultAzureCredential, get_bearer_token_provider
+from pydantic import BaseModel
 
 from graphrag_llm.completion.completion import LLMCompletion
 from graphrag_llm.config.types import AuthMethod
@@ -309,6 +311,35 @@ def _create_base_completions(
         # Filter out unsupported params (replaces litellm's drop_params=True)
         filtered = filter_completion_kwargs(merged, model)
 
+        response_format = kwargs.get("response_format")
+        is_pydantic = inspect.isclass(response_format) and issubclass(
+            response_format, BaseModel,
+        )
+
+        if is_pydantic:
+            parsed = _get_sync_client(
+                model_config, azure_cognitive_services_audience,
+            ).chat.completions.parse(
+                model=str(model),
+                messages=filtered.get("messages", []),
+                **{k: v for k, v in filtered.items() if k not in ("model", "messages")},
+            )
+            return LLMCompletionResponse.model_validate({
+                "model": parsed.model,
+                "id": parsed.id,
+                "object": parsed.object,
+                "created": parsed.created,
+                "choices": [{
+                    "index": 0,
+                    "message": {
+                        "role": parsed.choices[0].message.role,
+                        "content": parsed.choices[0].message.content,
+                    },
+                    "finish_reason": parsed.choices[0].finish_reason,
+                }],
+                "usage": parsed.usage,
+            })
+
         response = _get_sync_client(
             model_config, azure_cognitive_services_audience,
         ).chat.completions.create(
@@ -340,6 +371,35 @@ def _create_base_completions(
             merged["response_format"] = {"type": "json_object"}
 
         filtered = filter_completion_kwargs(merged, model)
+
+        response_format = kwargs.get("response_format")
+        is_pydantic = inspect.isclass(response_format) and issubclass(
+            response_format, BaseModel,
+        )
+
+        if is_pydantic:
+            parsed = await _get_async_client(
+                model_config, azure_cognitive_services_audience,
+            ).chat.completions.parse(
+                model=str(model),
+                messages=filtered.get("messages", []),
+                **{k: v for k, v in filtered.items() if k not in ("model", "messages")},
+            )
+            return LLMCompletionResponse.model_validate({
+                "model": parsed.model,
+                "id": parsed.id,
+                "object": parsed.object,
+                "created": parsed.created,
+                "choices": [{
+                    "index": 0,
+                    "message": {
+                        "role": parsed.choices[0].message.role,
+                        "content": parsed.choices[0].message.content,
+                    },
+                    "finish_reason": parsed.choices[0].finish_reason,
+                }],
+                "usage": parsed.usage,
+            })
 
         response = await _get_async_client(
             model_config, azure_cognitive_services_audience,

@@ -104,13 +104,15 @@ async def generate_indexing_prompts(
     logger.info("Creating language model...")
     llm = create_completion(default_llm_settings)
 
+    quick_docs = doc_list[:3]
+
     if not domain:
         logger.info("Generating domain...")
-        domain = await generate_domain(llm, doc_list)
+        domain = await generate_domain(llm, quick_docs)
 
     if not language:
         logger.info("Detecting language...")
-        language = await detect_language(llm, doc_list)
+        language = await detect_language(llm, quick_docs)
 
     logger.info("Generating persona...")
     persona = await generate_persona(llm, domain)

@@ -66,6 +66,10 @@ def get_tokenizer(
         An instance of a Tokenizer.
     """
     if model_config is not None:
+        # Use tokenizer config from model_config if available
+        if model_config.tokenizer is not None:
+            return create_tokenizer(model_config.tokenizer)
+
         model_name = f"{model_config.model_provider}/{model_config.model}".lower()
 
         if _is_openai_model(model_name):

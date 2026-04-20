@@ -105,8 +105,9 @@ class TestMiddlewareToolCallCycle:
         assert "path" in call_args.kwargs["arguments"]
 
         # Verify final response is returned
-        assert result is not None  # type: ignore[union-attr]
-        assert "file1.txt" in result.choices[0].message.content
+        assert hasattr(result, "choices")  # type: ignore[attr-defined]
+        assert result.choices[0].message.content is not None  # type: ignore[attr-defined]
+        assert "file1.txt" in result.choices[0].message.content  # type: ignore[attr-defined]
 
     @pytest.mark.asyncio
     async def test_multiple_tool_calls_executed_sequentially(self):

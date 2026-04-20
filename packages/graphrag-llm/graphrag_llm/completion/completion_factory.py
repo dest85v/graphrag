@@ -119,7 +119,10 @@ def create_completion(
                 msg = f"ModelConfig.type '{strategy}' is not registered in the CompletionFactory. Registered strategies: {', '.join(completion_factory.keys())}"
                 raise ValueError(msg)
 
-    tokenizer = tokenizer or create_tokenizer(TokenizerConfig(model_id=model_id))
+    if tokenizer is None and model_config.tokenizer is not None:
+        tokenizer = create_tokenizer(model_config.tokenizer)
+    elif tokenizer is None:
+        tokenizer = create_tokenizer(TokenizerConfig(model_id=model_id))
 
     rate_limiter: RateLimiter | None = None
     if model_config.rate_limit:

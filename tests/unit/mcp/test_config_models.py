@@ -173,5 +173,5 @@ class TestMCPConfig:
             MCPConfig(
                 transport_type="stdio",
                 stdio=MCPStdioConfig(command="python"),
-                invalid_field="should_fail",
+                invalid_field="should_fail",  # type: ignore[call-arg]
             )

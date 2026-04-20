@@ -65,13 +65,16 @@ async def generate_entity_relationship_examples(
 
     messages = messages[:MAX_EXAMPLES]
 
-    tasks = [
-        model.completion_async(
-            messages=msg_builder.add_user_message(message).build(),
-            response_format_json_object=json_mode,
-        )
-        for message in messages
-    ]
+    semaphore = asyncio.Semaphore(1)
+
+    async def _limited_completion(message: str):
+        async with semaphore:
+            return await model.completion_async(
+                messages=msg_builder.add_user_message(message).build(),
+                response_format_json_object=json_mode,
+            )
+
+    tasks = [_limited_completion(message) for message in messages]
 
     responses: list[LLMCompletionResponse] = await asyncio.gather(*tasks)  # type: ignore
 

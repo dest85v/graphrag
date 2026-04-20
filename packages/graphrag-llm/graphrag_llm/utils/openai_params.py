@@ -35,6 +35,7 @@ CHAT_COMPLETION_PARAMS: set[str] = {
     "user",
     "reasoning_effort",
     "extra_headers",
+    "timeout",
 }
 
 # OpenAI SDK supported params for embeddings.create()
