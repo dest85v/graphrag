@@ -2,11 +2,13 @@
 # Licensed under the MIT License
 
 import os
+import tempfile
 from pathlib import Path
 from unittest import mock
 
 from graphrag.config.load_config import load_config
 from graphrag.config.models.graph_rag_config import GraphRagConfig
+from graphrag_vectors import VectorStoreConfig, VectorStoreType
 
 from tests.unit.config.utils import (
     DEFAULT_COMPLETION_MODELS,
@@ -58,3 +60,54 @@ def test_load_config_with_cli_overrides() -> None:
     assert_graphrag_configs(actual, expected)
     # Need to reset cwd after test
     os.chdir(cwd)
+
+
+def test_lancedb_db_uri_empty_fallback() -> None:
+    config = GraphRagConfig(
+        completion_models=DEFAULT_COMPLETION_MODELS,  # type: ignore
+        embedding_models=DEFAULT_EMBEDDING_MODELS,  # type: ignore
+        vector_store=VectorStoreConfig(
+            type=VectorStoreType.LanceDB,
+            db_uri="",
+        ),
+    )
+    assert config.vector_store.db_uri is not None
+    assert config.vector_store.db_uri != ""
+
+
+def test_lancedb_db_uri_whitespace_fallback() -> None:
+    config = GraphRagConfig(
+        completion_models=DEFAULT_COMPLETION_MODELS,  # type: ignore
+        embedding_models=DEFAULT_EMBEDDING_MODELS,  # type: ignore
+        vector_store=VectorStoreConfig(
+            type=VectorStoreType.LanceDB,
+            db_uri="   ",
+        ),
+    )
+    assert config.vector_store.db_uri is not None
+    assert config.vector_store.db_uri.strip() != ""
+
+
+def test_lancedb_db_uri_none_fallback() -> None:
+    config = GraphRagConfig(
+        completion_models=DEFAULT_COMPLETION_MODELS,  # type: ignore
+        embedding_models=DEFAULT_EMBEDDING_MODELS,  # type: ignore
+        vector_store=VectorStoreConfig(
+            type=VectorStoreType.LanceDB,
+            db_uri=None,  # type: ignore
+        ),
+    )
+    assert config.vector_store.db_uri is not None
+
+
+def test_lancedb_db_uri_valid_preserved() -> None:
+    with tempfile.TemporaryDirectory() as tmpdir:
+        config = GraphRagConfig(
+            completion_models=DEFAULT_COMPLETION_MODELS,  # type: ignore
+            embedding_models=DEFAULT_EMBEDDING_MODELS,  # type: ignore
+            vector_store=VectorStoreConfig(
+                type=VectorStoreType.LanceDB,
+                db_uri=tmpdir,
+            ),
+        )
+        assert config.vector_store.db_uri == str(Path(tmpdir).resolve())
