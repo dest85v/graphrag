@@ -1224,3 +1224,530 @@ RUF001 String contains ambiguous `И` (CYRILLIC CAPITAL LETTER I)
 ### Риск
 
 **Низкий:** Все проблемы — pre-existing, не от новых изменений. Исправления не затрагивают runtime-логику.
+
+---
+
+## P0 — Исправить `strip` вместо `strip()` в валидации db_uri
+
+**Приоритет:** P0 — баг, валидация `db_uri` никогда не срабатывает
+
+**Пакет:** `graphrag`
+
+**Файл:** `packages/graphrag/graphrag/config/models/graph_rag_config.py:274`
+
+**Текущее состояние:**
+```python
+if not store.db_uri or store.db_uri.strip == "":
+```
+
+`strip` — метод, не свойство. Сравнение `method == ""` всегда `False` → fallback на `MemoryStorage` никогда не применяется. Конфиг с пустым `db_uri` проходит валидацию и ломается при первом чтении из Cosmos DB.
+
+**Что нужно исправить:**
+```python
+if not store.db_uri or store.db_uri.strip() == "":
+```
+
+**Тесты:**
+- Юнит-тест: `GraphRagConfig` с `storage.type: azure_cosmos` + пустой `db_uri` → должен fallback на `MemoryStorage` и вызвать `UserWarning`
+- Юнит-тест: `db_uri.strip()` — проверить что `None`, `" "`, `""` все обрабатываются
+
+**Зависимости:** Нет
+
+**Риск:** Низкий — исправление меняет поведение валидации, но текущее поведение тоже сломано.
+
+---
+
+## P0 — Заменить `time.sleep()` на `await asyncio.sleep()` в retry
+
+**Приоритет:** P0 — блокирует весь event loop при каждом рестарте
+
+**Пакет:** `graphrag-llm`
+
+**Файл:** `packages/graphrag-llm/graphrag_llm/retry/exponential_retry.py:84`
+
+**Текущее состояние:**
+```python
+time.sleep(sleep_delay)  # blocks the entire event loop!
+```
+
+Все LLM вызовы идут через async pipeline. При rate limit / timeout → `time.sleep()` блокирует event loop на всё время задержки. Задержка `base_delay: 10` → 10 секунд полной блокировки всех запросов.
+
+**Что нужно исправить:**
+```python
+await asyncio.sleep(sleep_delay)
+```
+
+Проверить, что обёртка retry-функции async — если sync обёртка, то `time.sleep` корректен. Если async — то `await asyncio.sleep`.
+
+**Тесты:**
+- Интеграционный тест: simulate rate limit → проверить что event loop не блокируется
+
+**Зависимости:** Нет
+
+**Риск:** Низкий — нужно аккуратно проверить sync/async обёртку.
+
+---
+
+## P0 — Продолжающая обработка при ошибках в `ParallelizationError`
+
+**Приоритет:** P0 — полная потеря данных при одной ошибке
+
+**Пакет:** `graphrag`
+
+**Файл:** `packages/graphrag/graphrag/index/utils/derive_from_rows.py:164-165`
+
+**Текущее состояние:**
+```python
+if len(errors) > 0:
+    raise ParallelizationError(len(errors), errors[0][1])
+```
+
+При 10 000 документов и 1 неудачном (LLM malformed response) → отбрасываются **все 9 999 успешно обработанных документов**.
+
+**Что нужно реализовать:**
+```python
+@dataclass
+class ParallelizationError(Exception):
+    num_failed: int
+    first_error: Exception
+    continue_on_error: bool = False  # ← новый параметр
+
+# В derive_from_rows:
+if errors and not continue_on_error:
+    raise ParallelizationError(...)
+# Иначе — логировать ошибки, вернуть частично обработанный результат
+```
+
+- `extract_graph` — `continue_on_error=True`
+- `extract_covariates` — `continue_on_error=True`
+- `cluster_graph`, `prune_graph` — `continue_on_error=False`
+
+**Тесты:**
+- Юнит-тест: 10% ошибок + `continue_on_error=True` → возвращает результат, логирует ошибки
+- Юнит-тест: `continue_on_error=False` → raises как раньше
+
+**Зависимости:** Нет
+
+**Риск:** Средний — меняет семантику error handling.
+
+---
+
+## P1 — Устранить NoSQL injection в Cosmos DB storage
+
+**Приоритет:** P1 — SQL injection через user-supplied keys
+
+**Пакеты:** `graphrag-storage`, `graphrag-vectors`
+
+**Файлы:**
+- `packages/graphrag-storage/graphrag_storage/azure_cosmos_storage.py:198, 358, 376`
+- `packages/graphrag-vectors/graphrag_vectors/cosmosdb.py:293, 311`
+
+**Текущее состояние:**
+```python
+query = f"SELECT * FROM c WHERE STARTSWITH(c.id, '{prefix}:')"
+count_query = f"SELECT VALUE COUNT(1) FROM c WHERE {query_filter}"
+```
+
+Ключи файлов (prefix, query_filter, id_field) приходят из конфигурации или имен файлов.
+
+**Что нужно реализовать:**
+1. Экранирование prefix:
+```python
+def _sanitize_cosmos_key(key: str) -> str:
+    return key.replace("\\", "\\\\").replace('"', '\\"')
+```
+
+2. Валидация id_field / vector_field — только `[a-zA-Z_][a-zA-Z0-9_]` паттерн
+
+3. Параметризованные запросы где возможно
+
+**Тесты:**
+- Юнит-тест: prefix = `"entities'; DROP --"` → query экранирован
+- Integration-тест: Cosmos DB с malicious key → error, не injection
+
+**Зависимости:** Нет
+
+**Риск:** Низкий — только добавление валидации.
+
+---
+
+## P1 — Исправить `asyncio.run()` / event loop в sync middleware
+
+**Приоритет:** P1 — краш при вызове из async контекста
+
+**Файлы:**
+- `packages/graphrag-llm/graphrag_llm/mcp/middleware.py:352, 414`
+- `packages/graphrag-llm/graphrag_llm/middleware/with_cache.py:69-103`
+
+**Проблема 1: MCP middleware**
+```python
+loop = asyncio.new_event_loop()
+loop.run_until_complete(self._initialize_mcp())
+result = asyncio.run(self._client.call_tool(...))
+```
+
+Крашнется при вызове из async context (`RuntimeError: This event loop is already running`).
+
+**Проблема 2: with_cache — создание event loop на каждый вызов**
+```python
+event_loop = asyncio.new_event_loop()
+asyncio.set_event_loop(event_loop)
+cached_response = event_loop.run_until_complete(cache.get(cache_key))
+```
+
+Каждый sync кэш-промах создаёт/уничтожает event loop — **extremely expensive**, GC pressure при высокой конкуренции.
+
+**Что нужно исправить:**
+1. MCP: использовать async-first подход, убрать sync обёртки
+2. with_cache: async-first, убрать sync обёртки. Если sync нужен — использовать `anyio.from_thread.run()`
+
+**Тесты:**
+- Тест: sync cache call из async context → работает, не крашится
+
+**Зависимости:** Нет
+
+**Риск:** Средний — breaking change для sync API.
+
+---
+
+## P1 — Убрать silent exception swallowing в middleware
+
+**Приоритет:** P1 — ошибки полностью игнорируются, нет логирования
+
+**Файлы:**
+- `packages/graphrag-llm/graphrag_llm/middleware/with_cache.py:92-95, 140-143`
+- `packages/graphrag-llm/graphrag_llm/mcp/middleware.py:236, 302, 384, 421`
+- `packages/graphrag/graphrag/query/structured_search/global_search/search.py:265, 422`
+
+**Текущее состояние:**
+```python
+except Exception:  # noqa: BLE001
+    # Try to retrieve value from cache but if it fails, continue
+    ...
+```
+
+Ошибка кэша полностью заглушена — нет логирования, нет recovery.
+
+**Что нужно:**
+1. Заменить `...` на `logger.warning("cache get failed: %s", exc_info=True)`
+2. В query engines: вместо пустого ответа — `logger.error` + fallback с предупреждением
+
+**Тесты:**
+- Тест: cache server недоступен → warning в логах, request продолжается без кэша
+
+**Зависимости:** Нет
+
+**Риск:** Низкий — только добавление логирования.
+
+---
+
+## P1 — Добавить CLI overrides для index/update команд
+
+**Приоритет:** P1 — CLI для query поддерживает overrides, для index — нет
+
+**Файл:** `packages/graphrag/graphrag/cli/index.py:53, 73-75`
+
+**Текущее состояние:**
+```python
+# index.py:53 — load_config без cli_overrides
+config = load_config(root_dir=root_dir)
+
+# query.py:34-36 — load_config С cli_overrides
+cli_overrides = {"output_storage": {"base_dir": str(data_dir)}}
+config = load_config(root_dir=root_dir, cli_overrides=cli_overrides)
+```
+
+**Что нужно:**
+1. Добавить `--override key=value` flag в `index_cli()` и `update_cli()`
+2. Поддерживать dot-notation: `--set completion_models.default.model=gpt-4o`
+3. Передать `cli_overrides` в `load_config()`
+
+**Тесты:**
+- CLI-тест: `graphrag index --set completion_models.default.api_key=sk-test` → config содержит override
+
+**Зависимости:** Нет
+
+**Риск:** Низкий — добавление новой опции.
+
+---
+
+## P2 — Заменить `str.format()` на безопасную template engine для промптов
+
+**Приоритет:** P2 — prompt injection через user input
+
+**Файлы:** Все промпты используют `str.format()` (~15 файлов):
+- `packages/graphrag/graphrag/index/operations/extract_graph/graph_extractor.py:87-91`
+- `packages/graphrag/graphrag/prompts/index/community_report.py:54`
+
+**Текущее состояние:**
+```python
+self._extraction_prompt.format(**{
+    INPUT_TEXT_KEY: text,  # user-controlled input document
+    ENTITY_TYPES_KEY: ",".join(entity_types),
+})
+```
+
+Input document с `}}` или `{entity_types}` может сломать форматирование или inject новые директивы.
+
+**Что нужно реализовать:**
+1. Перейти на Jinja2 (уже есть в зависимостях):
+```python
+from jinja2 import Environment, BaseLoader
+env = Environment(loader=BaseLoader, variable_start_string="{{{", variable_end_string="}}}")
+template = env.from_string(prompt_text)
+result = template.render(input_text=text, entity_types=", ".join(entity_types))
+```
+
+2. Для совместимости: позволить оба формата, deprecated warning для `.format()`
+
+**Тесты:**
+- Тест: input text с `}}` → не ломает промпт
+- Тест: input text с `{entity_types}` → не injects в промпт
+
+**Зависимости:** `jinja2` уже в зависимостях
+
+**Риск:** Средний — breaking change для custom prompts. Нужен deprecation period.
+
+---
+
+## P2 — Исправить `os.chdir()` side effect в load_config
+
+**Приоритет:** P2 — process-wide side effect при загрузке конфига
+
+**Файл:** `packages/graphrag/graphrag_common/config/load_config.py:203`
+
+**Текущее состояние:**
+```python
+if set_cwd:
+    os.chdir(config_path.parent)  # changes CWD for ENTIRE process
+```
+
+Если CLI загружает несколько config-файлов — CWD меняется непредсказуемо.
+
+**Что нужно:**
+```python
+# Вариант 1: context manager
+with _chdir(config_path.parent):
+    # load config in scoped CWD
+
+# Вариант 2: использовать absolute paths, не менять CWD вообще
+```
+
+**Тесты:**
+- Тест: дважды вызвать `load_config` из разных каталогов → CWD не меняется
+
+**Зависимости:** Нет
+
+**Риск:** Средний — нужно проверить все места где предполагается что cwd = config_dir.
+
+---
+
+## P2 — Исправить dead code: `_clean_claim` не фильтрует `status=False`
+
+**Приоритет:** P2 — misleading comment, claims с status=False не фильтруются
+
+**Файл:** `packages/graphrag/graphrag/index/operations/extract_covariates/claim_extractor.py:108`
+
+**Текущее состояние:**
+```python
+# clean the parsed claims to remove any claims with status = False
+def _clean_claim(self, claim: dict) -> Claim | None:
+    # resolve entity names...
+    # but does NOT filter status=False!
+```
+
+**Что нужно:**
+```python
+def _clean_claim(self, claim: dict) -> Claim | None:
+    if claim.get("status") == False:
+        return None  # filter out false claims
+    # ... resolve entity names ...
+```
+
+**Тесты:**
+- Юнит-тест: claim с `status=False` → возвращает `None`
+
+**Зависимости:** Нет
+
+**Риск:** Средний — если `status=False` claims были нужны, это изменит output.
+
+---
+
+## P2 — Уменьшить количество `# type: ignore` (~120 случаев)
+
+**Приоритет:** P2 — подавлена type checking на critical paths
+
+**Распределение:**
+| Файл | Кол-во |
+|------|--------|
+| `packages/graphrag-llm/graphrag_llm/mcp/middleware.py` | 15 |
+| `packages/graphrag-llm/graphrag_llm/completion/openai_completion.py` | 10 |
+| `packages/graphrag-vectors/graphrag_vectors/qdrant.py` | 12 |
+| `packages/graphrag/graphrag/query/structured_search/global_search/search.py` | 14 |
+
+**Что нужно:**
+1. **MCP middleware**: типизировать `_base_sync`, `_base_async` вместо `Any`. Использовать `Protocol`.
+2. **OpenAI completion**: убрать `# type: ignore[call-arg]` — явно указать signature.
+3. **Qdrant**: проверить что type stubs актуальны.
+4. Review каждый `# type: ignore` — заменить на конкретный тип или исправить код.
+
+**Тесты:**
+- `uv run poe check` — уменьшить количество `type: ignore` до <50
+
+**Зависимости:** Нет (можно делать по файлам)
+
+**Риск:** Низкий — только исправление type hints.
+
+---
+
+## P2 — Убрать дублирование prompt в community_report.py
+
+**Приоритет:** P2 — copy-paste error
+
+**Файл:** `packages/graphrag/graphrag/prompts/index/community_report.py`
+
+**Текущее состояние:**
+Структура и инструкции форматирования продублированы (lines 13-54 и lines 110-151).
+
+**Что нужно:**
+Удалить дублирующуюся секцию (lines 110-151). Оставить один canonical prompt text.
+
+**Тесты:**
+- Тест: prompt length = ~X lines (без дублирования)
+- Integration-тест: community report generation — не сломан
+
+**Зависимости:** Нет
+
+**Риск:** Низкий — удаление мёртвого кода.
+
+---
+
+## P3 — Добавить deprecation handling для config fields
+
+**Приоритет:** P3 — старые конфиги молча игнорируют unknown keys
+
+**Файл:** `packages/graphrag/graphrag/config/models/graph_rag_config.py`
+
+**Текущее состояние:**
+Pydantic по умолчанию игнорирует unknown keys. Если поле переименовано — старый конфиг не применит значение без предупреждения.
+
+**Что нужно:**
+```python
+@model_validator(mode="before")
+@classmethod
+def _handle_deprecated_fields(cls, data: dict) -> dict:
+    if "old_field" in data:
+        warnings.warn("'old_field' is deprecated, use 'new_field'.")
+        data["new_field"] = data.pop("old_field")
+    return data
+```
+
+**Тесты:**
+- Тест: deprecated field → warning, value перенесён
+
+**Зависимости:** Нет
+
+**Риск:** Низкий — только добавление warning.
+
+---
+
+## P3 — Убрать mutable default dicts в GraphRagConfig
+
+**Приоритет:** P3 — потенциальное shared state при `model_copy()`
+
+**Файл:** `packages/graphrag/graphrag/config/models/graph_rag_config.py:53,58`
+
+**Что нужно:**
+```python
+import copy
+completion_models: dict[str, ModelConfig] = field(
+    default_factory=lambda: dict(copy.deepcopy(graphrag_config_defaults.completion_models)),
+)
+```
+
+**Тесты:**
+- Тест: два `GraphRagConfig()` — `completion_models` независимы
+
+**Зависимости:** Нет
+
+**Риск:** Низкий.
+
+---
+
+## P3 — Увеличить покрытие тестами критических модулей
+
+**Приоритет:** P3 — ~40% модулей без тестов
+
+**Без тестов:**
+| Модуль | Файлов | Приоритет |
+|--------|--------|-----------|
+| Query engines (`structured_search/`) | ~20 | 🔴 High |
+| CLI | 5 | 🔴 High |
+| Drift search | 5 | 🟡 Medium |
+| Basic search | 3 | 🟡 Medium |
+| Input loaders | 6 | 🟡 Medium |
+
+**Приоритетные тесты:**
+1. Query engines — интеграционные тесты с моковым LLM
+2. CLI — smoke-тесты основных команд
+3. Input loaders — edge cases: empty file, malformed CSV, binary file
+
+**Тесты:**
+- `uv run poe test` — coverage должен вырасти до >70%
+
+**Зависимости:** Нет
+
+**Риск:** Низкий — только добавление тестов.
+
+---
+
+## P3 — Hardcoded workflow list — добавить extensibility
+
+**Приоритет:** P3 — нельзя вставить свой workflow между steps
+
+**Файл:** `packages/graphrag/graphrag/index/workflows/factory.py:52-96`
+
+**Что нужно:**
+```python
+class PipelineFactory:
+    @staticmethod
+    def register_pre_workflow(workflow_name: str, workflow_func: WorkflowFunction) -> None:
+        """Register a workflow to run before a named workflow."""
+        ...
+    
+    @staticmethod
+    def register_post_workflow(workflow_name: str, workflow_func: WorkflowFunction) -> None:
+        """Register a workflow to run after a named workflow."""
+        ...
+```
+
+**Тесты:**
+- Тест: `register_pre_workflow("extract_graph", my_validation)` → validation runs before extract_graph
+
+**Зависимости:** Нет
+
+**Риск:** Средний — API change.
+
+---
+
+## P3 — Исправить несоответствие `pd.concat` в extract_graph
+
+**Приоритет:** P3 — inconsistent `ignore_index` может вызвать misaligned indices
+
+**Файл:** `packages/graphrag/graphrag/index/operations/extract_graph/extract_graph.py:104-119`
+
+**Текущее состояние:**
+```python
+_merge_entities: ignore_index=True
+_merge_relationships: ignore_index=False (inconsistent!)
+```
+
+**Что нужно:**
+Единообразно использовать `ignore_index=True` для обоих, или задокументировать почему relationships нужны с оригинальными индексами.
+
+**Тесты:**
+- Тест: extract_graph с несколькими документами → check index alignment
+
+**Зависимости:** Нет
+
+**Риск:** Низкий — только единообразие.
