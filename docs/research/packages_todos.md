@@ -1227,7 +1227,7 @@ RUF001 String contains ambiguous `И` (CYRILLIC CAPITAL LETTER I)
 
 ---
 
-## P0 — Исправить `strip` вместо `strip()` в валидации db_uri
+## P0 — Исправить `strip` вместо `strip()` в валидации db_uri ✅ **ВЫПОЛНЕНО**
 
 **Приоритет:** P0 — баг, валидация `db_uri` никогда не срабатывает
 
