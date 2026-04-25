@@ -24,7 +24,13 @@ ItemType = TypeVar("ItemType")
 class ParallelizationError(ValueError):
     """Exception for invalid parallel processing."""
 
-    def __init__(self, num_errors: int, example: str | None = None) -> None:
+    def __init__(
+        self,
+        num_errors: int,
+        example: str | None = None,
+        continue_on_error: bool = False,
+    ) -> None:
+        self.continue_on_error = continue_on_error
         msg = f"{num_errors} Errors occurred while running parallel transformation, could not complete!"
         if example:
             msg += f"\nExample error: {example}"
@@ -38,17 +44,20 @@ async def derive_from_rows(
     num_threads: int = 4,
     async_type: AsyncType = AsyncType.AsyncIO,
     progress_msg: str = "",
+    continue_on_error: bool = True,
 ) -> list[ItemType | None]:
-    """Apply a generic transform function to each row. Any errors will be reported and thrown."""
+    """Apply a generic transform function to each row. Errors can be handled gracefully."""
     callbacks = callbacks or NoopWorkflowCallbacks()
     match async_type:
         case AsyncType.AsyncIO:
             return await derive_from_rows_asyncio(
                 input, transform, callbacks, num_threads, progress_msg,
+                continue_on_error,
             )
         case AsyncType.Threaded:
             return await derive_from_rows_asyncio_threads(
                 input, transform, callbacks, num_threads, progress_msg,
+                continue_on_error,
             )
         case _:
             msg = f"Unsupported scheduling type {async_type}"
@@ -61,6 +70,7 @@ async def derive_from_rows_asyncio_threads(
     callbacks: WorkflowCallbacks,
     num_threads: int | None = 4,
     progress_msg: str = "",
+    continue_on_error: bool = True,
 ) -> list[ItemType | None]:
     """
     Derive from rows asynchronously.
@@ -81,7 +91,7 @@ async def derive_from_rows_asyncio_threads(
         return await asyncio.gather(*[execute_task(task) for task in tasks])
 
     return await _derive_from_rows_base(
-        input, transform, callbacks, gather, progress_msg,
+        input, transform, callbacks, gather, progress_msg, continue_on_error,
     )
 
 
@@ -91,6 +101,7 @@ async def derive_from_rows_asyncio(
     callbacks: WorkflowCallbacks,
     num_threads: int = 4,
     progress_msg: str = "",
+    continue_on_error: bool = True,
 ) -> list[ItemType | None]:
     """
     Derive from rows asynchronously.
@@ -112,7 +123,7 @@ async def derive_from_rows_asyncio(
         return await asyncio.gather(*tasks)
 
     return await _derive_from_rows_base(
-        input, transform, callbacks, gather, progress_msg,
+        input, transform, callbacks, gather, progress_msg, continue_on_error,
     )
 
 
@@ -128,6 +139,7 @@ async def _derive_from_rows_base(
     callbacks: WorkflowCallbacks,
     gather: GatherFn[ItemType],
     progress_msg: str = "",
+    continue_on_error: bool = True,
 ) -> list[ItemType | None]:
     """
     Derive from rows asynchronously.
@@ -161,7 +173,7 @@ async def _derive_from_rows_base(
             "parallel transformation error", exc_info=error, extra={"stack": stack},
         )
 
-    if len(errors) > 0:
-        raise ParallelizationError(len(errors), errors[0][1])
+    if len(errors) > 0 and not continue_on_error:
+        raise ParallelizationError(len(errors), errors[0][1], continue_on_error=False)
 
     return result

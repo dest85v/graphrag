@@ -57,6 +57,7 @@ async def extract_graph(
         num_threads=num_threads,
         async_type=async_type,
         progress_msg="extract graph progress: ",
+        continue_on_error=True,
     )
 
     entity_dfs = []

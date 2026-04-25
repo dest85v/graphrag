@@ -64,6 +64,7 @@ async def extract_covariates(
         num_threads=num_threads,
         async_type=async_type,
         progress_msg="extract covariates progress: ",
+        continue_on_error=True,
     )
     return pd.DataFrame([item for row in results for item in row or []])
 
