@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Any, Unpack
 
 import openai
 from azure.identity import DefaultAzureCredential, get_bearer_token_provider
+from openai import AsyncStream, Stream
 from pydantic import BaseModel
 
 from graphrag_llm.completion.completion import LLMCompletion
@@ -345,6 +346,8 @@ def _create_base_completions(
         ).chat.completions.create(
             **filtered,
         )
+        if isinstance(response, Stream):
+            return response  # type: ignore[return-value]
         return LLMCompletionResponse.model_validate(response.model_dump())
 
     async def _base_completion_async(
@@ -406,6 +409,8 @@ def _create_base_completions(
         ).chat.completions.create(
             **filtered,
         )
+        if isinstance(response, AsyncStream):
+            return response  # type: ignore[return-value]
         return LLMCompletionResponse.model_validate(response.model_dump())
 
     return (_base_completion, _base_completion_async)
