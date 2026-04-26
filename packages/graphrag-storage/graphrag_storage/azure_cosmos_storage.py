@@ -18,6 +18,7 @@ from azure.cosmos.partition_key import PartitionKey
 from azure.identity import DefaultAzureCredential
 from graphrag.logger.progress import Progress
 
+from graphrag_storage.cosmos_sanitizer import _sanitize_cosmos_key
 from graphrag_storage.storage import (
     Storage,
     get_timestamp_formatted_with_local_tz,
@@ -172,7 +173,9 @@ class AzureCosmosStorage(Storage):
                     num_filtered += 1
 
             progress_status = _create_progress_status(
-                num_loaded, num_filtered, num_total,
+                num_loaded,
+                num_filtered,
+                num_total,
             )
             logger.debug(
                 "Progress: %s (%d/%d completed)",
@@ -186,7 +189,10 @@ class AzureCosmosStorage(Storage):
             )
 
     async def get(
-        self, key: str, as_bytes: bool | None = None, encoding: str | None = None,
+        self,
+        key: str,
+        as_bytes: bool | None = None,
+        encoding: str | None = None,
     ) -> Any:
         """Fetch all items in a container that match the given key."""
         try:
@@ -194,8 +200,8 @@ class AzureCosmosStorage(Storage):
                 return None
 
             if as_bytes:
-                prefix = self._get_prefix(key)
-                query = f"SELECT * FROM c WHERE STARTSWITH(c.id, '{prefix}:')"  # noqa: S608
+                prefix = _sanitize_cosmos_key(self._get_prefix(key))
+                query = f"SELECT * FROM c WHERE STARTSWITH(c.id, '{prefix}:')"  # noqa: S608 - prefix sanitized
                 items_list = self._query_all_items(
                     self._container_client,
                     query=query,
@@ -212,7 +218,9 @@ class AzureCosmosStorage(Storage):
 
                 items_json_str = json.dumps(items_list)
                 items_df = pd.read_json(
-                    StringIO(items_json_str), orient="records", lines=False,
+                    StringIO(items_json_str),
+                    orient="records",
+                    lines=False,
                 )
 
                 if prefix == "entities":
@@ -238,7 +246,9 @@ class AzureCosmosStorage(Storage):
 
                 if items_df.empty:
                     logger.warning(
-                        "No rows returned for prefix %s (key=%s)", prefix, key,
+                        "No rows returned for prefix %s (key=%s)",
+                        prefix,
+                        key,
                     )
                     return None
                 return items_df.to_parquet()
@@ -304,7 +314,7 @@ class AzureCosmosStorage(Storage):
         if not self._database_client or not self._container_client:
             return False
         if ".parquet" in key:
-            prefix = self._get_prefix(key)
+            prefix = _sanitize_cosmos_key(self._get_prefix(key))
             count = self._query_count(
                 self._container_client,
                 query_filter=f"STARTSWITH(c.id, '{prefix}:')",
@@ -312,7 +322,7 @@ class AzureCosmosStorage(Storage):
             return count > 0
         count = self._query_count(
             self._container_client,
-            query_filter=f"c.id = '{key}'",
+            query_filter=f"c.id = '{_sanitize_cosmos_key(key)}'",
         )
         return count >= 1
 
@@ -372,15 +382,16 @@ class AzureCosmosStorage(Storage):
             return
         try:
             if ".parquet" in key:
-                prefix = self._get_prefix(key)
-                query = f"SELECT * FROM c WHERE STARTSWITH(c.id, '{prefix}:')"  # noqa: S608
+                prefix = _sanitize_cosmos_key(self._get_prefix(key))
+                query = f"SELECT * FROM c WHERE STARTSWITH(c.id, '{prefix}:')"  # noqa: S608 - prefix sanitized
                 items = self._query_all_items(
                     self._container_client,
                     query=query,
                 )
                 for item in items:
                     self._container_client.delete_item(
-                        item=item["id"], partition_key=item["id"],
+                        item=item["id"],
+                        partition_key=item["id"],
                     )
             else:
                 self._container_client.delete_item(item=key, partition_key=key)
@@ -426,7 +437,9 @@ class AzureCosmosStorage(Storage):
 
 
 def _create_progress_status(
-    num_loaded: int, num_filtered: int, num_total: int,
+    num_loaded: int,
+    num_filtered: int,
+    num_total: int,
 ) -> Progress:
     return Progress(
         total_items=num_total,

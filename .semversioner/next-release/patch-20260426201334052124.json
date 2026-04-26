@@ -1,0 +1,4 @@
+{
+  "type": "patch",
+  "description": "Fix NoSQL injection vulnerability in Cosmos DB storage and vector store layers by sanitizing query string values."
+}

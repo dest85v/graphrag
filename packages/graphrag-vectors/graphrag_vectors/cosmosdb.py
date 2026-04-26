@@ -10,6 +10,7 @@ from azure.cosmos.exceptions import CosmosHttpResponseError
 from azure.cosmos.partition_key import PartitionKey
 from azure.identity import DefaultAzureCredential
 
+from graphrag_vectors.cosmos_sanitizer import _sanitize_cosmos_key
 from graphrag_vectors.filtering import (
     AndExpr,
     Condition,
@@ -59,7 +60,8 @@ class CosmosDBVectorStore(VectorStore):
             )
         else:
             self._cosmos_client = CosmosClient(
-                url=self.url, credential=DefaultAzureCredential(),
+                url=self.url,
+                credential=DefaultAzureCredential(),
             )
 
         self._create_database()
@@ -212,7 +214,9 @@ class CosmosDBVectorStore(VectorStore):
         value = cond.value
 
         def quote(v: Any) -> str:
-            return f"'{v}'" if isinstance(v, str) else str(v)
+            if isinstance(v, str):
+                return f"'{_sanitize_cosmos_key(v)}'"
+            return str(v)
 
         match cond.operator:
             case Operator.eq:
@@ -234,11 +238,11 @@ class CosmosDBVectorStore(VectorStore):
                 items = ", ".join(quote(v) for v in value)
                 return f"{field} NOT IN ({items})"
             case Operator.contains:
-                return f"CONTAINS({field}, '{value}')"
+                return f"CONTAINS({field}, '{_sanitize_cosmos_key(value)}')"
             case Operator.startswith:
-                return f"STARTSWITH({field}, '{value}')"
+                return f"STARTSWITH({field}, '{_sanitize_cosmos_key(value)}')"
             case Operator.endswith:
-                return f"ENDSWITH({field}, '{value}')"
+                return f"ENDSWITH({field}, '{_sanitize_cosmos_key(value)}')"
             case Operator.exists:
                 return f"IS_DEFINED({field})" if value else f"NOT IS_DEFINED({field})"
             case _:
@@ -246,7 +250,9 @@ class CosmosDBVectorStore(VectorStore):
                 raise ValueError(msg)
 
     def _extract_data(
-        self, doc: dict[str, Any], select: list[str] | None = None,
+        self,
+        doc: dict[str, Any],
+        select: list[str] | None = None,
     ) -> dict[str, Any]:
         """Extract additional field data from a document response."""
         fields_to_extract = select if select is not None else list(self.fields.keys())
@@ -396,7 +402,8 @@ class CosmosDBVectorStore(VectorStore):
 
         # Read the existing document
         existing = self._container_client.read_item(
-            item=document.id, partition_key=document.id,
+            item=document.id,
+            partition_key=document.id,
         )
 
         # Set update_date
