@@ -1257,7 +1257,7 @@ if not store.db_uri or store.db_uri.strip() == "":
 
 ---
 
-## P0 — Заменить `time.sleep()` на `await asyncio.sleep()` в retry
+## P0 — Заменить `time.sleep()` на `await asyncio.sleep()` в retry ✅ **ВЫПОЛНЕНО**
 
 **Приоритет:** P0 — блокирует весь event loop при каждом рестарте
 
@@ -1288,7 +1288,7 @@ await asyncio.sleep(sleep_delay)
 
 ---
 
-## P0 — Продолжающая обработка при ошибках в `ParallelizationError`
+## P0 — Продолжающая обработка при ошибках в `ParallelizationError` ✅ **ВЫПОЛНЕНО**
 
 **Приоритет:** P0 — полная потеря данных при одной ошибке
 

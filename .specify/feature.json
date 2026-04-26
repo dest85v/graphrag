@@ -1,1 +1,3 @@
-{"feature_directory": "specs/009-mcp-llm-support"}
+{
+  "feature_directory": "specs/011-nosql-injection-defense"
+}
