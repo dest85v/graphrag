@@ -37,20 +37,20 @@
 
 ### Implementation for Foundational
 
-- [ ] T007 Create `_run_async_in_loop()` helper in `packages/graphrag-llm/graphrag_llm/middleware/_event_loop.py` with: try/except `asyncio.get_running_loop()`, `anyio.from_thread.run()` when running, `new_event_loop()` + `run_until_complete()` + `close()` when not running
-- [ ] T008 Implement test for T003: write failing test that calls `MCPMiddleware._wrap_completion()` from `asyncio.run()` context, expecting `RuntimeError` to NOT be raised
-- [ ] T009 Implement test for T004: write failing test that asserts `anyio.from_thread.run()` is called (patched/mock) when inside an async context
-- [ ] T010 Implement test for T005: write failing test that calls sync cache middleware 100 times and asserts `len([o for o in gc.get_objects() if isinstance(o, asyncio.AbstractEventLoop)])` stays stable
-- [ ] T011 Implement test for T006: write failing test that calls the helper from a sync context and verifies a new loop is created and closed
+- [X] T007 Create `_run_async_in_loop()` helper in `packages/graphrag-llm/graphrag_llm/middleware/_event_loop.py` with: try/except `asyncio.get_running_loop()`, `anyio.from_thread.run()` when running, `new_event_loop()` + `run_until_complete()` + `close()` when not running
+- [X] T008 Implement test for T003: write failing test that calls `MCPMiddleware._wrap_completion()` from `asyncio.run()` context, expecting `RuntimeError` to NOT be raised
+- [X] T009 Implement test for T004: write failing test that asserts `anyio.from_thread.run()` is called (patched/mock) when inside an async context
+- [X] T010 Implement test for T005: write failing test that calls sync cache middleware 100 times and asserts `len([o for o in gc.get_objects() if isinstance(o, asyncio.AbstractEventLoop)])` stays stable
+- [X] T011 Implement test for T006: write failing test that calls the helper from a sync context and verifies a new loop is created and closed
 
 **Checkpoint**: Foundation ready — all tests written and failing. Implementation begins below.
 
-- [ ] T012 Replace `asyncio.run()` in `packages/graphrag-llm/graphrag_llm/mcp/middleware.py:414` with `_run_async_in_loop()` helper — make tools importable, import from `._event_loop`
-- [ ] T013 Replace `asyncio.new_event_loop()` / `event_loop.run_until_complete()` pattern in `packages/graphrag-llm/graphrag_llm/middleware/with_cache.py:69-103` with `_run_async_in_loop()` helper — import from `._event_loop`
-- [ ] T014 Fix exception handling in `packages/graphrag-llm/graphrag_llm/mcp/middleware.py:302-303` — replace bare `except Exception:` with `except Exception as e: log.exception(...)` for tool call detection
-- [ ] T015 Fix exception handling in `packages/graphrag-llm/graphrag_llm/mcp/middleware.py:384-385` — same pattern for sync path tool call detection
-- [ ] T016 Fix exception handling in `packages/graphrag-llm/graphrag_llm/middleware/with_cache.py:92-95` — replace bare `except Exception:` with `except Exception as e: log.exception(...)` for cache read
-- [ ] T017 Fix exception handling in `packages/graphrag-llm/graphrag_llm/middleware/with_cache.py:140-143` — same pattern for async cache read
+- [X] T012 Replace `asyncio.run()` in `packages/graphrag-llm/graphrag_llm/mcp/middleware.py:414` with `_run_async_in_loop()` helper — make tools importable, import from `._event_loop`
+- [X] T013 Replace `asyncio.new_event_loop()` / `event_loop.run_until_complete()` pattern in `packages/graphrag-llm/graphrag_llm/middleware/with_cache.py:69-103` with `_run_async_in_loop()` helper — import from `._event_loop`
+- [X] T014 Fix exception handling in `packages/graphrag-llm/graphrag_llm/mcp/middleware.py:302-303` — replace bare `except Exception:` with `except Exception as e: log.exception(...)` for tool call detection
+- [X] T015 Fix exception handling in `packages/graphrag-llm/graphrag_llm/mcp/middleware.py:384-385` — same pattern for sync path tool call detection
+- [X] T016 Fix exception handling in `packages/graphrag-llm/graphrag_llm/middleware/with_cache.py:92-95` — replace bare `except Exception:` with `except Exception as e: log.exception(...)` for cache read
+- [X] T017 Fix exception handling in `packages/graphrag-llm/graphrag_llm/middleware/with_cache.py:140-143` — same pattern for async cache read
 
 **Checkpoint**: Foundational implementation complete. All 4 foundational tests must now PASS.
 
@@ -101,12 +101,12 @@
 
 **Purpose**: Ensure quality, backward compatibility, and zero regression.
 
-- [ ] T027 Run full existing test suite: `uv run poe test_unit -- -k "mcp or middleware"` and `uv run poe test_integration -- -k "mcp"` — all existing tests must pass (SC-004)
-- [ ] T028 [P] Run full CI check: `uv run poe check` — format + lint + typecheck must pass
+- [X] T027 Run full existing test suite: `uv run poe test_unit -- -k "mcp or middleware"` and `uv run poe test_integration -- -k "mcp"` — all existing tests must pass (SC-004)
+- [X] T028 [P] Run full CI check: `uv run poe check` — format + lint + typecheck must pass
 - [ ] T029 [P] Run full test suite: `uv run poe test` — no regressions in other packages
 - [ ] T030 Update `quickstart.md` verification results with actual test output
-- [ ] T031 Add semversioner change entry: `uv run semversioner add-change -t patch -d "Fix asyncio.run() crash in sync middleware when called from async context, and eliminate event loop leak in cache middleware."`
-- [ ] T032 Verify backward compatibility: test `MCPMiddleware._wrap_completion()` from pure sync context (no running loop) — must still work with `new_event_loop()` fallback
+- [X] T031 Add semversioner change entry: `uv run semversioner add-change -t patch -d "Fix asyncio.run() crash in sync middleware when called from async context, and eliminate event loop leak in cache middleware."`
+- [X] T032 Verify backward compatibility: test `MCPMiddleware._wrap_completion()` from pure sync context (no running loop) — must still work with `new_event_loop()` fallback
 
 **Checkpoint**: All tests pass, CI clean, backward compatibility confirmed. Feature ready for PR.
 
