@@ -1,0 +1,4 @@
+{
+  "type": "patch",
+  "description": "Add --set CLI override flag to index and update commands."
+}
