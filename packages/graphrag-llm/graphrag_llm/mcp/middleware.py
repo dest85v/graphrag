@@ -11,7 +11,6 @@ result formatting -> LLM final response.
 
 from __future__ import annotations
 
-import asyncio
 import json
 import logging
 from typing import TYPE_CHECKING, Any
@@ -23,8 +22,8 @@ from graphrag_llm.mcp.client import (
     MCPToolError,
 )
 from graphrag_llm.types import (
-        LLMCompletionResponse,
-    )
+    LLMCompletionResponse,
+)
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator, Iterator
@@ -65,6 +64,13 @@ class MCPCompletionMiddleware:
         self._base_sync: Any = None
         self._base_async: Any = None
 
+    @staticmethod
+    def _run_async(coro: Any) -> Any:
+        """Run an async coroutine from sync code, reusing a running loop or creating one."""
+        from graphrag_llm.middleware._event_loop import run_async_in_loop
+
+        return run_async_in_loop(coro)
+
     def _should_use_mcp(self) -> bool:
         """Check if MCP is enabled."""
         return not self._disabled
@@ -96,7 +102,8 @@ class MCPCompletionMiddleware:
             )
         except (MCPConnectionError, MCPTimeoutError) as e:
             log.warning(
-                "MCP initialization failed, disabling MCP for this session: %s", e,
+                "MCP initialization failed, disabling MCP for this session: %s",
+                e,
             )
             self._mcp_tools = []
 
@@ -111,7 +118,9 @@ class MCPCompletionMiddleware:
         return [tool.to_openai_tool() for tool in self._mcp_tools]  # type: ignore[return-value]
 
     def _format_tool_results(
-        self, tool_calls: list[Any], results: list[str],
+        self,
+        tool_calls: list[Any],
+        results: list[str],
     ) -> list[dict[str, Any]]:
         """Format tool call results as tool_result messages.
 
@@ -131,10 +140,9 @@ class MCPCompletionMiddleware:
         for i, (tc, result_text) in enumerate(zip(tool_calls, results, strict=False)):
             tool_id = getattr(tc, "id", f"call_{i}")
             tool_name = (
-                (getattr(tc, "function", None)
-                and getattr(tc.function, "name", "<unknown>"))
-                or getattr(tc, "name", "<unknown>")
-            )
+                getattr(tc, "function", None)
+                and getattr(tc.function, "name", "<unknown>")
+            ) or getattr(tc, "name", "<unknown>")
             messages.append({
                 "role": "tool",
                 "tool_call_id": tool_id,
@@ -169,7 +177,8 @@ class MCPCompletionMiddleware:
         )
 
     async def _execute_tool_calls(
-        self, tool_calls: list[Any],
+        self,
+        tool_calls: list[Any],
     ) -> tuple[list[str], list[Exception]]:
         """Execute LLM tool calls via MCP server.
 
@@ -195,13 +204,13 @@ class MCPCompletionMiddleware:
         for tc in tool_calls:
             # Extract tool name and arguments
             tool_name = (
-                (getattr(tc, "function", None)
-                and getattr(tc.function, "name", None))
-                or getattr(tc, "name", None)
-            )
+                getattr(tc, "function", None) and getattr(tc.function, "name", None)
+            ) or getattr(tc, "name", None)
             tool_args = (
-                (getattr(tc, "function", None)
-                and getattr(tc.function, "arguments", "{}"))
+                (
+                    getattr(tc, "function", None)
+                    and getattr(tc.function, "arguments", "{}")
+                )
                 or getattr(tc, "input", None)
                 or {}
             )
@@ -299,7 +308,8 @@ class MCPCompletionMiddleware:
                     "tool_calls",
                     None,
                 )
-            except Exception:  # noqa: BLE001
+            except Exception:
+                log.exception("Failed to extract tool_calls from response")
                 tool_calls = None
 
             if not tool_calls:
@@ -349,11 +359,7 @@ class MCPCompletionMiddleware:
             self._ensure_client()
 
         if not self._initialized:
-            loop = asyncio.new_event_loop()
-            try:
-                loop.run_until_complete(self._initialize_mcp())
-            finally:
-                loop.close()
+            self._run_async(self._initialize_mcp())
 
         openai_tools = self._convert_tools_to_openai_format()
 
@@ -381,7 +387,8 @@ class MCPCompletionMiddleware:
                     "tool_calls",
                     None,
                 )
-            except Exception:  # noqa: BLE001
+            except Exception:
+                log.exception("Failed to extract tool_calls from response")
                 tool_calls = None
 
             if not tool_calls:
@@ -391,10 +398,8 @@ class MCPCompletionMiddleware:
             results: list[str] = []
             for tc in tool_calls:
                 tool_name = (
-                    (getattr(tc, "function", None)
-                    and getattr(tc.function, "name", None))
-                    or getattr(tc, "name", None)
-                )
+                    getattr(tc, "function", None) and getattr(tc.function, "name", None)
+                ) or getattr(tc, "name", None)
                 if not tool_name:
                     results.append("Error: Could not determine tool name.")
                     continue
@@ -411,7 +416,7 @@ class MCPCompletionMiddleware:
                         args = json.loads(args)
                     elif not isinstance(args, dict):
                         args = {}
-                    result = asyncio.run(
+                    result = self._run_async(
                         self._client.call_tool(
                             name=tool_name,
                             arguments=args,

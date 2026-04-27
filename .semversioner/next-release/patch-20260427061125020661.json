@@ -1,0 +1,4 @@
+{
+  "type": "patch",
+  "description": "Fix asyncio.run() crash in sync middleware when called from async context, and eliminate event loop leak in cache middleware."
+}
