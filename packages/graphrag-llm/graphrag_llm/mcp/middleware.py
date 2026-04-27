@@ -242,7 +242,8 @@ class MCPCompletionMiddleware:
             except MCPTimeoutError as e:
                 results.append(f"Timeout error: {e}")
                 exceptions.append(e)
-            except Exception as e:  # noqa: BLE001
+            except Exception as e:
+                log.exception("Unexpected error executing MCP tool call")
                 results.append(f"Unexpected error: {e}")
                 exceptions.append(e)
 
@@ -396,6 +397,7 @@ class MCPCompletionMiddleware:
 
             # For sync, execute tools in a loop
             results: list[str] = []
+            exceptions: list[Exception] = []
             for tc in tool_calls:
                 tool_name = (
                     getattr(tc, "function", None) and getattr(tc.function, "name", None)
@@ -423,8 +425,10 @@ class MCPCompletionMiddleware:
                         ),
                     )
                     results.append(str(result))
-                except Exception as e:  # noqa: BLE001
+                except Exception as e:
+                    log.exception("Unexpected error executing MCP tool call (sync path)")
                     results.append(f"Error: {e}")
+                    exceptions.append(e)
 
             tool_messages = self._format_tool_results(tool_calls, results)
             messages.extend(tool_messages)
