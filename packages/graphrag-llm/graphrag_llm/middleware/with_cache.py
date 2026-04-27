@@ -99,7 +99,10 @@ def with_cache(
             "response": response.model_dump(),  # type: ignore
             "metrics": metrics if metrics is not None else {},
         }
-        run_async_in_loop(cache.set(cache_key, cache_value))
+        try:
+            run_async_in_loop(cache.set(cache_key, cache_value))
+        except Exception:
+            log.exception("Failed to write response to cache")
         return response
 
     async def _cache_middleware_async(
@@ -144,7 +147,10 @@ def with_cache(
             "response": response.model_dump(),  # type: ignore
             "metrics": metrics if metrics is not None else {},
         }
-        await cache.set(cache_key, cache_value)
+        try:
+            await cache.set(cache_key, cache_value)
+        except Exception:
+            log.exception("Failed to write response to cache")
         return response
 
     return (_cache_middleware, _cache_middleware_async)  # type: ignore

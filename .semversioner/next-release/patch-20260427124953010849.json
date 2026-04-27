@@ -1,0 +1,4 @@
+{
+  "type": "patch",
+  "description": "Add exception logging to cache write failures and MCP tool call errors"
+}
