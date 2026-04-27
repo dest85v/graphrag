@@ -21,6 +21,18 @@ from graphrag.prompt_tune.types import DocSelectionType
 
 INVALID_METHOD_ERROR = "Invalid method"
 
+
+def _parse_cli_overrides(set_args: list[str] | None) -> dict | None:
+    """Parse --set CLI arguments into a nested override dict.
+
+    Returns None if set_args is empty or None.
+    """
+    if not set_args:
+        return None
+    from graphrag.cli.overrides import parse_set_args
+
+    return parse_set_args(set_args)
+
 app = typer.Typer(
     help="GraphRAG: A graph-based retrieval-augmented generation (RAG) system.",
     no_args_is_help=True,
@@ -179,9 +191,17 @@ def _index_cli(
         "--skip-validation",
         help="Skip any preflight validation. Useful when running no LLM steps.",
     ),
+    set_args: list[str] = typer.Option(
+        [],
+        "--set",
+        "-s",
+        help="Override configuration values (key=value, repeatable). Supports dot-notation for nested paths (e.g., 'completion_models.default.model=gpt-4o').",
+    ),
 ) -> None:
     """Build a knowledge graph index."""
     from graphrag.cli.index import index_cli
+
+    cli_overrides = _parse_cli_overrides(set_args if set_args else None)
 
     index_cli(
         root_dir=root,
@@ -190,6 +210,7 @@ def _index_cli(
         dry_run=dry_run,
         skip_validation=skip_validation,
         method=method,
+        cli_overrides=cli_overrides,
     )
 
 
@@ -229,6 +250,12 @@ def _update_cli(
         "--skip-validation",
         help="Skip any preflight validation. Useful when running no LLM steps.",
     ),
+    set_args: list[str] = typer.Option(
+        [],
+        "--set",
+        "-s",
+        help="Override configuration values (key=value, repeatable). Supports dot-notation for nested paths (e.g., 'completion_models.default.model=gpt-4o').",
+    ),
 ) -> None:
     """
     Update an existing knowledge graph index.
@@ -237,12 +264,15 @@ def _update_cli(
     """
     from graphrag.cli.index import update_cli
 
+    cli_overrides = _parse_cli_overrides(set_args if set_args else None)
+
     update_cli(
         root_dir=root,
         verbose=verbose,
         cache=cache,
         skip_validation=skip_validation,
         method=method,
+        cli_overrides=cli_overrides,
     )
 
 
