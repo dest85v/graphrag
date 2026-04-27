@@ -3,10 +3,12 @@
 
 """Cache middleware."""
 
-import asyncio
+import logging
 from typing import TYPE_CHECKING, Any, Literal
 
 from graphrag_llm.types import LLMCompletionResponse, LLMEmbeddingResponse
+
+log = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from graphrag_cache import Cache, CacheKeyCreator
@@ -66,9 +68,9 @@ def with_cache(
 
         cache_key = cache_key_creator(kwargs)
 
-        event_loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(event_loop)
-        cached_response = event_loop.run_until_complete(cache.get(cache_key))
+        from graphrag_llm.middleware._event_loop import run_async_in_loop
+
+        cached_response = run_async_in_loop(cache.get(cache_key))
         if (
             cached_response is not None
             and isinstance(cached_response, dict)
@@ -89,18 +91,15 @@ def with_cache(
                 if request_type == "chat":
                     return LLMCompletionResponse(**cached_response["response"])
                 return LLMEmbeddingResponse(**cached_response["response"])
-            except Exception:  # noqa: BLE001
-                # Try to retrieve value from cache but if it fails, continue
-                # to make the request.
-                ...
+            except Exception:
+                log.exception("Failed to parse cached response, making request")
 
         response = sync_middleware(**kwargs)
         cache_value = {
             "response": response.model_dump(),  # type: ignore
             "metrics": metrics if metrics is not None else {},
         }
-        event_loop.run_until_complete(cache.set(cache_key, cache_value))
-        event_loop.close()
+        run_async_in_loop(cache.set(cache_key, cache_value))
         return response
 
     async def _cache_middleware_async(
@@ -137,10 +136,8 @@ def with_cache(
                 if request_type == "chat":
                     return LLMCompletionResponse(**cached_response["response"])
                 return LLMEmbeddingResponse(**cached_response["response"])
-            except Exception:  # noqa: BLE001
-                # Try to retrieve value from cache but if it fails, continue
-                # to make the request.
-                ...
+            except Exception:
+                log.exception("Failed to parse cached response, making request")
 
         response = await async_middleware(**kwargs)
         cache_value = {
