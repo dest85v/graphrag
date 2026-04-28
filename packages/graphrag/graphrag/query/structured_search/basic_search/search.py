@@ -18,6 +18,7 @@ from graphrag.prompts.query.basic_search_system_prompt import (
 from graphrag.query.context_builder.builders import BasicContextBuilder
 from graphrag.query.context_builder.conversation_history import ConversationHistory
 from graphrag.query.structured_search.base import BaseSearch, SearchResult
+from graphrag.utils.jinja_engine import render_prompt
 
 if TYPE_CHECKING:
     from graphrag_llm.completion import LLMCompletion
@@ -78,7 +79,8 @@ class BasicSearch(BaseSearch[BasicContextBuilder]):
 
         logger.debug("GENERATE ANSWER: %s. QUERY: %s", start_time, query)
         try:
-            search_prompt = self.system_prompt.format(
+            search_prompt = render_prompt(
+                self.system_prompt,
                 context_data=context_result.context_chunks,
                 response_type=self.response_type,
             )
@@ -154,8 +156,10 @@ class BasicSearch(BaseSearch[BasicContextBuilder]):
             **self.context_builder_params,
         )
         logger.debug("GENERATE ANSWER: %s. QUERY: %s", start_time, query)
-        search_prompt = self.system_prompt.format(
-            context_data=context_result.context_chunks, response_type=self.response_type,
+        search_prompt = render_prompt(
+            self.system_prompt,
+            context_data=context_result.context_chunks,
+            response_type=self.response_type,
         )
 
         messages_builder = (

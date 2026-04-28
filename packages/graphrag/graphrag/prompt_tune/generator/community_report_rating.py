@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 from graphrag.prompt_tune.prompt.community_report_rating import (
     GENERATE_REPORT_RATING_PROMPT,
 )
+from graphrag.utils.jinja_engine import render_prompt
 
 if TYPE_CHECKING:
     from graphrag_llm.completion import LLMCompletion
@@ -14,7 +15,10 @@ if TYPE_CHECKING:
 
 
 async def generate_community_report_rating(
-    model: "LLMCompletion", domain: str, persona: str, docs: str | list[str],
+    model: "LLMCompletion",
+    domain: str,
+    persona: str,
+    docs: str | list[str],
 ) -> str:
     """Generate an LLM persona to use for GraphRAG prompts.
 
@@ -30,8 +34,11 @@ async def generate_community_report_rating(
     - str: The generated rating description prompt response.
     """
     docs_str = " ".join(docs) if isinstance(docs, list) else docs
-    domain_prompt = GENERATE_REPORT_RATING_PROMPT.format(
-        domain=domain, persona=persona, input_text=docs_str,
+    domain_prompt = render_prompt(
+        GENERATE_REPORT_RATING_PROMPT,
+        domain=domain,
+        persona=persona,
+        input_text=docs_str,
     )
 
     response: LLMCompletionResponse = await model.completion_async(

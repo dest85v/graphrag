@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING
 from pydantic import BaseModel, Field
 
 from graphrag.index.typing.error_handler import ErrorHandlerFn
+from graphrag.utils.jinja_engine import render_prompt
 
 if TYPE_CHECKING:
     from graphrag_llm.completion import LLMCompletion
@@ -75,10 +76,11 @@ class CommunityReportsExtractor:
         """Call method definition."""
         output = None
         try:
-            prompt = self._extraction_prompt.format(**{
-                INPUT_TEXT_KEY: input_text,
-                MAX_LENGTH_KEY: str(self._max_report_length),
-            })
+            prompt = render_prompt(
+                self._extraction_prompt,
+                input_text=input_text,
+                max_report_length=str(self._max_report_length),
+            )
             response = await self._model.completion_async(
                 messages=prompt,
                 response_format=CommunityReportResponse,  # A model is required when using json mode

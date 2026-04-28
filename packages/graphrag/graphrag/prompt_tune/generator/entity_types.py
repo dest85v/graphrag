@@ -15,6 +15,7 @@ from graphrag.prompt_tune.prompt.entity_types import (
     ENTITY_TYPE_GENERATION_JSON_PROMPT,
     ENTITY_TYPE_GENERATION_PROMPT,
 )
+from graphrag.utils.jinja_engine import render_prompt
 
 if TYPE_CHECKING:
     from graphrag_llm.completion import LLMCompletion
@@ -41,15 +42,17 @@ async def generate_entity_types(
     Example Output:
     "entity_types": ['military unit', 'organization', 'person', 'location', 'event', 'date', 'equipment']
     """
-    formatted_task = task.format(domain=domain)
+    formatted_task = render_prompt(task, domain=domain)
 
     docs_str = "\n".join(docs) if isinstance(docs, list) else docs
 
-    entity_types_prompt = (
+    entity_types_prompt = render_prompt(
         ENTITY_TYPE_GENERATION_JSON_PROMPT
         if json_mode
-        else ENTITY_TYPE_GENERATION_PROMPT
-    ).format(task=formatted_task, input_text=docs_str)
+        else ENTITY_TYPE_GENERATION_PROMPT,
+        task=formatted_task,
+        input_text=docs_str,
+    )
 
     messages = (
         CompletionMessagesBuilder()

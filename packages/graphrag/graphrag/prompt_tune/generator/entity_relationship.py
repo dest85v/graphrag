@@ -15,6 +15,7 @@ from graphrag.prompt_tune.prompt.entity_relationship import (
     ENTITY_RELATIONSHIPS_GENERATION_PROMPT,
     UNTYPED_ENTITY_RELATIONSHIPS_GENERATION_PROMPT,
 )
+from graphrag.utils.jinja_engine import render_prompt
 
 if TYPE_CHECKING:
     from graphrag_llm.completion import LLMCompletion
@@ -49,16 +50,23 @@ async def generate_entity_relationship_examples(
 
         messages = [
             (
-                ENTITY_RELATIONSHIPS_GENERATION_JSON_PROMPT
-                if json_mode
-                else ENTITY_RELATIONSHIPS_GENERATION_PROMPT
-            ).format(entity_types=entity_types_str, input_text=doc, language=language)
-            for doc in docs_list
+                render_prompt(
+                    ENTITY_RELATIONSHIPS_GENERATION_JSON_PROMPT
+                    if json_mode
+                    else ENTITY_RELATIONSHIPS_GENERATION_PROMPT,
+                    entity_types=entity_types_str,
+                    input_text=doc,
+                    language=language,
+                )
+                for doc in docs_list
+            )
         ]
     else:
         messages = [
-            UNTYPED_ENTITY_RELATIONSHIPS_GENERATION_PROMPT.format(
-                input_text=doc, language=language,
+            render_prompt(
+                UNTYPED_ENTITY_RELATIONSHIPS_GENERATION_PROMPT,
+                input_text=doc,
+                language=language,
             )
             for doc in docs_list
         ]

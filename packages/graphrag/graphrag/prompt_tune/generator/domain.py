@@ -6,6 +6,7 @@
 from typing import TYPE_CHECKING
 
 from graphrag.prompt_tune.prompt.domain import GENERATE_DOMAIN_PROMPT
+from graphrag.utils.jinja_engine import render_prompt
 
 if TYPE_CHECKING:
     from graphrag_llm.completion import LLMCompletion
@@ -25,7 +26,7 @@ async def generate_domain(model: "LLMCompletion", docs: str | list[str]) -> str:
     - str: The generated domain prompt response.
     """
     docs_str = " ".join(docs) if isinstance(docs, list) else docs
-    domain_prompt = GENERATE_DOMAIN_PROMPT.format(input_text=docs_str)
+    domain_prompt = render_prompt(GENERATE_DOMAIN_PROMPT, input_text=docs_str)
 
     response: LLMCompletionResponse = await model.completion_async(
         messages=domain_prompt,

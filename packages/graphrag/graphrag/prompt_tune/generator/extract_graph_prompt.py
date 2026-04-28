@@ -15,6 +15,7 @@ from graphrag.prompt_tune.template.extract_graph import (
     UNTYPED_GRAPH_EXTRACTION_PROMPT,
 )
 from graphrag.tokenizer.get_tokenizer import get_tokenizer
+from graphrag.utils.jinja_engine import render_prompt
 
 EXTRACT_GRAPH_FILENAME = "extract_graph.txt"
 
@@ -73,12 +74,19 @@ def create_extract_graph_prompt(
     for i, output in enumerate(examples):
         input = docs[i]
         example_formatted = (
-            EXAMPLE_EXTRACTION_TEMPLATE.format(
-                n=i + 1, input_text=input, entity_types=entity_types, output=output,
+            render_prompt(
+                EXAMPLE_EXTRACTION_TEMPLATE,
+                n=i + 1,
+                input_text=input,
+                entity_types=entity_types,
+                output=output,
             )
             if entity_types
-            else UNTYPED_EXAMPLE_EXTRACTION_TEMPLATE.format(
-                n=i + 1, input_text=input, output=output,
+            else render_prompt(
+                UNTYPED_EXAMPLE_EXTRACTION_TEMPLATE,
+                n=i + 1,
+                input_text=input,
+                output=output,
             )
         )
 
@@ -92,11 +100,14 @@ def create_extract_graph_prompt(
         tokens_left -= example_tokens
 
     prompt = (
-        prompt.format(
-            entity_types=entity_types, examples=examples_prompt, language=language,
+        render_prompt(
+            prompt,
+            entity_types=entity_types,
+            examples=examples_prompt,
+            language=language,
         )
         if entity_types
-        else prompt.format(examples=examples_prompt, language=language)
+        else render_prompt(prompt, examples=examples_prompt, language=language)
     )
 
     if output_path:

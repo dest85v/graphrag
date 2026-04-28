@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from graphrag.index.typing.error_handler import ErrorHandlerFn
+from graphrag.utils.jinja_engine import render_prompt
 
 if TYPE_CHECKING:
     from graphrag_llm.completion import LLMCompletion
@@ -73,7 +74,9 @@ class SummarizeExtractor:
         )
 
     async def _summarize_descriptions(
-        self, id: str | tuple[str, str], descriptions: list[str],
+        self,
+        id: str | tuple[str, str],
+        descriptions: list[str],
     ) -> str:
         """Summarize descriptions into a single description."""
         sorted_id = sorted(id) if isinstance(id, list) else id
@@ -103,7 +106,8 @@ class SummarizeExtractor:
             ):
                 # Calculate result (final or partial)
                 result = await self._summarize_descriptions_with_llm(
-                    sorted_id, descriptions_collected,
+                    sorted_id,
+                    descriptions_collected,
                 )
 
                 # If we go for another loop, reset values to new
@@ -118,17 +122,18 @@ class SummarizeExtractor:
         return result
 
     async def _summarize_descriptions_with_llm(
-        self, id: str | tuple[str, str] | list[str], descriptions: list[str],
+        self,
+        id: str | tuple[str, str] | list[str],
+        descriptions: list[str],
     ):
         """Summarize descriptions using the LLM."""
         response: LLMCompletionResponse = await self._model.completion_async(
-            messages=self._summarization_prompt.format(**{
-                ENTITY_NAME_KEY: json.dumps(id, ensure_ascii=False),
-                DESCRIPTION_LIST_KEY: json.dumps(
-                    sorted(descriptions), ensure_ascii=False,
-                ),
-                MAX_LENGTH_KEY: self._max_summary_length,
-            }),
+            messages=render_prompt(
+                self._summarization_prompt,
+                entity_name=json.dumps(id, ensure_ascii=False),
+                description_list=json.dumps(sorted(descriptions), ensure_ascii=False),
+                max_length=self._max_summary_length,
+            ),
         )  # type: ignore
         # Calculate result
         return response.content

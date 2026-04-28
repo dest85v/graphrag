@@ -17,6 +17,7 @@ from graphrag_llm.utils import (
 
 from graphrag.query.context_builder.rate_prompt import RATE_QUERY
 from graphrag.query.llm.text_utils import try_parse_json_object
+from graphrag.utils.jinja_engine import render_prompt
 
 if TYPE_CHECKING:
     from graphrag_llm.completion import LLMCompletion
@@ -51,7 +52,9 @@ async def rate_relevancy(
 
     messages_builder = (
         CompletionMessagesBuilder()
-        .add_system_message(rate_query.format(description=description, question=query))
+        .add_system_message(
+            render_prompt(rate_query, description=description, question=query)
+        )
         .add_user_message(query)
     )
 

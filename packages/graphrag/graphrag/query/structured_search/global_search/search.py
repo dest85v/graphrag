@@ -36,6 +36,7 @@ from graphrag.query.context_builder.conversation_history import (
 )
 from graphrag.query.llm.text_utils import try_parse_json_object
 from graphrag.query.structured_search.base import BaseSearch, SearchResult
+from graphrag.utils.jinja_engine import render_prompt
 
 if TYPE_CHECKING:
     from graphrag_llm.completion import LLMCompletion
@@ -225,8 +226,10 @@ class GlobalSearch(BaseSearch[GlobalContextBuilder]):
         start_time = time.time()
         search_prompt = ""
         try:
-            search_prompt = self.map_system_prompt.format(
-                context_data=context_data, max_length=max_length,
+            search_prompt = render_prompt(
+                self.map_system_prompt,
+                context_data=context_data,
+                max_length=max_length,
             )
 
             messages_builder = (
@@ -380,7 +383,8 @@ class GlobalSearch(BaseSearch[GlobalContextBuilder]):
                 total_tokens += len(self.tokenizer.encode(formatted_response_text))
             text_data = "\n\n".join(data)
 
-            search_prompt = self.reduce_system_prompt.format(
+            search_prompt = render_prompt(
+                self.reduce_system_prompt,
                 report_data=text_data,
                 response_type=self.response_type,
                 max_length=self.reduce_max_length,
@@ -493,7 +497,8 @@ class GlobalSearch(BaseSearch[GlobalContextBuilder]):
             total_tokens += len(self.tokenizer.encode(formatted_response_text))
         text_data = "\n\n".join(data)
 
-        search_prompt = self.reduce_system_prompt.format(
+        search_prompt = render_prompt(
+            self.reduce_system_prompt,
             report_data=text_data,
             response_type=self.response_type,
             max_length=max_length,

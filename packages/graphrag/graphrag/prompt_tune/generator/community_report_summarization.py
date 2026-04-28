@@ -8,6 +8,7 @@ from pathlib import Path
 from graphrag.prompt_tune.template.community_report_summarization import (
     COMMUNITY_REPORT_SUMMARIZATION_PROMPT,
 )
+from graphrag.utils.jinja_engine import render_prompt
 
 COMMUNITY_SUMMARIZATION_FILENAME = "community_report_graph.txt"
 
@@ -32,7 +33,8 @@ def create_community_summarization_prompt(
     -------
     - str: The community summarization prompt
     """
-    prompt = COMMUNITY_REPORT_SUMMARIZATION_PROMPT.format(
+    prompt = render_prompt(
+        COMMUNITY_REPORT_SUMMARIZATION_PROMPT,
         persona=persona,
         role=role,
         report_rating_description=report_rating_description,

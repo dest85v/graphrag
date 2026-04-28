@@ -8,6 +8,7 @@ from pathlib import Path
 from graphrag.prompt_tune.template.entity_summarization import (
     ENTITY_SUMMARIZATION_PROMPT,
 )
+from graphrag.utils.jinja_engine import render_prompt
 
 ENTITY_SUMMARIZATION_FILENAME = "summarize_descriptions.txt"
 
@@ -26,7 +27,9 @@ def create_entity_summarization_prompt(
     - language (str): The language to use for the entity summarization prompt
     - output_path (Path | None): The path to write the prompt to. Default is None.
     """
-    prompt = ENTITY_SUMMARIZATION_PROMPT.format(persona=persona, language=language)
+    prompt = render_prompt(
+        ENTITY_SUMMARIZATION_PROMPT, persona=persona, language=language
+    )
 
     if output_path:
         output_path.mkdir(parents=True, exist_ok=True)

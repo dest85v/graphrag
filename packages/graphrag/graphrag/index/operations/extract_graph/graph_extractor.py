@@ -19,6 +19,7 @@ from graphrag.prompts.index.extract_graph import (
     CONTINUE_PROMPT,
     LOOP_PROMPT,
 )
+from graphrag.utils.jinja_engine import render_prompt
 
 if TYPE_CHECKING:
     from graphrag_llm.completion import LLMCompletion
@@ -57,7 +58,10 @@ class GraphExtractor:
         self._on_error = on_error or (lambda _e, _s, _d: None)
 
     async def __call__(
-        self, text: str, entity_types: list[str], source_id: str,
+        self,
+        text: str,
+        entity_types: list[str],
+        source_id: str,
     ) -> tuple[pd.DataFrame, pd.DataFrame]:
         """Extract entities and relationships from the supplied text."""
         try:
@@ -84,10 +88,11 @@ class GraphExtractor:
 
     async def _process_document(self, text: str, entity_types: list[str]) -> str:
         messages_builder = CompletionMessagesBuilder().add_user_message(
-            self._extraction_prompt.format(**{
-                INPUT_TEXT_KEY: text,
-                ENTITY_TYPES_KEY: ",".join(entity_types),
-            }),
+            render_prompt(
+                self._extraction_prompt,
+                input_text=text,
+                entity_types=",".join(entity_types),
+            ),
         )
 
         response: LLMCompletionResponse = await self._model.completion_async(

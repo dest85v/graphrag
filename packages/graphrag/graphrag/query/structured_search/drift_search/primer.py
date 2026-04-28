@@ -20,6 +20,7 @@ from graphrag.prompts.query.drift_search_system_prompt import (
     DRIFT_PRIMER_PROMPT,
 )
 from graphrag.query.structured_search.base import SearchResult
+from graphrag.utils.jinja_engine import render_prompt
 
 if TYPE_CHECKING:
     from graphrag_llm.completion import LLMCompletion
@@ -142,7 +143,9 @@ class DRIFTPrimer:
         self.tokenizer = tokenizer or chat_model.tokenizer
 
     async def decompose_query(
-        self, query: str, reports: pd.DataFrame,
+        self,
+        query: str,
+        reports: pd.DataFrame,
     ) -> tuple[dict, dict[str, int]]:
         """
         Decompose the query into subqueries based on the fetched global structures.
@@ -156,13 +159,16 @@ class DRIFTPrimer:
         tuple[dict, int, int]: Parsed response and the number of prompt and output tokens used.
         """
         community_reports = "\n\n".join(reports["full_content"].tolist())
-        prompt = DRIFT_PRIMER_PROMPT.format(
-            query=query, community_reports=community_reports,
+        prompt = render_prompt(
+            DRIFT_PRIMER_PROMPT,
+            query=query,
+            community_reports=community_reports,
         )
         model_response: LLMCompletionResponse[
             PrimerResponse
         ] = await self.chat_model.completion_async(
-            messages=prompt, response_format=PrimerResponse,
+            messages=prompt,
+            response_format=PrimerResponse,
         )  # type: ignore
 
         parsed_response = model_response.formatted_response.model_dump()  # type: ignore

@@ -18,6 +18,7 @@ from graphrag.prompts.index.extract_claims import (
     CONTINUE_PROMPT,
     LOOP_PROMPT,
 )
+from graphrag.utils.jinja_engine import render_prompt
 
 if TYPE_CHECKING:
     from graphrag_llm.completion import LLMCompletion
@@ -82,7 +83,9 @@ class ClaimExtractor:
             document_id = f"d{doc_index}"
             try:
                 claims = await self._process_document(
-                    text, claim_description, entity_spec,
+                    text,
+                    claim_description,
+                    entity_spec,
                 )
                 all_claims += [
                     self._clean_claim(c, document_id, resolved_entities) for c in claims
@@ -103,7 +106,10 @@ class ClaimExtractor:
         )
 
     def _clean_claim(
-        self, claim: dict, document_id: str, resolved_entities: dict,
+        self,
+        claim: dict,
+        document_id: str,
+        resolved_entities: dict,
     ) -> dict:
         # clean the parsed claims to remove any claims with status = False
         obj = claim.get("object_id", claim.get("object"))
@@ -117,14 +123,18 @@ class ClaimExtractor:
         return claim
 
     async def _process_document(
-        self, text: str, claim_description: str, entity_spec: dict,
+        self,
+        text: str,
+        claim_description: str,
+        entity_spec: dict,
     ) -> list[dict]:
         messages_builder = CompletionMessagesBuilder().add_user_message(
-            self._extraction_prompt.format(**{
-                INPUT_TEXT_KEY: text,
-                INPUT_CLAIM_DESCRIPTION_KEY: claim_description,
-                INPUT_ENTITY_SPEC_KEY: entity_spec,
-            }),
+            render_prompt(
+                self._extraction_prompt,
+                input_text=text,
+                claim_description=claim_description,
+                entity_specs=entity_spec,
+            ),
         )
 
         response: LLMCompletionResponse = await self._model.completion_async(

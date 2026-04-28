@@ -26,6 +26,7 @@ from graphrag.prompt_tune.defaults import (
     K,
 )
 from graphrag.prompt_tune.types import DocSelectionType
+from graphrag.utils.jinja_engine import render_prompt
 
 
 def _sample_chunks_from_embeddings(
@@ -100,8 +101,4 @@ async def load_docs_in_chunks(
         chunks_df = _sample_chunks_from_embeddings(chunks_df, embeddings, k=k)
 
     # Convert the dataset to list form, so we have a list of documents
-    return [
-        # need this to prevent the str.format() function from breaking when parsing LaTeX from markdown files
-        i.replace("{", "{{").replace("}", "}}")
-        for i in chunks_df["text"]
-    ]
+    return chunks_df["text"].tolist()

@@ -20,6 +20,7 @@ from graphrag.query.context_builder.conversation_history import (
     ConversationHistory,
 )
 from graphrag.query.question_gen.base import BaseQuestionGen, QuestionResult
+from graphrag.utils.jinja_engine import render_prompt
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
@@ -94,12 +95,16 @@ class LocalQuestionGen(BaseQuestionGen):
         else:
             context_records = {"context_data": context_data}
         logger.debug(
-            "GENERATE QUESTION: %s. LAST QUESTION: %s", start_time, question_text,
+            "GENERATE QUESTION: %s. LAST QUESTION: %s",
+            start_time,
+            question_text,
         )
         system_prompt = ""
         try:
-            system_prompt = self.system_prompt.format(
-                context_data=context_data, question_count=question_count,
+            system_prompt = render_prompt(
+                self.system_prompt,
+                context_data=context_data,
+                question_count=question_count,
             )
 
             messages_builder = (
@@ -185,12 +190,16 @@ class LocalQuestionGen(BaseQuestionGen):
         else:
             context_records = {"context_data": context_data}
         logger.debug(
-            "GENERATE QUESTION: %s. QUESTION HISTORY: %s", start_time, question_text,
+            "GENERATE QUESTION: %s. QUESTION HISTORY: %s",
+            start_time,
+            question_text,
         )
         system_prompt = ""
         try:
-            system_prompt = self.system_prompt.format(
-                context_data=context_data, question_count=question_count,
+            system_prompt = render_prompt(
+                self.system_prompt,
+                context_data=context_data,
+                question_count=question_count,
             )
 
             messages_builder = (

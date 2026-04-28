@@ -6,6 +6,7 @@
 from typing import TYPE_CHECKING
 
 from graphrag.prompt_tune.prompt.language import DETECT_LANGUAGE_PROMPT
+from graphrag.utils.jinja_engine import render_prompt
 
 if TYPE_CHECKING:
     from graphrag_llm.completion import LLMCompletion
@@ -25,7 +26,7 @@ async def detect_language(model: "LLMCompletion", docs: str | list[str]) -> str:
     - str: The detected language.
     """
     docs_str = " ".join(docs) if isinstance(docs, list) else docs
-    language_prompt = DETECT_LANGUAGE_PROMPT.format(input_text=docs_str)
+    language_prompt = render_prompt(DETECT_LANGUAGE_PROMPT, input_text=docs_str)
 
     response: LLMCompletionResponse = await model.completion_async(
         messages=language_prompt,
